@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--Description-->
+    
+        <meta name="description" content="Intro: Learn how to write a smc program">
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="Mi1itray.axe">
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="SMC Write Procedures"/>
+    
+
+    <!--Open Graph Description-->
+    
+
+    <!--Open Graph Site Name-->
+    <meta property="og:site_name" content="Mi1itray.axe"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article" />
+    
+
+    <!--Page Cover-->
+    
+
+    
+        <meta name="twitter:card" content="summary" />
+    
+    
+    
+
+    <!-- Title -->
+    
+    <title>SMC Write Procedures - Mi1itray.axe</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Google Analytics -->
+    
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.2.0"></head>
+
+
+<body>
+
+<div class="bg-gradient"></div>
+<div class="bg-pattern"></div>
+
+<!-- Menu -->
+<!--Menu Links and Overlay-->
+<div class="menu-bg">
+    <div class="menu-container">
+        <ul>
+            
+            <li class="menu-item">
+                <a href="/">
+                    Home
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="/archives">
+                    Archives
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="/about.html">
+                    About
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="/tags">
+                    Tags
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="/categories">
+                    Categories
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="/contact.html">
+                    Contact
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+<!--Hamburger Icon-->
+<nav>
+    <a href="#menu"></a>
+</nav>
+
+<div class="container">
+
+    <!-- Main Content -->
+    <div class="row">
+    <div class="col-sm-12">
+
+        <!--Title and Logo-->
+        <header>
+    <div class="logo">
+        <a href="/"><i class="logo-icon fa fa-cube" aria-hidden="true"></i></a>
+        
+    </div>
+</header>
+
+        <section class="main">
+            
+<div class="post">
+
+    <div class="post-header">
+        <h1 class="title">
+            <a href="/2020/11/11/SMC-Write-Procedures/">
+                SMC Write Procedures
+            </a>
+        </h1>
+        <div class="post-info">
+            
+                <span class="date">2020-11-11</span>
+            
+            
+            
+                <span class="category">
+                    <a href="/categories/REVERSE/">REVERSE</a>
+                </span>
+            
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Gallery -->
+        
+
+        <!-- Post Content -->
+        <p>Intro: Learn how to write a smc program</p>
+<a id="more"></a>
+<h2 id="smc-write-procedures"><a class="markdownIt-Anchor" href="#smc-write-procedures"></a> SMC write procedures</h2>
+<p>I meet a challenge which use smc to protect it’s code</p>
+<h3 id="what-is-smc"><a class="markdownIt-Anchor" href="#what-is-smc"></a> What is SMC</h3>
+<p>Smc like simple pack. It decrypt the code when program run behind you change the asm code</p>
+<p>when we run program . It should run smc function to decrypt the code first ,then run the code has been decrypted</p>
+<h3 id="write-a-smc-program"><a class="markdownIt-Anchor" href="#write-a-smc-program"></a> Write a SMC program</h3>
+<p>I write the program by <code>vs2019 Community Edition</code> in <code>windows10 2004</code></p>
+<p>Remeber close address randomization in program value</p>
+<p>The  first problem is how can we find the code we should decrypt。</p>
+<p>We can add a section table to load the code. So we can easy to find the section by section name</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> code_seg(<span class="meta-string">&quot;.SMC&quot;</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Fun1</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;The encrypted algorithm&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> code_seg()</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> comment(linker, <span class="meta-string">&quot;/SECTION:.SMC,ERW&quot;</span>)</span></span><br></pre></td></tr></table></figure>
+<p>Also you can write this</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> code_seg(<span class="meta-string">&quot;.SMC&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;Key source code.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> code_seg()</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> comment(linker, <span class="meta-string">&quot;/SECTION:.SMC,ERW&quot;</span>)</span></span><br></pre></td></tr></table></figure>
+<p>Then we try to find a function to decrypt it</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">xorPlus</span><span class="params">(<span class="keyword">char</span> *soure,<span class="keyword">int</span> dLen,<span class="keyword">char</span> *Key,<span class="keyword">int</span> Klen)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;dLen;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        soure[i]^=Key[i%Klen];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>However the <code>dLen</code> we will change it. We will no to use all the section length. we just need to change the code we want to protect. so we can find the real length by 010editor after compile。we will try it later</p>
+<p>Then we should find the section by SMC code and decrypt it.</p>
+<p>Get self handle by <code>GetModuleHandle(0)</code></p>
+<p>Then parse PE file structure to find all sections and compare the section name and <code>.SMC</code>.</p>
+<p>If you find the right section. you can use decrypt function <code>xorPlus</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SMC</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="keyword">char</span>* pBuf = (<span class="keyword">char</span>*)GetModuleHandle(<span class="number">0</span>);</span><br><span class="line">  	<span class="keyword">char</span> key[]=<span class="string">&quot;mi1itray.axe&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span> szSecName[] = <span class="string">&quot;.SMC&quot;</span>;</span><br><span class="line">    <span class="keyword">short</span> nSec;</span><br><span class="line">    PIMAGE_DOS_HEADER pDosHeader;</span><br><span class="line">    PIMAGE_NT_HEADERS pNtHeader;</span><br><span class="line">    PIMAGE_SECTION_HEADER pSec;</span><br><span class="line">    pDosHeader=(PIMAGE_DOS_HEADER)pBuf;</span><br><span class="line">    pNtHeader=(PIMAGE_NT_HEADERS)&amp;pBuf[pDosHeader-&gt;e_lfanew];</span><br><span class="line">    nSec=pNtHeader-&gt;FileHeader.NumberOfSections;</span><br><span class="line">    pSec=(PIMAGE_SECTION_HEADER)&amp;pBuf[ <span class="keyword">sizeof</span>(IMAGE_NT_HEADERS)+pDosHeader-&gt;e_lfanew];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;nSec;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">strcmp</span>((<span class="keyword">char</span> *)&amp;pSec-&gt;Name,szSecName)==<span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span> pack_size;</span><br><span class="line">            <span class="keyword">char</span> *packStart;</span><br><span class="line">            pack_size=pSec-&gt;SizeOfRawData;</span><br><span class="line">            packStart = &amp;pBuf[pSec-&gt;VirtualAddress];</span><br><span class="line">            <span class="comment">//VirtualProtect(packStart,pack_size,PAGE_EXECUTE_READWRITE,&amp;old);</span></span><br><span class="line">            xorPlus(packStart,pack_size,key,<span class="built_in">strlen</span>(key));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        pSec++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>You can use <code>VirtualProtect</code> function to change value of <code>.SMC</code> to make the section could write Or you can change the section value by 010editor after compile. I choose latter</p>
+<p><img src="https://s1.ax1x.com/2020/10/12/0R7Uns.png" alt="" /></p>
+<p>Vs2019 release x86 to compile. It’s can’t debug. Because <code>.SMC</code> can’t write and the code I have not to encrypt it</p>
+<p>It’s ok. which had been compiled. I find the <code>.SMC</code> date by 010editor.</p>
+<p><img src="https://s1.ax1x.com/2020/10/12/0R7BNV.png" alt="" /></p>
+<p>Then I use python to read and encrypt the code</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">key=<span class="string">&#x27;mi1itray.axe&#x27;</span></span><br><span class="line">f=<span class="built_in">open</span>(<span class="string">&#x27;SMC.exe&#x27;</span>,<span class="string">&#x27;rb&#x27;</span>).read()</span><br><span class="line">a=<span class="built_in">list</span>(f[<span class="number">0x400</span>:<span class="number">0x400</span>+<span class="number">18</span>])</span><br><span class="line">tmp=<span class="string">b&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">for</span> i,k <span class="keyword">in</span> <span class="built_in">enumerate</span>(a):</span><br><span class="line">    tmp+= (k^<span class="built_in">ord</span>(key[i%<span class="built_in">len</span>(key)])).to_bytes(<span class="number">1</span>,<span class="string">&#x27;big&#x27;</span>)</span><br><span class="line">result=f[:<span class="number">0x400</span>]+tmp+f[<span class="number">0x400</span>+<span class="number">18</span>:]</span><br><span class="line">fc=<span class="built_in">open</span>(<span class="string">&#x27;SMC3.exe&#x27;</span>,<span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">fc.write(result)</span><br></pre></td></tr></table></figure>
+<p>run it</p>
+<p><img src="https://s1.ax1x.com/2020/10/12/0R76c4.png" alt="0R76c4.png" /></p>
+<p>I get it</p>
+
+    </div>
+
+    
+
+    
+        <div class="post-tags">
+            <i class="fa fa-tags" aria-hidden="true"></i>
+            <a href="/tags/SMC/">#SMC</a> <a href="/tags/Reverse/">#Reverse</a>
+        </div>
+    
+
+    <!-- Comments -->
+    
+
+</div>
+        </section>
+
+    </div>
+</div>
+
+
+</div>
+
+<!-- Footer -->
+<div class="push"></div>
+
+<footer class="footer-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 footer-about">
+                <h2>About</h2>
+                <p>
+                    A CTFer work in reverse and crypto. You can call me 张大炮
+                </p>
+            </div>
+            
+    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 recent-posts">
+        <h2>Recent Posts</h2>
+        <ul>
+            
+            <li>
+                <a class="footer-post" href="/2020/11/11/sage-with-elliptic-curve/">sage with elliptic curve</a>
+            </li>
+            
+            <li>
+                <a class="footer-post" href="/2020/11/11/SMC-Write-Procedures/">SMC Write Procedures</a>
+            </li>
+            
+            <li>
+                <a class="footer-post" href="/2020/10/07/StartIsBlack-Crack/">StartIsBlack++ Crack</a>
+            </li>
+            
+            <li>
+                <a class="footer-post" href="/2020/09/11/NPUCTF2020-babyLCG/">NPUCTF2020 babyLCG</a>
+            </li>
+            
+        </ul>
+    </div>
+
+
+
+            
+<div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 footer-categories">
+    <h2>Categories</h2>
+    <ul>
+        
+        <li>
+            <a class="footer-post" href="/categories/CRYPTO/">CRYPTO</a>
+        </li>
+        
+        <li>
+            <a class="footer-post" href="/categories/REVERSE/">REVERSE</a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <ul class="list-inline footer-social-icons">
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    <li class="list-inline-item">
+                        <a href="mailto:mi1itray.axe@gmail.com">
+                            <span class="footer-icon-container">
+                                <i class="fa fa-envelope-o"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="list-inline-item">
+                        <a href="\#">
+                            <span class="footer-icon-container">
+                                <i class="fa fa-rss"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="footer-copyright">
+                    @Untitled. All right reserved | Design & Hexo <a target="_blank" rel="noopener" href="http://www.codeblocq.com/">Jonathan Klughertz</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- After footer scripts -->
+
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Tween Max -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.18.5/TweenMax.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Custom JavaScript -->
+
+<script src="/js/main.js"></script>
+
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
