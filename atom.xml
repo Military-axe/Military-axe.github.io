@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Mi1itray.axe</title>
+  
+  
+  <link href="https://military-axe.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://military-axe.github.io/"/>
+  <updated>2020-11-12T12:41:22.491Z</updated>
+  <id>https://military-axe.github.io/</id>
+  
+  <author>
+    <name>Mi1itray.axe</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>sage with elliptic curve</title>
+    <link href="https://military-axe.github.io/2020/11/11/sage-with-elliptic-curve/"/>
+    <id>https://military-axe.github.io/2020/11/11/sage-with-elliptic-curve/</id>
+    <published>2020-11-11T07:46:17.000Z</published>
+    <updated>2020-11-12T12:41:22.491Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Intro: I don’t how to do the challenge about curves in N1CTF2020. so I try to learn some thing about this&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="CRYPTO" scheme="https://military-axe.github.io/categories/CRYPTO/"/>
+    
+    
+    <category term="Crypto" scheme="https://military-axe.github.io/tags/Crypto/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>SMC Write Procedures</title>
+    <link href="https://military-axe.github.io/2020/11/11/SMC-Write-Procedures/"/>
+    <id>https://military-axe.github.io/2020/11/11/SMC-Write-Procedures/</id>
+    <published>2020-11-11T04:09:52.000Z</published>
+    <updated>2020-11-12T12:40:31.050Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Intro: Learn how to write a smc program&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="REVERSE" scheme="https://military-axe.github.io/categories/REVERSE/"/>
+    
+    
+    <category term="SMC" scheme="https://military-axe.github.io/tags/SMC/"/>
+    
+    <category term="Reverse" scheme="https://military-axe.github.io/tags/Reverse/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>StartIsBlack++ Crack</title>
+    <link href="https://military-axe.github.io/2020/10/07/StartIsBlack-Crack/"/>
+    <id>https://military-axe.github.io/2020/10/07/StartIsBlack-Crack/</id>
+    <published>2020-10-07T03:36:15.000Z</published>
+    <updated>2020-11-12T12:41:02.852Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Intro: This is the first real world software I cracked. I realized that some real world software maybe easier then CTF challenge. For sure thanks for my bro kai&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="REVERSE" scheme="https://military-axe.github.io/categories/REVERSE/"/>
+    
+    
+    <category term="Reverse" scheme="https://military-axe.github.io/tags/Reverse/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>NPUCTF2020 babyLCG</title>
+    <link href="https://military-axe.github.io/2020/09/11/NPUCTF2020-babyLCG/"/>
+    <id>https://military-axe.github.io/2020/09/11/NPUCTF2020-babyLCG/</id>
+    <published>2020-09-11T03:40:56.000Z</published>
+    <updated>2020-11-12T12:40:50.713Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;I solved ctf first by lattice. Lattice is hard and trouble as I recall. However I have to learn it for solver ctf challenge. I have to say. This guy’s magic. Not only lattice.&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="CRYPTO" scheme="https://military-axe.github.io/categories/CRYPTO/"/>
+    
+    
+    <category term="Crypto" scheme="https://military-axe.github.io/tags/Crypto/"/>
+    
+  </entry>
+  
+</feed>
