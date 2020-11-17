@@ -6,7 +6,7 @@
   <link href="https://military-axe.github.io/atom.xml" rel="self"/>
   
   <link href="https://military-axe.github.io/"/>
-  <updated>2020-11-12T14:15:15.053Z</updated>
+  <updated>2020-11-17T08:54:50.744Z</updated>
   <id>https://military-axe.github.io/</id>
   
   <author>
@@ -17,11 +17,32 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Dll Proxy</title>
+    <link href="https://military-axe.github.io/2020/11/17/Dll-Proxy/"/>
+    <id>https://military-axe.github.io/2020/11/17/Dll-Proxy/</id>
+    <published>2020-11-17T08:53:59.000Z</published>
+    <updated>2020-11-17T08:54:50.744Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Intro: Learn Dll Proxy principle and freedom from antivirus software&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="REVERSE" scheme="https://military-axe.github.io/categories/REVERSE/"/>
+    
+    
+    <category term="Reverse" scheme="https://military-axe.github.io/tags/Reverse/"/>
+    
+    <category term="Dll proxy" scheme="https://military-axe.github.io/tags/Dll-proxy/"/>
+    
+  </entry>
+  
+  <entry>
     <title>sage with elliptic curve</title>
     <link href="https://military-axe.github.io/2020/11/11/sage-with-elliptic-curve/"/>
     <id>https://military-axe.github.io/2020/11/11/sage-with-elliptic-curve/</id>
     <published>2020-11-11T07:46:17.000Z</published>
-    <updated>2020-11-12T14:15:15.053Z</updated>
+    <updated>2020-11-17T08:54:57.353Z</updated>
     
     
     <summary type="html">&lt;p&gt;Intro: I don’t how to do the challenge about curves in N1CTF2020. so I try to learn some thing about this&lt;/p&gt;</summary>
@@ -32,6 +53,8 @@
     
     
     <category term="Crypto" scheme="https://military-axe.github.io/tags/Crypto/"/>
+    
+    <category term="lattic" scheme="https://military-axe.github.io/tags/lattic/"/>
     
   </entry>
   
@@ -50,9 +73,9 @@
     <category term="REVERSE" scheme="https://military-axe.github.io/categories/REVERSE/"/>
     
     
-    <category term="SMC" scheme="https://military-axe.github.io/tags/SMC/"/>
-    
     <category term="Reverse" scheme="https://military-axe.github.io/tags/Reverse/"/>
+    
+    <category term="SMC" scheme="https://military-axe.github.io/tags/SMC/"/>
     
   </entry>
   
