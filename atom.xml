@@ -6,7 +6,7 @@
   <link href="https://military-axe.github.io/atom.xml" rel="self"/>
   
   <link href="https://military-axe.github.io/"/>
-  <updated>2020-12-13T07:51:37.557Z</updated>
+  <updated>2021-01-07T12:28:03.915Z</updated>
   <id>https://military-axe.github.io/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>华为CTF2020 鲲鹏专场 print</title>
+    <link href="https://military-axe.github.io/2021/01/07/%E5%8D%8E%E4%B8%BACTF2020-%E9%B2%B2%E9%B9%8F%E4%B8%93%E5%9C%BA-print/"/>
+    <id>https://military-axe.github.io/2021/01/07/%E5%8D%8E%E4%B8%BACTF2020-%E9%B2%B2%E9%B9%8F%E4%B8%93%E5%9C%BA-print/</id>
+    <published>2021-01-07T12:26:47.000Z</published>
+    <updated>2021-01-07T12:28:03.915Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;华为ctf2020-鲲鹏专场-print&quot;&gt;&lt;a class=&quot;markdownIt-Anchor&quot; href=&quot;#华为ctf2020-鲲鹏专场-print&quot;&gt;&lt;/a&gt; 华为CTF2020 鲲鹏专场 print&lt;/h2&gt;
+&lt;p&gt;Intro: 其他两题，都很简单，这题有点意思，学到了格式化字符串的一些妙用&lt;/p&gt;
+&lt;p&gt;以前只在pwn题的格式化字符串漏洞才见过一些奇怪的字符串，这是第一次见到利用格式化字符串来作为加密代码以此增加逆向难度&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="REVERSE" scheme="https://military-axe.github.io/categories/REVERSE/"/>
+    
+    
+    <category term="Reverse" scheme="https://military-axe.github.io/tags/Reverse/"/>
+    
+    <category term="CTF" scheme="https://military-axe.github.io/tags/CTF/"/>
+    
+  </entry>
   
   <entry>
     <title>RoarCTF crypto reappear</title>
