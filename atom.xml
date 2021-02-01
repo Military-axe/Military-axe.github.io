@@ -6,7 +6,7 @@
   <link href="https://military-axe.github.io/atom.xml" rel="self"/>
   
   <link href="https://military-axe.github.io/"/>
-  <updated>2021-02-01T07:57:45.665Z</updated>
+  <updated>2021-02-01T08:04:19.027Z</updated>
   <id>https://military-axe.github.io/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>DASCTF February -- HWS Write Up</title>
-    <link href="https://military-axe.github.io/2021/02/01/DASCTF-February-HWS-Write-Up/"/>
-    <id>https://military-axe.github.io/2021/02/01/DASCTF-February-HWS-Write-Up/</id>
+    <title>DASCTF January -- HWS Write Up</title>
+    <link href="https://military-axe.github.io/2021/02/01/DASCTF-January-HWS-Write-Up/"/>
+    <id>https://military-axe.github.io/2021/02/01/DASCTF-January-HWS-Write-Up/</id>
     <published>2021-02-01T07:52:27.000Z</published>
-    <updated>2021-02-01T07:57:45.665Z</updated>
+    <updated>2021-02-01T08:04:19.027Z</updated>
     
     
     <summary type="html">&lt;p&gt;Intro: I just solved some easy reverse challenge. Some middle challenge I teamwork with my teammate king in xm&lt;/p&gt;</summary>
