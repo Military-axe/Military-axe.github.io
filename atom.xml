@@ -6,7 +6,7 @@
   <link href="https://military-axe.github.io/atom.xml" rel="self"/>
   
   <link href="https://military-axe.github.io/"/>
-  <updated>2021-02-01T08:04:19.027Z</updated>
+  <updated>2021-02-11T02:36:57.642Z</updated>
   <id>https://military-axe.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HGAME2021 WP</title>
+    <link href="https://military-axe.github.io/2021/02/11/HGAME2021-WP/"/>
+    <id>https://military-axe.github.io/2021/02/11/HGAME2021-WP/</id>
+    <published>2021-02-11T02:36:11.000Z</published>
+    <updated>2021-02-11T02:36:57.642Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Intro: write some wp about hgame2021 re and crypto&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="CTF" scheme="https://military-axe.github.io/categories/CTF/"/>
+    
+    
+    <category term="CTF" scheme="https://military-axe.github.io/tags/CTF/"/>
+    
+  </entry>
   
   <entry>
     <title>DASCTF January -- HWS Write Up</title>
