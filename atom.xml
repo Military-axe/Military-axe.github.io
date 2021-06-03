@@ -6,7 +6,7 @@
   <link href="https://military-axe.github.io/atom.xml" rel="self"/>
   
   <link href="https://military-axe.github.io/"/>
-  <updated>2021-03-18T07:16:52.828Z</updated>
+  <updated>2021-06-03T01:05:12.441Z</updated>
   <id>https://military-axe.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Dll hide in PE</title>
+    <link href="https://military-axe.github.io/2021/06/03/Dll-hide-in-PE/"/>
+    <id>https://military-axe.github.io/2021/06/03/Dll-hide-in-PE/</id>
+    <published>2021-06-03T01:01:16.000Z</published>
+    <updated>2021-06-03T01:05:12.441Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html"></summary>
+        
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>DFA learn</title>
@@ -31,9 +52,9 @@
     <category term="CRYPTO" scheme="https://military-axe.github.io/categories/CRYPTO/"/>
     
     
-    <category term="Crypto" scheme="https://military-axe.github.io/tags/Crypto/"/>
-    
     <category term="DFA" scheme="https://military-axe.github.io/tags/DFA/"/>
+    
+    <category term="Crypto" scheme="https://military-axe.github.io/tags/Crypto/"/>
     
   </entry>
   
