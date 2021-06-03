@@ -6,7 +6,7 @@
   <link href="https://military-axe.github.io/atom.xml" rel="self"/>
   
   <link href="https://military-axe.github.io/"/>
-  <updated>2021-06-03T01:05:12.441Z</updated>
+  <updated>2021-06-03T01:06:27.222Z</updated>
   <id>https://military-axe.github.io/</id>
   
   <author>
@@ -21,16 +21,11 @@
     <link href="https://military-axe.github.io/2021/06/03/Dll-hide-in-PE/"/>
     <id>https://military-axe.github.io/2021/06/03/Dll-hide-in-PE/</id>
     <published>2021-06-03T01:01:16.000Z</published>
-    <updated>2021-06-03T01:05:12.441Z</updated>
+    <updated>2021-06-03T01:06:27.222Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html"></summary>
-        
-      
+    <summary type="html">&lt;p&gt;Intro: hide dll in PE. When I run PE. Mapping it to memory then analyze it and call the function in dll. Next time I want to hide some shell in dll.&lt;/p&gt;
+&lt;h2 id=&quot;-more-&quot;&gt;&lt;a class=&quot;markdownIt-Anchor&quot; href=&quot;#-more-&quot;&gt;&lt;/a&gt;</summary>
     
     
     
