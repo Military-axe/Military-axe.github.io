@@ -74,11 +74,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.2.0"><link rel="alternate" href="/atom.xml" title="Mi1itray.axe" type="application/atom+xml">
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Mi1itray.axe" type="application/atom+xml">
 </head>
 
 
@@ -177,7 +173,7 @@
         <!-- Post Content -->
         <p>Intro: 其他两题，都很简单，这题有点意思，学到了格式化字符串的一些妙用</p>
 <p>以前只在pwn题的格式化字符串漏洞才见过一些奇怪的字符串，这是第一次见到利用格式化字符串来作为加密代码以此增加逆向难度</p>
-<a id="more"></a>
+<span id="more"></span>
 <h2 id="环境"><a class="markdownIt-Anchor" href="#环境"></a> 环境</h2>
 <p>Ubuntu20</p>
 <p>本文格式化字符串效果windows下可能无法显示相应效果</p>
@@ -212,11 +208,11 @@
 <p>通过更改v2的值修改real_syms地址，偏移到其他格式化字符串。可以在堆上看到</p>
 <p><img src="https://gitee.com/Mi1itray_axe/image_table/raw/master/img/20201224151423.png" alt="image-20201224151418623" /></p>
 <p>这些字符串在一开始在setup函数中就设置好了。接着看第二个sprintf</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sprintf</span>(</span><br><span class="line">      buf,</span><br><span class="line">      *(<span class="keyword">const</span> <span class="keyword">char</span> **)real_syms,</span><br><span class="line">      (<span class="keyword">unsigned</span> __int16)<span class="built_in">array</span>,</span><br><span class="line">      &amp;<span class="built_in">array</span>,</span><br><span class="line">      *(<span class="keyword">unsigned</span> __int8 *)<span class="built_in">array</span>,</span><br><span class="line">      <span class="built_in">array</span>,</span><br><span class="line">      output,</span><br><span class="line">      (<span class="keyword">unsigned</span> __int16)output,</span><br><span class="line">      &amp;output,</span><br><span class="line">      &amp;cond,</span><br><span class="line">      &amp;bf_CGOTO_fmt3,</span><br><span class="line">      v5[<span class="number">1</span>],</span><br><span class="line">      &amp;v5,</span><br><span class="line">      <span class="number">0L</span>L,</span><br><span class="line">      (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(<span class="keyword">char</span> *)input,</span><br><span class="line">      (<span class="keyword">unsigned</span> __int16)input,</span><br><span class="line">      &amp;input);</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sprintf</span>(</span><br><span class="line">      buf,</span><br><span class="line">      *(<span class="keyword">const</span> <span class="keyword">char</span> **)real_syms,</span><br><span class="line">      (<span class="keyword">unsigned</span> __int16)<span class="built_in">array</span>,</span><br><span class="line">      &amp;<span class="built_in">array</span>,</span><br><span class="line">      *(<span class="keyword">unsigned</span> __int8 *)<span class="built_in">array</span>,</span><br><span class="line">      <span class="built_in">array</span>,</span><br><span class="line">      output,</span><br><span class="line">      (<span class="keyword">unsigned</span> __int16)output,</span><br><span class="line">      &amp;output,</span><br><span class="line">      &amp;cond,</span><br><span class="line">      &amp;bf_CGOTO_fmt3,</span><br><span class="line">      v5[<span class="number">1</span>],</span><br><span class="line">      &amp;v5,</span><br><span class="line">      <span class="number">0LL</span>,</span><br><span class="line">      (<span class="keyword">unsigned</span> <span class="keyword">int</span>)*(<span class="keyword">char</span> *)input,</span><br><span class="line">      (<span class="keyword">unsigned</span> __int16)input,</span><br><span class="line">      &amp;input);</span><br></pre></td></tr></table></figure>
 <p>此时real_syms已经是格式化字符串了</p>
 <p>对应的字符串是<code>%1$.*1$d%10$.*10$d%2$hn</code>,第10个参数是v5，实际上v5控制了v2,同时这里改写array对应的地址，暂时没看出来</p>
 <p>下一行</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sprintf</span>(buf, <span class="string">&quot;12345678%.*d%hn&quot;</span>, (<span class="keyword">unsigned</span> __int16)v5, <span class="number">0L</span>L, &amp;v5);</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sprintf</span>(buf, <span class="string">&quot;12345678%.*d%hn&quot;</span>, (<span class="keyword">unsigned</span> __int16)v5, <span class="number">0LL</span>, &amp;v5);</span><br></pre></td></tr></table></figure>
 <p>还是控制v5，那本质上还是控制real_syms的偏移</p>
 <p>这就是一个vm题。看到这里恍然大悟。不得不佩服出题人的想法</p>
 <p>接下来就是导出这个执行顺序，看看这个vm的opcode，也就是关注v5的值</p>

@@ -73,11 +73,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 
-<!-- hexo injector head_end start -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.2.0"><link rel="alternate" href="/atom.xml" title="Mi1itray.axe" type="application/atom+xml">
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Mi1itray.axe" type="application/atom+xml">
 </head>
 
 
@@ -175,16 +171,16 @@
 
         <!-- Post Content -->
         <p>Intro: This is the first real world software I cracked. I realized that some real world software maybe easier then CTF challenge. For sure thanks for my bro kai</p>
-<a id="more"></a>
+<span id="more"></span>
 <h2 id="monitor-the-registry"><a class="markdownIt-Anchor" href="#monitor-the-registry"></a> Monitor the registry</h2>
 <p>Use 火绒剑 to monitor the registry. Then press to activate and enter a activation code</p>
 <p>we found it read and write some value from registry. The path is  <code>HKEY_USERS\S-1-5-21-2007651450-3224918017-2398156755-1001\SOFTWARE\StartIsBack\License</code> in my computer</p>
 <p>I try to search the string in program. After some times we found  the  key function in <code>sub_4bbeb0</code> key components in address <code>0x4bbf55</code></p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjr9lumwjwj30u00x1jy5.jpg" alt="0bZnTf.png" /></p>
 <p>I try the easiest way. Change the jump</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x4BBF55 jz short loc_4BBFB6 ---&gt; jmp short loc_4BBFB6</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x4BBF55 jz short loc_4BBFB6 ---&gt; jmp short loc_4BBFB6</span><br></pre></td></tr></table></figure>
 <p>and</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x4BBFC4 jz short loc_4BC008 ---&gt; jnz short loc_4BC008</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x4BBFC4 jz short loc_4BC008 ---&gt; jnz short loc_4BC008</span><br></pre></td></tr></table></figure>
 <p>Let we run the program</p>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjr9mdj0w4j30jw0ezwf4.jpg" alt="0bZm0P.png" /></p>
 <p>After I install StartBack++ , replace <code>StartIsBackCfg.exe</code> . Then I have a “activate” software</p>
