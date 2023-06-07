@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>mi1itray.axe</title>
-    <link>https://example.com/</link>
+    <link>https://military-axe.github.io/</link>
     <description>Recent content on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 07 Jun 2023 13:37:53 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 07 Jun 2023 13:37:53 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GotYouKey</title>
-      <link>https://example.com/blog/2023-06-07-gotyoukey/</link>
+      <link>https://military-axe.github.io/blog/2023-06-07-gotyoukey/</link>
       <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
       
-      <guid>https://example.com/blog/2023-06-07-gotyoukey/</guid>
+      <guid>https://military-axe.github.io/blog/2023-06-07-gotyoukey/</guid>
       <description>&lt;p&gt;前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。&lt;/p&gt;</description>
     </item>
     

@@ -24,7 +24,7 @@
 
   
   
-    <link href="https://example.com/favicon.png" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -52,7 +52,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://example.com/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -63,11 +63,11 @@
   <select onchange="location = this.value;">
     <option value="">Navigate…</option>
       
-        <option value="https://example.com/">» Blog</option>
+        <option value="https://military-axe.github.io/">» Blog</option>
       
-        <option value="https://example.com/categories">» Categories</option>
+        <option value="https://military-axe.github.io/categories">» Categories</option>
       
-        <option value="https://example.com/tags">» Tags</option>
+        <option value="https://military-axe.github.io/tags">» Tags</option>
       
   </select>
 </fieldset>
@@ -77,15 +77,15 @@
   
   
     
-      <li><a href="https://example.com/" title="Blog">Blog</a></li>
+      <li><a href="https://military-axe.github.io/" title="Blog">Blog</a></li>
     
   
     
-      <li><a href="https://example.com/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+      <li><a href="https://military-axe.github.io/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
     
   
     
-      <li><a href="https://example.com/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+      <li><a href="https://military-axe.github.io/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
     
   
 </ul>
@@ -93,7 +93,7 @@
 <ul class="subscription">
   
     
-        <a href="https://example.com/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+        <a href="https://military-axe.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
     
   
 </ul>
@@ -102,7 +102,7 @@
   <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
     <fieldset role="search">
       <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-      <input type="hidden" name="q" value="site:https://example.com/" />
+      <input type="hidden" name="q" value="site:https://military-axe.github.io/" />
     </fieldset>
   </form>
 
@@ -124,11 +124,11 @@
 
     
     
-      - <a class="label" href="https://example.com/categories/reverse/">reverse </a>
+      - <a class="label" href="https://military-axe.github.io/categories/reverse/">reverse </a>
     
   </p>
   <h1 class="entry-title">
-    <a href="https://example.com/blog/2023-06-07-gotyoukey/">GotYouKey</a>
+    <a href="https://military-axe.github.io/blog/2023-06-07-gotyoukey/">GotYouKey</a>
   </h1>
 </header>
 
@@ -140,10 +140,10 @@
           <p>前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。</p>
 <h2 id="分析过程">分析过程</h2>
 <p>jadx反编译后看源码，前面都是开线程，开端口，都不关键，直接到<code>com.hack.gotyourkey.Oooo000</code>中看到关键函数
-<img src="https://cdn.nlark.com/yuque/0/2023/png/2212593/1686030528894-eeed6f1c-adc0-474c-b3b1-ffbde82a3b08.png#averageHue=%23313130&amp;clientId=ub6060e07-2a64-4&amp;from=paste&amp;height=881&amp;id=uc425bcf2&amp;originHeight=1321&amp;originWidth=1798&amp;originalType=binary&amp;ratio=1.5&amp;rotation=0&amp;showTitle=false&amp;size=173615&amp;status=done&amp;style=none&amp;taskId=u6d5ca1c4-305c-4814-8273-e974215607b&amp;title=&amp;width=1198.6666666666667" alt="image.png">
+<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519119.png" alt="image.png">
 只有这个<code>check</code>函数关键其他的都是加的，传入<code>check</code>函数中的就是输入的值。
 进入之后是AES加密和base64换表
-<img src="https://cdn.nlark.com/yuque/0/2023/png/2212593/1686030902334-9d73fe3d-cf7c-4afd-b7e8-ad886a916d33.png#averageHue=%23323131&amp;clientId=ub6060e07-2a64-4&amp;from=paste&amp;height=1255&amp;id=ucbecdf28&amp;originHeight=1882&amp;originWidth=1523&amp;originalType=binary&amp;ratio=1.5&amp;rotation=0&amp;showTitle=false&amp;size=261783&amp;status=done&amp;style=none&amp;taskId=u1ca8f75e-1ec9-40d6-9ff7-841683e4563&amp;title=&amp;width=1015.3333333333334" alt="image.png">
+<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519871.png" alt="image.png">
 接出来得到flag: <code>flag{345ghyuj!$}</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#ef9f76;background-color:#303446;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>from Crypto.Cipher import AES
 </span></span><span style="display:flex;"><span>import base64
@@ -159,7 +159,7 @@
 </span></span><span style="display:flex;"><span>print<span style="color:#99d1db">(</span>m<span style="color:#99d1db">)</span>
 </span></span></code></pre></div><p>但是这个flag是假的，继续分析后发现，存在一个<code>libgotyoukey.so</code>
 打开后在<code>JNI_OnLoad</code>函数存在很多逻辑
-<img src="https://cdn.nlark.com/yuque/0/2023/png/2212593/1686032002924-b7e9602b-e14f-401c-a2af-66737b90b844.png#averageHue=%23fefefd&amp;clientId=ub6060e07-2a64-4&amp;from=paste&amp;height=845&amp;id=u270ce353&amp;originHeight=1267&amp;originWidth=958&amp;originalType=binary&amp;ratio=1.5&amp;rotation=0&amp;showTitle=false&amp;size=95264&amp;status=done&amp;style=none&amp;taskId=ubba9b5ba-11fd-470d-9465-8ddb6e4dca6&amp;title=&amp;width=638.6666666666666" alt="image.png">
+<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519549.png" alt="image.png">
 进入<code>core</code>函数后，设置第一个参数为<code>JNIEnv *</code>
 可以发现core中的函数是调用各种java中的函数，还原函数类型后，重命名后逻辑如下</p>
 <div class="highlight"><pre tabindex="0" style="color:#ef9f76;background-color:#303446;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-basic" data-lang="basic"><span style="display:flex;"><span><span style="color:#babbf1">v54</span><span style="color:#414559"> </span><span style="color:#99d1db">=</span><span style="color:#414559"> </span><span style="color:#babbf1">FindClass</span><span style="color:#c6d0f5">(</span><span style="color:#babbf1">env</span><span style="color:#c6d0f5">,</span><span style="color:#414559"> </span><span style="color:#a6d189">&#34;android/app/ActivityThread&#34;</span><span style="color:#c6d0f5">);</span>
@@ -304,16 +304,16 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#99d1db">fwrite</span><span style="color:#c6d0f5">(</span><span style="color:#babbf1">data</span><span style="color:#c6d0f5">,</span> <span style="color:#ca9ee6">sizeof</span><span style="color:#c6d0f5">(</span><span style="color:#e5c890">unsigned</span> <span style="color:#e5c890">char</span><span style="color:#c6d0f5">),</span> <span style="color:#babbf1">len</span><span style="color:#c6d0f5">,</span> <span style="color:#babbf1">file2</span><span style="color:#c6d0f5">);</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#99d1db">fclose</span><span style="color:#c6d0f5">(</span><span style="color:#babbf1">file2</span><span style="color:#c6d0f5">);</span>
 </span></span><span style="display:flex;"><span><span style="color:#c6d0f5">}</span>
-</span></span></code></pre></div><p>解密之后发现和原来的逻辑几乎一样，但是在最关节的check函数不同
-<img src="https://cdn.nlark.com/yuque/0/2023/png/2212593/1686032768010-b405c04d-df7a-4d02-bf34-f7588eef451e.png#averageHue=%23333232&amp;clientId=ub6060e07-2a64-4&amp;from=paste&amp;height=946&amp;id=u2733ae47&amp;originHeight=1419&amp;originWidth=959&amp;originalType=binary&amp;ratio=1.5&amp;rotation=0&amp;showTitle=false&amp;size=173354&amp;status=done&amp;style=none&amp;taskId=ua3e0a759-d262-47e6-8923-9675f3419e8&amp;title=&amp;width=639.3333333333334" alt="image.png">
-这里是base64换表和rc4加密，不是原来的base+aes
-所以，直接base64换表后rc4解密
-<img src="https://cdn.nlark.com/yuque/0/2023/png/2212593/1686032888229-c3ac1af3-778b-43dd-8a02-b0f5ff9cd84c.png#averageHue=%23fdfdfc&amp;clientId=ub6060e07-2a64-4&amp;from=paste&amp;height=694&amp;id=u72914525&amp;originHeight=1041&amp;originWidth=2017&amp;originalType=binary&amp;ratio=1.5&amp;rotation=0&amp;showTitle=false&amp;size=64757&amp;status=done&amp;style=none&amp;taskId=u83d9e80f-94b2-41cf-89ed-6c03c660aa0&amp;title=&amp;width=1344.6666666666667" alt="image.png">
-但是得到这个flag: <code>flag{ikjnmkjh±$}</code>还是过不了原apk的check
-通过调试发现，密文变了不是<code>SSro3CogRALMhCnQRBDyWa^^</code>变成了<code>SSro3CogRALMhCnQRG9yWa^^</code>
-<img src="https://cdn.nlark.com/yuque/0/2023/png/2212593/1686032999177-f4871c91-8e17-46ef-a813-1546ef75a37e.png#averageHue=%23f8f6f5&amp;clientId=ub6060e07-2a64-4&amp;from=paste&amp;height=851&amp;id=u46459737&amp;originHeight=1277&amp;originWidth=1394&amp;originalType=binary&amp;ratio=1.5&amp;rotation=0&amp;showTitle=false&amp;size=101853&amp;status=done&amp;style=none&amp;taskId=ued3807ad-b820-4fdf-88b1-cfff8bd5b83&amp;title=&amp;width=929.3333333333334" alt="fa686bcd2089778e03832656e34b71c.png">
-所以再用<code>SSro3CogRALMhCnQRG9yWa^^</code>解密一次，得到flag: <code>flag{ikjnmkjh@$}</code>，这就可以过check了
-<img src="https://cdn.nlark.com/yuque/0/2023/jpeg/2212593/1686033113209-027bd275-0af1-436f-9f1e-4a6d7562cf84.jpeg#averageHue=%23194e3c&amp;clientId=ub6060e07-2a64-4&amp;from=paste&amp;height=1600&amp;id=u9000cfea&amp;originHeight=2400&amp;originWidth=1080&amp;originalType=binary&amp;ratio=1.5&amp;rotation=0&amp;showTitle=false&amp;size=254202&amp;status=done&amp;style=none&amp;taskId=ub0f565a7-f85a-40c7-ada5-3e2ae0305f1&amp;title=&amp;width=720" alt="7c41a84fd36fb8cf5da333553b0480e.jpg"></p>
+</span></span></code></pre></div><p>解密之后发现和原来的逻辑几乎一样，但是在最关节的check函数不同</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519480.png" alt="image.png"></p>
+<p>这里是base64换表和rc4加密，不是原来的base+aes
+所以，直接base64换表后rc4解密</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519880.png" alt="image.png"></p>
+<p>但是得到这个flag: <code>flag{ikjnmkjh±$}</code>还是过不了原apk的check
+通过调试发现，密文变了不是<code>SSro3CogRALMhCnQRBDyWa^^</code>变成了<code>SSro3CogRALMhCnQRG9yWa^^</code></p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519811.png" alt="fa686bcd2089778e03832656e34b71c.png"></p>
+<p>所以再用<code>SSro3CogRALMhCnQRG9yWa^^</code>解密一次，得到flag: <code>flag{ikjnmkjh@$}</code>，这就可以过check了</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519143.jpeg" alt="7c41a84fd36fb8cf5da333553b0480e.jpg"></p>
         </div>
         
 
@@ -326,7 +326,7 @@
       <span class="categories">
         Tags:
         
-          <a class="category" href="https://example.com/tags/reverse">reverse</a>  <a class="category" href="https://example.com/tags/android">android</a>  
+          <a class="category" href="https://military-axe.github.io/tags/reverse">reverse</a>  <a class="category" href="https://military-axe.github.io/tags/android">android</a>  
     
     </span>
   </p>
@@ -428,7 +428,7 @@
 </div>
 
     <footer role="contentinfo">
-      <p>Copyright &copy; 2023 Mi1itray.axe - <a href="https://example.com/license/">License</a> -
+      <p>Copyright &copy; 2023 Mi1itray.axe - <a href="https://military-axe.github.io/license/">License</a> -
         <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
       </p>
     </footer>

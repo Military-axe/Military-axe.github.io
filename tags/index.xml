@@ -2,26 +2,26 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on mi1itray.axe</title>
-    <link>https://example.com/tags/</link>
+    <link>https://military-axe.github.io/tags/</link>
     <description>Recent content in Tags on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 07 Jun 2023 13:37:53 +0800</lastBuildDate><atom:link href="https://example.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 07 Jun 2023 13:37:53 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>android</title>
-      <link>https://example.com/tags/android/</link>
+      <link>https://military-axe.github.io/tags/android/</link>
       <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
       
-      <guid>https://example.com/tags/android/</guid>
+      <guid>https://military-axe.github.io/tags/android/</guid>
       <description></description>
     </item>
     
     <item>
       <title>reverse</title>
-      <link>https://example.com/tags/reverse/</link>
+      <link>https://military-axe.github.io/tags/reverse/</link>
       <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
       
-      <guid>https://example.com/tags/reverse/</guid>
+      <guid>https://military-axe.github.io/tags/reverse/</guid>
       <description></description>
     </item>
     
