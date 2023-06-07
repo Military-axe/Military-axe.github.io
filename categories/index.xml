@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on mi1itray.axe</title>
+    <link>https://example.com/categories/</link>
+    <description>Recent content in Categories on mi1itray.axe</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 07 Jun 2023 13:37:53 +0800</lastBuildDate><atom:link href="https://example.com/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>reverse</title>
+      <link>https://example.com/categories/reverse/</link>
+      <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
+      
+      <guid>https://example.com/categories/reverse/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
