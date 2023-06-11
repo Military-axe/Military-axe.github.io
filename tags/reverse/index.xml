@@ -6,7 +6,17 @@
     <description>Recent content in reverse on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 10 Jun 2023 21:12:15 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/reverse/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 11 Jun 2023 15:40:13 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/reverse/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2023 ciscn ezbytes Write Up</title>
+      <link>https://military-axe.github.io/blog/2023-06-11-2023-ciscn-ezbytes-write-up/</link>
+      <pubDate>Sun, 11 Jun 2023 15:40:13 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/blog/2023-06-11-2023-ciscn-ezbytes-write-up/</guid>
+      <description>&lt;p&gt;这题使用了DWARF字节码，需要了解DWARF相关知识，实际上是c++异常处理中的相关知识。这题利用异常处理的栈回溯，执行了一段设计好的DWARF字节码，单纯的跟踪是跟踪不到的&lt;/p&gt;
+&lt;p&gt;这题怪我没有心去做这题，不然早就出了，最近想改变一下心态，既然不能摆脱，那就走到底。&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation</title>
       <link>https://military-axe.github.io/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</link>
