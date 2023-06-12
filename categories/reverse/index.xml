@@ -28,11 +28,11 @@
     </item>
     
     <item>
-      <title>GotYouKey</title>
-      <link>https://military-axe.github.io/blog/2023-06-07-gotyoukey/</link>
+      <title>2023 XCTF GotYouKey Write Up</title>
+      <link>https://military-axe.github.io/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</link>
       <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
       
-      <guid>https://military-axe.github.io/blog/2023-06-07-gotyoukey/</guid>
+      <guid>https://military-axe.github.io/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</guid>
       <description>&lt;p&gt;前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。&lt;/p&gt;</description>
     </item>
     
