@@ -2,19 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://military-axe.github.io/categories/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/fuzz/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/categories/fuzz/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/macos/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/categories/paper/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/post/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/</loc>
+    <lastmod>2023-06-14T15:53:46+08:00</lastmod>
+  </url><url>
     <loc>https://military-axe.github.io/blog/2023-06-11-2023-ciscn-ezbytes-write-up/</loc>
     <lastmod>2023-06-11T15:40:13+08:00</lastmod>
   </url><url>
-    <loc>https://military-axe.github.io/categories/</loc>
-    <lastmod>2023-06-11T15:40:13+08:00</lastmod>
-  </url><url>
     <loc>https://military-axe.github.io/tags/dwarf/</loc>
-    <lastmod>2023-06-11T15:40:13+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/</loc>
-    <lastmod>2023-06-11T15:40:13+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/post/</loc>
     <lastmod>2023-06-11T15:40:13+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/tags/reverse/</loc>
@@ -23,13 +41,7 @@
     <loc>https://military-axe.github.io/categories/reverse/</loc>
     <lastmod>2023-06-11T15:40:13+08:00</lastmod>
   </url><url>
-    <loc>https://military-axe.github.io/tags/</loc>
-    <lastmod>2023-06-11T15:40:13+08:00</lastmod>
-  </url><url>
     <loc>https://military-axe.github.io/tags/decompile/</loc>
-    <lastmod>2023-06-10T21:12:15+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/categories/paper/</loc>
     <lastmod>2023-06-10T21:12:15+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</loc>

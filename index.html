@@ -124,6 +124,37 @@
           
 
 <header>
+  <p class="meta">Jun 14, 2023
+     - 1 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://military-axe.github.io/categories/fuzz/">Fuzz </a><a class="label" href="https://military-axe.github.io/categories/paper/">Paper </a>
+    
+  </p>
+  <h1 class="entry-title">
+     KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations 
+  </h1>
+</header>
+
+          
+            <p><p>来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章</p>
+<p>讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决</p>
+<p>通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz</p></p>
+            
+              <footer>
+                <a href="https://military-axe.github.io/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/" rel="full-article">Would you like to know more? →</a>
+              </footer>
+            
+          
+        </article>
+        
+        <article>
+          
+          
+
+<header>
   <p class="meta">Jun 11, 2023
      - 3 minute read 
     
@@ -334,10 +365,16 @@
           
             
               <li class="post">
-                <a href="/blog/2023-06-11-2023-ciscn-ezbytes-write-up/">2023 ciscn ezbytes Write Up</a>
+                <a href="/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/">KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations</a>
               </li>
             
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2023-06-11-2023-ciscn-ezbytes-write-up/">2023 ciscn ezbytes Write Up</a>
+              </li>
             
           
             
@@ -349,12 +386,6 @@
             
               <li class="post">
                 <a href="/blog/2023-06-08-driver-development-and-debug-config/">Driver Development and Debug Config</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-06-07-2023-xctf-gotyoukey-write-up/">2023 XCTF GotYouKey Write Up</a>
               </li>
             
           
