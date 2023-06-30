@@ -6,7 +6,16 @@
     <description>Recent content in Categories on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 14 Jun 2023 15:53:46 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 30 Jun 2023 17:05:32 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reverse</title>
+      <link>https://military-axe.github.io/categories/reverse/</link>
+      <pubDate>Fri, 30 Jun 2023 17:05:32 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/categories/reverse/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Fuzz</title>
       <link>https://military-axe.github.io/categories/fuzz/</link>
@@ -22,15 +31,6 @@
       <pubDate>Wed, 14 Jun 2023 15:53:46 +0800</pubDate>
       
       <guid>https://military-axe.github.io/categories/paper/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Reverse</title>
-      <link>https://military-axe.github.io/categories/reverse/</link>
-      <pubDate>Sun, 11 Jun 2023 15:40:13 +0800</pubDate>
-      
-      <guid>https://military-axe.github.io/categories/reverse/</guid>
       <description></description>
     </item>
     
