@@ -2,8 +2,35 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://military-axe.github.io/tags/android/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
     <loc>https://military-axe.github.io/categories/</loc>
-    <lastmod>2023-07-03T21:51:06+08:00</lastmod>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/frida/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/categories/mobile/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/post/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/reverse/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/categories/reverse/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/</loc>
+    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/categories/cheatsheets/</loc>
     <lastmod>2023-07-03T21:51:06+08:00</lastmod>
@@ -14,26 +41,8 @@
     <loc>https://military-axe.github.io/blog/2023-07-03-ida-symbolic-recovery/</loc>
     <lastmod>2023-07-03T21:51:06+08:00</lastmod>
   </url><url>
-    <loc>https://military-axe.github.io/</loc>
-    <lastmod>2023-07-03T21:51:06+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/post/</loc>
-    <lastmod>2023-07-03T21:51:06+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/reverse/</loc>
-    <lastmod>2023-07-03T21:51:06+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/categories/reverse/</loc>
-    <lastmod>2023-07-03T21:51:06+08:00</lastmod>
-  </url><url>
     <loc>https://military-axe.github.io/tags/sig/</loc>
     <lastmod>2023-07-03T21:51:06+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/</loc>
-    <lastmod>2023-07-03T21:51:06+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/frida/</loc>
-    <lastmod>2023-07-03T16:06:30+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</loc>
     <lastmod>2023-07-03T16:06:30+08:00</lastmod>
@@ -93,9 +102,6 @@
     <lastmod>2023-06-08T13:58:36+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</loc>
-    <lastmod>2023-06-07T13:37:53+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/android/</loc>
     <lastmod>2023-06-07T13:37:53+08:00</lastmod>
   </url>
 </urlset>
