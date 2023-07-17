@@ -2,10 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://military-axe.github.io/tags/android/</loc>
-    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
-  </url><url>
     <loc>https://military-axe.github.io/categories/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/obfuscate/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/blog/2023-07-17-obfuscate-hide-string-zer0pts/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/post/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/reverse/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/categories/reverse/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/rsa/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/</loc>
+    <lastmod>2023-07-17T15:43:19+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/android/</loc>
     <lastmod>2023-07-07T10:01:10+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/tags/frida/</loc>
@@ -14,22 +38,7 @@
     <loc>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</loc>
     <lastmod>2023-07-07T10:01:10+08:00</lastmod>
   </url><url>
-    <loc>https://military-axe.github.io/</loc>
-    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
-  </url><url>
     <loc>https://military-axe.github.io/categories/mobile/</loc>
-    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/post/</loc>
-    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/reverse/</loc>
-    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/categories/reverse/</loc>
-    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/</loc>
     <lastmod>2023-07-07T10:01:10+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/categories/cheatsheets/</loc>
