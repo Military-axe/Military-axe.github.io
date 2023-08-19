@@ -6,7 +6,34 @@
     <description>Recent content in Tags on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 23 Jul 2023 21:36:57 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 19 Aug 2023 15:56:52 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>binary diffing</title>
+      <link>https://military-axe.github.io/tags/binary-diffing/</link>
+      <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/binary-diffing/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>machine learning</title>
+      <link>https://military-axe.github.io/tags/machine-learning/</link>
+      <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>reverse</title>
+      <link>https://military-axe.github.io/tags/reverse/</link>
+      <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/reverse/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>llvm</title>
       <link>https://military-axe.github.io/tags/llvm/</link>
@@ -22,15 +49,6 @@
       <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
       
       <guid>https://military-axe.github.io/tags/obfuscation/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>reverse</title>
-      <link>https://military-axe.github.io/tags/reverse/</link>
-      <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
-      
-      <guid>https://military-axe.github.io/tags/reverse/</guid>
       <description></description>
     </item>
     
