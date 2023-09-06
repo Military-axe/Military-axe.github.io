@@ -6,7 +6,61 @@
     <description>Recent content in Tags on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 01 Sep 2023 16:15:57 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 06 Sep 2023 17:50:41 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2023</title>
+      <link>https://military-axe.github.io/tags/2023/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/2023/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>base64换表</title>
+      <link>https://military-axe.github.io/tags/base64%E6%8D%A2%E8%A1%A8/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/base64%E6%8D%A2%E8%A1%A8/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>DES</title>
+      <link>https://military-axe.github.io/tags/des/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/des/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>golang</title>
+      <link>https://military-axe.github.io/tags/golang/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/golang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vm</title>
+      <link>https://military-axe.github.io/tags/vm/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/vm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>羊城杯</title>
+      <link>https://military-axe.github.io/tags/%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>mongodb</title>
       <link>https://military-axe.github.io/tags/mongodb/</link>
