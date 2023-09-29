@@ -119,7 +119,11 @@
 
 <header>
   <p class="meta">Sep 27, 2023
+<<<<<<< HEAD
      - 11 minute read 
+=======
+     - 10 minute read 
+>>>>>>> ca32a51c44e55ec35198899577759206cb2c48f4
     
 
     
@@ -1016,6 +1020,7 @@
 <h2 id="lin">lin</h2>
 <p>这是一道golang语言编程的题目</p>
 <p>搜索字符串，发现base64字符表，然后在程序中查找base64相关函数，发现在main_thirdChall中有一个base64字符串</p>
+<<<<<<< HEAD
 <div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
@@ -1190,6 +1195,29 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>flag: <code>DASCTF{hasaki-kyoukou-vxnfnu}</code></p>
+=======
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309271424043.png" alt="image-20230927142447580"></p>
+<p>解码后得到一个flag但是不对</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272303034.png" alt="image-20230927142524503"></p>
+<p>这是main_thirdChall前面还有main_firstChall和main_secondChall</p>
+<p>查看前面的代码，main_firstChall有检查长度的部分</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272301421.png" alt="image-20230927142632687"></p>
+<p>运行程序后，测试多次发现输入<code>DASCTF{hasaki-pdtzptz-vxnfnu}</code>中的第一个部分<code>hasaki</code>可以通过</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309271428183.png" alt="image-20230927142800496"></p>
+<p>然后第二部分测试后发现输入<code>DASCTF{hasaki-pdtzptz-vxnfnu}</code>中的第三个部分<code>vxnfnu</code>可以通过</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309271432389.png" alt="image-20230927143224668"></p>
+<p>然后第三个部分要求输入是29个字符，然后处理输入后base64加密对比密文，可以想到输入就是类似DASCTF{hasaki-pdtzptz-vxnfnu}的形式，只是中间那一段被处理了，我们调试这一部分</p>
+<p>然后下断点到base64加密钱</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272302296.png" alt="image-20230927143442718"></p>
+<p>前两关就还是输入<code>hasaki</code>,<code>vxnfnu</code>，第三个直接输入错误的flag，通过调试看看差别在哪里</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272303276.png" alt="image-20230927143645624"></p>
+<p>可以发现flag中间那段变了</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272303102.png" alt="image-20230927143927802"></p>
+<p>我们输入的是<code>pdtzptz</code>，变成了<code>uiyeuye</code></p>
+<p>像misc一样测试一下偏移，发现每个字符差5，就是凯撒密码，所以就逆着求一个凯撒就可以</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272303214.png" alt="image-20230927144133716"></p>
+<p>所以flag就是<code>DASCTF{hasaki-kyoukou-vxnfnu}</code></p>
+>>>>>>> ca32a51c44e55ec35198899577759206cb2c48f4
 <h2 id="附件">附件</h2>
 <p>
 <a href="https://github.com/Military-axe/ctf/tree/master/2023/2023%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B%E5%88%9D%E8%B5%9B" target="_blank" rel="noopener">https://github.com/Military-axe/ctf/tree/master/2023/2023%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B%E5%88%9D%E8%B5%9B</a></p>
