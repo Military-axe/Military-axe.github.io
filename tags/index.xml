@@ -6,7 +6,25 @@
     <description>Recent content in Tags on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 27 Sep 2023 23:08:11 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 12 Oct 2023 14:42:18 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Obfuscation</title>
+      <link>https://military-axe.github.io/tags/obfuscation/</link>
+      <pubDate>Thu, 12 Oct 2023 14:42:18 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/obfuscation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Smart Contract</title>
+      <link>https://military-axe.github.io/tags/smart-contract/</link>
+      <pubDate>Thu, 12 Oct 2023 14:42:18 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/tags/smart-contract/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>2023</title>
       <link>https://military-axe.github.io/tags/2023/</link>
@@ -157,15 +175,6 @@
       <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
       
       <guid>https://military-axe.github.io/tags/llvm/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>obfuscation</title>
-      <link>https://military-axe.github.io/tags/obfuscation/</link>
-      <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
-      
-      <guid>https://military-axe.github.io/tags/obfuscation/</guid>
       <description></description>
     </item>
     

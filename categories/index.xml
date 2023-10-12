@@ -6,11 +6,20 @@
     <description>Recent content in Categories on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 27 Sep 2023 23:08:11 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 12 Oct 2023 14:42:18 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Paper</title>
+      <link>https://military-axe.github.io/categories/paper/</link>
+      <pubDate>Thu, 12 Oct 2023 14:42:18 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/categories/paper/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Reverse</title>
       <link>https://military-axe.github.io/categories/reverse/</link>
-      <pubDate>Wed, 27 Sep 2023 23:08:11 +0800</pubDate>
+      <pubDate>Thu, 12 Oct 2023 14:42:18 +0800</pubDate>
       
       <guid>https://military-axe.github.io/categories/reverse/</guid>
       <description></description>
@@ -22,15 +31,6 @@
       <pubDate>Fri, 01 Sep 2023 16:15:57 +0800</pubDate>
       
       <guid>https://military-axe.github.io/categories/develop/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Paper</title>
-      <link>https://military-axe.github.io/categories/paper/</link>
-      <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
-      
-      <guid>https://military-axe.github.io/categories/paper/</guid>
       <description></description>
     </item>
     
