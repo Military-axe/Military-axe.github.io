@@ -2,13 +2,43 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://military-axe.github.io/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</loc>
-    <lastmod>2023-10-12T14:42:18+08:00</lastmod>
+    <loc>https://military-axe.github.io/tags/2023/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/blog/2023-10-16-2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/android/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/base64/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/categories/</loc>
-    <lastmod>2023-10-12T14:42:18+08:00</lastmod>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/post/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/categories/reverse/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/vm/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/xor/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/tags/%E9%A6%99%E5%B1%B1%E6%9D%AF/</loc>
+    <lastmod>2023-10-16T14:05:44+08:00</lastmod>
+  </url><url>
+    <loc>https://military-axe.github.io/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</loc>
     <lastmod>2023-10-12T14:42:18+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/tags/obfuscation/</loc>
@@ -17,25 +47,10 @@
     <loc>https://military-axe.github.io/categories/paper/</loc>
     <lastmod>2023-10-12T14:42:18+08:00</lastmod>
   </url><url>
-    <loc>https://military-axe.github.io/post/</loc>
-    <lastmod>2023-10-12T14:42:18+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/categories/reverse/</loc>
-    <lastmod>2023-10-12T14:42:18+08:00</lastmod>
-  </url><url>
     <loc>https://military-axe.github.io/tags/smart-contract/</loc>
     <lastmod>2023-10-12T14:42:18+08:00</lastmod>
   </url><url>
-    <loc>https://military-axe.github.io/tags/</loc>
-    <lastmod>2023-10-12T14:42:18+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/2023/</loc>
-    <lastmod>2023-09-27T23:08:11+08:00</lastmod>
-  </url><url>
     <loc>https://military-axe.github.io/blog/2023-09-27-2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/</loc>
-    <lastmod>2023-09-27T23:08:11+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/base64/</loc>
     <lastmod>2023-09-27T23:08:11+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/tags/rc4/</loc>
@@ -57,9 +72,6 @@
     <lastmod>2023-09-06T17:50:41+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/tags/golang/</loc>
-    <lastmod>2023-09-06T17:50:41+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/vm/</loc>
     <lastmod>2023-09-06T17:50:41+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/tags/%E7%BE%8A%E5%9F%8E%E6%9D%AF/</loc>
@@ -106,9 +118,6 @@
   </url><url>
     <loc>https://military-axe.github.io/tags/rsa/</loc>
     <lastmod>2023-07-17T15:43:19+08:00</lastmod>
-  </url><url>
-    <loc>https://military-axe.github.io/tags/android/</loc>
-    <lastmod>2023-07-07T10:01:10+08:00</lastmod>
   </url><url>
     <loc>https://military-axe.github.io/tags/frida/</loc>
     <lastmod>2023-07-07T10:01:10+08:00</lastmod>
