@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>c&#43;&#43; on mi1itray.axe</title>
+    <link>https://military-axe.github.io/tags/c&#43;&#43;/</link>
+    <description>Recent content in c&#43;&#43; on mi1itray.axe</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 19 Mar 2024 11:36:56 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>利用PEB遍历模块链表</title>
+      <link>https://military-axe.github.io/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</link>
+      <pubDate>Tue, 19 Mar 2024 11:36:56 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</guid>
+      <description>&lt;p&gt;使用c++遍历PEB获取模块信息的代码段&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
