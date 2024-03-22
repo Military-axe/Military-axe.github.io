@@ -6,7 +6,22 @@
     <description>Recent content in rust on mi1itray.axe</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 01 Sep 2023 16:15:57 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/rust/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 22 Mar 2024 15:59:44 +0800</lastBuildDate><atom:link href="https://military-axe.github.io/tags/rust/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Rust编写几种hook的方式</title>
+      <link>https://military-axe.github.io/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/</link>
+      <pubDate>Fri, 22 Mar 2024 15:59:44 +0800</pubDate>
+      
+      <guid>https://military-axe.github.io/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/</guid>
+      <description>&lt;p&gt;使用Rust编写几种在windows上常用的hook方式:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;IAT hook&lt;/li&gt;
+&lt;li&gt;Inline hook&lt;/li&gt;
+&lt;li&gt;VMT hook&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;为什么要用rust的不用c++？就是想用，想给自己找麻烦😎&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Rtag cli tools dev</title>
       <link>https://military-axe.github.io/blog/2023-09-01-rtag-cli-tools-dev/</link>
