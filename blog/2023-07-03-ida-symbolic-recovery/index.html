@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
   <title>Ida Symbolic Recovery</title>
@@ -24,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -35,7 +40,7 @@
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -137,16 +142,6 @@
           
           
           
-            <nav id="TableOfContents">
-  <ul>
-    <li><a href="#编译工具与其他环境">编译工具与其他环境</a></li>
-    <li><a href="#finger">Finger</a></li>
-    <li><a href="#lscan">lscan</a></li>
-    <li><a href="#bindiff">bindiff</a></li>
-    <li><a href="#参考">参考</a></li>
-  </ul>
-</nav>
-          
           <p>最近发现二进制文件中符号恢复的手段有不少，这里想记录一下几种符号恢复的工具使用与效果对比。</p>
 <p>Finger，lscan，flair，bindiff</p>
 <h1 id="编译工具与其他环境">编译工具与其他环境</h1>
@@ -156,9 +151,9 @@
 <p>github 地址：
 <a href="https://github.com/aliyunav/Finger" target="_blank" rel="noopener">aliyunav/Finger: A tool for recognizing function symbol (github.com)</a></p>
 <p>实际上是要联网访问阿里的库来识别函数，所以遇到大程序，识别所有函数会慢一点。安装可以看github链接，使用也很简单，ida的导航栏会多一个Finger，两个选项，恢复所有函数或者恢复当前函数。</p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307031931288.png" alt="image-20230703193129579" style="zoom:50%;" />
+<!-- raw HTML omitted -->
 <p>绿色的部分是还原的函数名</p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307031923588.png" alt="image-20230703192350452" style="zoom:50%;" />
+<!-- raw HTML omitted -->
 <p>这个使用简单，效果好，但是要联网。只是不知道对arm，mips这些其他架构的识别如何。虽然识别可能会有假阳性，但是很低，从易用性来说，这个首选。</p>
 <h1 id="lscan">lscan</h1>
 <p>github地址：
@@ -169,29 +164,20 @@
 </blockquote>
 <p><strong>使用</strong></p>
 <p><code>python ./lscan.py -S .sig的目录 -f 要扫描的二进制文件</code>，例子如下</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python lscan.py -S i386/sig -f i386/bin/bin-libc-2.23
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python lscan.py -S i386/sig -f i386/bin/bin-libc-2.23
 </span></span><span style="display:flex;"><span>python lscan.py -s i386/sig/libpthread-2.23.sig -f i386/bin/bin-libpthread-2.23 -v
 </span></span><span style="display:flex;"><span>python lscan.py -f i386/win32/bin/bin-libcmt.exe -s i386/win32/sig/msvcmrt.sig
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>项目自带了一些sig文件，github上也有专门收集的sig文件
+</span></span></code></pre></div><p>项目自带了一些sig文件，github上也有专门收集的sig文件
 <a href="https://github.com/push0ebp/sig-database" target="_blank" rel="noopener">push0ebp/sig-database: IDA FLIRT Signature Database (github.com)</a></p>
 <p>使用这个是来批量识别你目标程序中和那个sig文件最吻合，选择到对应的后，可以再ida中加载对饮的sig文件</p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307032030931.png" alt="image-20230703203058226" style="zoom:50%;" />
+<!-- raw HTML omitted -->
 <p>加载sig文件的功能直接在ida中。首先如果ida中没有这个对应的sig文件，需要将sig文件放到<code>&lt;IDA_INSTALL_PATH&gt;/sig/&lt;arch&gt;</code>。</p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307032111710.png" alt="image-20230703211141485" style="zoom:50%;" />
+<!-- raw HTML omitted -->
 <ul>
 <li>view-&ldquo;Open subview&rdquo;-Signatures(快捷键shift+F5)打开已应用的签名窗口</li>
 <li>右键Apply new signatures，选择一个添加</li>
 </ul>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307032112628.png" alt="image-20230703211216386" style="zoom:50%;" />
+<!-- raw HTML omitted -->
 <p>但是这种方法要求你有sig文件，并且能确定是那个sig文件。对于c++的可以通过字符串来判断。如果是一些开源库这种不存在sig的情况，可以制作sig文件，并导入文件中。[IDA使用技巧&ndash;导入头文件和导入函数签名 | Hexo (tomqunchao.github.io)](
 <a href="https://tomqunchao.github.io/2020/10/10/note/rev/rev-1/#:~:text=" target="_blank" rel="noopener">https://tomqunchao.github.io/2020/10/10/note/rev/rev-1/#:~:text=</a>导入函数签名 1 使用pelf制作pat 1 .%2Fpelf libgmp.a gmp.pat 如果出现,collisions. &hellip; 3 如果一切顺利，则会生成sig文件 4 把sig文件复制到IDA_INSTALL_PATH%2Fsig%2Fpc目录下，打开IDA 5 Shift%2BF5，打开函数签名页面，右键，选择你刚刚添加的签名)</p>
 <h1 id="bindiff">bindiff</h1>
@@ -260,7 +246,7 @@
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -273,7 +259,7 @@
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -298,7 +284,7 @@
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -306,15 +292,15 @@
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -334,6 +320,12 @@
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -372,24 +364,6 @@
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -415,6 +389,9 @@
     
 
     
+  
+
+
   </body>
 </html>
 

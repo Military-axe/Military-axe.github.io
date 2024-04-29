@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
   <title>Driver Development and Debug Config</title>
@@ -24,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -35,7 +40,7 @@
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -137,27 +142,6 @@
           
           
           
-            <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#驱动开发">驱动开发</a>
-          <ul>
-            <li><a href="#开发环境">开发环境</a></li>
-            <li><a href="#项目设置">项目设置</a></li>
-            <li><a href="#虚拟机设置">虚拟机设置</a></li>
-          </ul>
-        </li>
-        <li><a href="#驱动调试">驱动调试</a>
-          <ul>
-            <li><a href="#日志调试等级">日志调试等级</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-          
           <p>配置windows驱动开发环境与windbg preview调试技巧，还会记录一下遇到的问题</p>
 <h2 id="驱动开发">驱动开发</h2>
 <p>我选择的模式是物理机编译开发驱动，虚拟机调试</p>
@@ -185,57 +169,29 @@ wdk version: <code>10.0.19041</code>,
 </ol>
 <p>这些都是vs2019中用于编译的，我开发代码是用vscode，写完了再去vs2019点一下编译，直接用vscode打开项目会很多头文件缺失，补全也很简单，在项目目录下配置一下。</p>
 <p>vscode control+shift+p打开控制面板，选择<code>C/C++ Edit Configuration(JSON)</code>，然后在vs2019右键引用在vscode中缺失的头文件，copy一下路径，配置在vscode的项目json中。实际上只用添加一个路径，我这是<code>&quot;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/km&quot;</code></p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">22
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&#34;configurations&#34;</span>: [
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">&#34;configurations&#34;</span>: [
 </span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;name&#34;</span>: <span style="color:#a5d6ff">&#34;Win32&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;includePath&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#a5d6ff">&#34;${workspaceFolder}/**&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#a5d6ff">&#34;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/km&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;name&#34;</span>: <span style="color:#2aa198">&#34;Win32&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;includePath&#34;</span>: [
+</span></span><span style="display:flex;"><span>                <span style="color:#2aa198">&#34;${workspaceFolder}/**&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#2aa198">&#34;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/km&#34;</span>
 </span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;defines&#34;</span>: [
-</span></span><span style="display:flex;"><span>                <span style="color:#a5d6ff">&#34;_DEBUG&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#a5d6ff">&#34;UNICODE&#34;</span>,
-</span></span><span style="display:flex;"><span>                <span style="color:#a5d6ff">&#34;_UNICODE&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;defines&#34;</span>: [
+</span></span><span style="display:flex;"><span>                <span style="color:#2aa198">&#34;_DEBUG&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#2aa198">&#34;UNICODE&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#2aa198">&#34;_UNICODE&#34;</span>
 </span></span><span style="display:flex;"><span>            ],
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;windowsSdkVersion&#34;</span>: <span style="color:#a5d6ff">&#34;10.0.22000.0&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;compilerPath&#34;</span>: <span style="color:#a5d6ff">&#34;cl.exe&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;cStandard&#34;</span>: <span style="color:#a5d6ff">&#34;c17&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;cppStandard&#34;</span>: <span style="color:#a5d6ff">&#34;c++17&#34;</span>,
-</span></span><span style="display:flex;"><span>            <span style="color:#7ee787">&#34;intelliSenseMode&#34;</span>: <span style="color:#a5d6ff">&#34;windows-msvc-x64&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;windowsSdkVersion&#34;</span>: <span style="color:#2aa198">&#34;10.0.22000.0&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;compilerPath&#34;</span>: <span style="color:#2aa198">&#34;cl.exe&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;cStandard&#34;</span>: <span style="color:#2aa198">&#34;c17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;cppStandard&#34;</span>: <span style="color:#2aa198">&#34;c++17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">&#34;intelliSenseMode&#34;</span>: <span style="color:#2aa198">&#34;windows-msvc-x64&#34;</span>
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    ],
-</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&#34;version&#34;</span>: <span style="color:#a5d6ff">4</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">&#34;version&#34;</span>: <span style="color:#2aa198">4</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>然后vscode就可以愉快的打代码了</p>
+</span></span></code></pre></div><p>然后vscode就可以愉快的打代码了</p>
 <h3 id="虚拟机设置">虚拟机设置</h3>
 <p>这个很多文章都有很详细的配置，这里只记录简单的几个我用到的命令，详细的请找别的文章</p>
 <p>虚拟机需要开启测试模式，一般的驱动无法直接安装上在win10 x64下，需要签名，开启测试模式则无需签名</p>
@@ -244,49 +200,19 @@ wdk version: <code>10.0.19041</code>,
 <p>shift+单机重启 -&gt; 高级选项-&gt;启动设置-&gt;重启，然后选择强制禁用驱动签名</p>
 </blockquote>
 <p><strong>管理员 powershell</strong></p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>bcdedit /<span style="color:#ff7b72">set</span> testsigning on
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>bcdedit /<span style="color:#719e07">set</span> testsigning on
 </span></span><span style="display:flex;"><span>bcdedit /Debug on
-</span></span><span style="display:flex;"><span>bcdedit /dbgsettings serial baudrate:<span style="color:#a5d6ff">115200</span> debugport:<span style="color:#a5d6ff">2</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>最后一个开启后，还要再虚拟机上设置，开启一个端口才能在物理机上用windbg连上虚拟机</p>
+</span></span><span style="display:flex;"><span>bcdedit /dbgsettings serial baudrate:<span style="color:#2aa198">115200</span> debugport:<span style="color:#2aa198">2</span>
+</span></span></code></pre></div><p>最后一个开启后，还要再虚拟机上设置，开启一个端口才能在物理机上用windbg连上虚拟机</p>
 <p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081444764.png" alt=""></p>
 <p>以下命令都是在管理员权限下执行</p>
 <p><strong>启动服务</strong></p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>net start &lt;service_name&gt;
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>关闭服务</strong></p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>net stop &lt;service_anem&gt;
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>删除服务</strong></p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>sc delete &lt;service_name&gt;
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="驱动调试">驱动调试</h2>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>net start &lt;service_name&gt;
+</span></span></code></pre></div><p><strong>关闭服务</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>net stop &lt;service_anem&gt;
+</span></span></code></pre></div><p><strong>删除服务</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>sc delete &lt;service_name&gt;
+</span></span></code></pre></div><h2 id="驱动调试">驱动调试</h2>
 <p>在物理机上调试虚拟机中的驱动</p>
 <p>调试软件: <code>windbg preview</code>，设置截图</p>
 <p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081458667.png" alt=""></p>
@@ -295,58 +221,23 @@ wdk version: <code>10.0.19041</code>,
 <p>系统运行中间不能再键入命令，需要再设置什么值则可以点击左上角的Break，然后再键入命令</p>
 <h3 id="日志调试等级">日志调试等级</h3>
 <p>开发中在源码中写入<code>KdPrintEx</code>，并在参数中设置调试等级。</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">4
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#d2a8ff;font-weight:bold">KdPrintEx</span>(( DPFLTR_IHVDRIVER_ID,
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#268bd2">KdPrintEx</span>(( DPFLTR_IHVDRIVER_ID,
 </span></span><span style="display:flex;"><span>            DPFLTR_WARNING_LEVEL,
-</span></span><span style="display:flex;"><span>            <span style="color:#a5d6ff">&#34;[+] HoneyFile: FileNameInfo-&gt;Name.MaximumLength: %d &gt;= 260</span><span style="color:#79c0ff">\r\n</span><span style="color:#a5d6ff">&#34;</span>,
-</span></span><span style="display:flex;"><span>            FileNameInfo<span style="color:#ff7b72;font-weight:bold">-&gt;</span>Name.MaximumLength));
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><code>DPFLTR_WARNING_LEVEL</code>就是等级，对应的值是1</p>
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;[+] HoneyFile: FileNameInfo-&gt;Name.MaximumLength: %d &gt;= 260</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>            FileNameInfo<span style="color:#719e07">-&gt;</span>Name.MaximumLength));
+</span></span></code></pre></div><p><code>DPFLTR_WARNING_LEVEL</code>就是等级，对应的值是1</p>
 <p>在windbg中运行起来后设置</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kd&gt; ed Kd_IHVDRIVER_Mask <span style="color:#a5d6ff">3</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>这样，打印的时候进行的运算是<code>(1 &lt;&lt; DPFLTR_WARNING_LEVEL) &amp; Kd_IHVDRIVER_Mask = 2</code>只要值不是0就可以打印出来</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kd&gt; ed Kd_IHVDRIVER_Mask <span style="color:#2aa198">3</span>
+</span></span></code></pre></div><p>这样，打印的时候进行的运算是<code>(1 &lt;&lt; DPFLTR_WARNING_LEVEL) &amp; Kd_IHVDRIVER_Mask = 2</code>只要值不是0就可以打印出来</p>
 <p><code>Kd_IHVDRIVER_Mask</code>的设置是根据源码中第一个参数设置成<code>Kd_XXXX_Mask</code>的，要是怕变量名重复可以改成</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>nt!Kd_IHVDRIVER_Mask
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>下面是调试日志等级对应的值</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">5
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#8b949e;font-weight:bold;font-style:italic">#define DPFLTR_ERROR_LEVEL 0
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-weight:bold;font-style:italic">#define DPFLTR_WARNING_LEVEL 1
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-weight:bold;font-style:italic">#define DPFLTR_TRACE_LEVEL 2
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-weight:bold;font-style:italic">#define DPFLTR_INFO_LEVEL 3
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-weight:bold;font-style:italic">#define DPFLTR_MASK 0x80000000
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div>
+<pre tabindex="0"><code>nt!Kd_IHVDRIVER_Mask
+</code></pre><p>下面是调试日志等级对应的值</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">#define DPFLTR_ERROR_LEVEL 0
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#define DPFLTR_WARNING_LEVEL 1
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#define DPFLTR_TRACE_LEVEL 2
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#define DPFLTR_INFO_LEVEL 3
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#define DPFLTR_MASK 0x80000000
+</span></span></span></code></pre></div>
         </div>
         
 
@@ -394,7 +285,7 @@ wdk version: <code>10.0.19041</code>,
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -407,7 +298,7 @@ wdk version: <code>10.0.19041</code>,
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -432,7 +323,7 @@ wdk version: <code>10.0.19041</code>,
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -440,15 +331,15 @@ wdk version: <code>10.0.19041</code>,
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -468,6 +359,12 @@ wdk version: <code>10.0.19041</code>,
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -506,24 +403,6 @@ wdk version: <code>10.0.19041</code>,
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -549,6 +428,9 @@ wdk version: <code>10.0.19041</code>,
     
 
     
+  
+
+
   </body>
 </html>
 

@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
   <title>2023 ciscn ezbytes Write Up</title>
@@ -24,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -35,7 +40,7 @@
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -119,7 +124,7 @@
 
 <header>
   <p class="meta">Jun 11, 2023
-     - 3 minute read 
+     - 2 minute read 
     
 
     
@@ -137,18 +142,6 @@
           
           
           
-            <nav id="TableOfContents">
-  <ul>
-    <li><a href="#c异常处理">c++异常处理</a>
-      <ul>
-        <li><a href="#eh_frame">.eh_frame</a></li>
-      </ul>
-    </li>
-    <li><a href="#解题过程">解题过程</a></li>
-    <li><a href="#参考">参考</a></li>
-  </ul>
-</nav>
-          
           <p>这题使用了DWARF字节码，需要了解DWARF相关知识，实际上是c++异常处理中的相关知识。这题利用异常处理的栈回溯，执行了一段设计好的DWARF字节码，单纯的跟踪是跟踪不到的</p>
 <p>这题怪我没有心去做这题，不然早就出了，最近想改变一下心态，既然不能摆脱，那就走到底。</p>
 <h1 id="c异常处理">c++异常处理</h1>
@@ -159,61 +152,31 @@
 <li>如果没有找到 landing pad 则把程序 abort，如果找到则记下 landing pad 的位置，再重新回到抛异常的函数那里开始，一帧一帧地清理调用链上各个函数内部的局部变量，直到 landing pad 所在的函数为止。</li>
 </ul>
 <p>简而言之，正常情况下，stack unwind 所要做的事情就是从抛出异常的函数开始，沿着调用链向上找 catch 所在的函数，然后从抛异常的地方开始，清理调用链上各栈帧内已经创建了的局部变量。</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">22
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">23
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">24
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#ff7b72">void</span> <span style="color:#d2a8ff;font-weight:bold">func1</span>()
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">void</span> <span style="color:#268bd2">func1</span>()
 </span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    cs a; <span style="color:#8b949e;font-style:italic">// stack unwind时被析构。
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>    throw <span style="color:#a5d6ff">3</span>;
+</span></span><span style="display:flex;"><span>    cs a; <span style="color:#586e75">// stack unwind时被析构。
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    throw <span style="color:#2aa198">3</span>;
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">void</span> <span style="color:#d2a8ff;font-weight:bold">func2</span>()
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">void</span> <span style="color:#268bd2">func2</span>()
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    cs b;
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">func1</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">func1</span>();
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">void</span> <span style="color:#d2a8ff;font-weight:bold">func3</span>()
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">void</span> <span style="color:#268bd2">func3</span>()
 </span></span><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>    cs c;
 </span></span><span style="display:flex;"><span>    try 
 </span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#d2a8ff;font-weight:bold">func2</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">func2</span>();
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">catch</span> (<span style="color:#ff7b72">int</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">catch</span> (<span style="color:#dc322f">int</span>)
 </span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#8b949e;font-style:italic">//进入这里之前， func1, func2已经被unwind.
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>    }
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">//进入这里之前， func1, func2已经被unwind.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    }
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>这里可以看到unwind的调用过程是函数调用的逆过程，实际实现的过程由专门的 stack unwind 库来进行。</p>
+</span></span></code></pre></div><p>这里可以看到unwind的调用过程是函数调用的逆过程，实际实现的过程由专门的 stack unwind 库来进行。</p>
 <p>由于是异常处理，还涉及到恢复调用现场，很大一部分上下文是可以从堆栈上恢复回来的,如 ebp, esp, 返回地址等。编译器为了让 unwinder 可以从栈上获取这些信息，它在编译代码的时候，建立了很多表项用于记录每个可以抛异常的函数的相关信息，这些信息在重建上下文时将会指导程序怎么去搜索栈上的东西。
 这个表项中记录了很多关键的东西，这个表就是<code>.eh_frame</code></p>
 <h2 id="eh_frame">.eh_frame</h2>
@@ -229,220 +192,101 @@
 <p>本来DWARF是用来恢复栈结构，做一些异常捕获过程中的辅助操作。这题直接将数据等藏在DWARF，然后直接用DWARF中的代码处理寄存器执行，这样调试是无法跟踪的。</p>
 </blockquote>
 <p>查看程序的<code>.eh_frame</code>段数据</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>readelf <span style="color:#ff7b72;font-weight:bold">-</span>Wwf <span style="color:#ff7b72;font-weight:bold">&lt;</span>file name<span style="color:#ff7b72;font-weight:bold">&gt;</span>
-</span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic">// 或者使用
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>readelf <span style="color:#f85149">–</span>debug<span style="color:#ff7b72;font-weight:bold">-</span>dump<span style="color:#ff7b72;font-weight:bold">=</span>frames <span style="color:#ff7b72;font-weight:bold">&lt;</span>file name<span style="color:#ff7b72;font-weight:bold">&gt;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>得到的结果大概如下</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">22
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">23
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">24
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>The section .eh_frame <span style="color:#79c0ff;font-weight:bold">contains</span>:
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>readelf <span style="color:#719e07">-</span>Wwf <span style="color:#719e07">&lt;</span>file name<span style="color:#719e07">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 或者使用
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>readelf –debug<span style="color:#719e07">-</span>dump<span style="color:#719e07">=</span>frames <span style="color:#719e07">&lt;</span>file name<span style="color:#719e07">&gt;</span>
+</span></span></code></pre></div><p>得到的结果大概如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>The section .eh_frame contains:
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a5d6ff">00000000</span> <span style="color:#a5d6ff">0000001</span>c <span style="color:#a5d6ff">00000000</span> CIE
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">Version</span>:               <span style="color:#a5d6ff">1</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">Augmentation</span>:          <span style="color:#a5d6ff">&#34;zPL&#34;</span>
-</span></span><span style="display:flex;"><span>  Code alignment <span style="color:#79c0ff;font-weight:bold">factor</span>: <span style="color:#a5d6ff">1</span>
-</span></span><span style="display:flex;"><span>  Data alignment <span style="color:#79c0ff;font-weight:bold">factor</span>: <span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">8</span>
-</span></span><span style="display:flex;"><span>  Return address <span style="color:#79c0ff;font-weight:bold">column</span>: <span style="color:#a5d6ff">16</span>
-</span></span><span style="display:flex;"><span>  Augmentation <span style="color:#79c0ff;font-weight:bold">data</span>:     <span style="color:#a5d6ff">00</span> d8 <span style="color:#a5d6ff">09</span> <span style="color:#a5d6ff">40</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">00000000</span> <span style="color:#2aa198">0000001</span>c <span style="color:#2aa198">00000000</span> CIE
+</span></span><span style="display:flex;"><span>  Version:               <span style="color:#2aa198">1</span>
+</span></span><span style="display:flex;"><span>  Augmentation:          <span style="color:#2aa198">&#34;zPL&#34;</span>
+</span></span><span style="display:flex;"><span>  Code alignment factor: <span style="color:#2aa198">1</span>
+</span></span><span style="display:flex;"><span>  Data alignment factor: <span style="color:#719e07">-</span><span style="color:#2aa198">8</span>
+</span></span><span style="display:flex;"><span>  Return address column: <span style="color:#2aa198">16</span>
+</span></span><span style="display:flex;"><span>  Augmentation data:     <span style="color:#2aa198">00</span> d8 <span style="color:#2aa198">09</span> <span style="color:#2aa198">40</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_def_cfa</span>: r7 ofs <span style="color:#a5d6ff">8</span>   <span style="color:#f85149">##以下为字节码</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_offset</span>: r16 at cfa<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">8</span>
+</span></span><span style="display:flex;"><span>  DW_CFA_def_cfa: r7 ofs <span style="color:#2aa198">8</span>   ##以下为字节码
+</span></span><span style="display:flex;"><span>  DW_CFA_offset: r16 at cfa<span style="color:#719e07">-</span><span style="color:#2aa198">8</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a5d6ff">00000020</span> <span style="color:#a5d6ff">0000002</span>c <span style="color:#a5d6ff">00000024</span> FDE cie<span style="color:#ff7b72;font-weight:bold">=</span><span style="color:#a5d6ff">00000000</span> pc<span style="color:#ff7b72;font-weight:bold">=</span><span style="color:#a5d6ff">00400</span>ac8.<span style="color:#a5d6ff">.00400</span>bd8
-</span></span><span style="display:flex;"><span>  Augmentation <span style="color:#79c0ff;font-weight:bold">data</span>:     <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#8b949e;font-weight:bold;font-style:italic">#以下为字节码
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-weight:bold;font-style:italic"></span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_advance_loc</span>: <span style="color:#a5d6ff">1</span> to <span style="color:#a5d6ff">00400</span>ac9
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_def_cfa_offset</span>: <span style="color:#a5d6ff">16</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_offset</span>: r6 at cfa<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">16</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_advance_loc</span>: <span style="color:#a5d6ff">3</span> to <span style="color:#a5d6ff">00400</span>acc
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_def_cfa_reg</span>: r6
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">00000020</span> <span style="color:#2aa198">0000002</span>c <span style="color:#2aa198">00000024</span> FDE cie<span style="color:#719e07">=</span><span style="color:#2aa198">00000000</span> pc<span style="color:#719e07">=</span><span style="color:#2aa198">00400</span>ac8.<span style="color:#2aa198">.00400</span>bd8
+</span></span><span style="display:flex;"><span>  Augmentation data:     <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">#以下为字节码
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07"></span>  DW_CFA_advance_loc: <span style="color:#2aa198">1</span> to <span style="color:#2aa198">00400</span>ac9
+</span></span><span style="display:flex;"><span>  DW_CFA_def_cfa_offset: <span style="color:#2aa198">16</span>
+</span></span><span style="display:flex;"><span>  DW_CFA_offset: r6 at cfa<span style="color:#719e07">-</span><span style="color:#2aa198">16</span>
+</span></span><span style="display:flex;"><span>  DW_CFA_advance_loc: <span style="color:#2aa198">3</span> to <span style="color:#2aa198">00400</span>acc
+</span></span><span style="display:flex;"><span>  DW_CFA_def_cfa_reg: r6
 </span></span><span style="display:flex;"><span>  DW_CFA_nop
 </span></span><span style="display:flex;"><span>  DW_CFA_nop
 </span></span><span style="display:flex;"><span>  DW_CFA_nop
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>整个eh_frame结构一般是一个CIE块加多个FDE块，连续存放。一般来说，一个CIE代表一个文件，一个FDE代表一个函数。
+</span></span></code></pre></div><p>整个eh_frame结构一般是一个CIE块加多个FDE块，连续存放。一般来说，一个CIE代表一个文件，一个FDE代表一个函数。
 下图是使用<code>readelf -wF</code>查看的文件信息，其实和上一条命令大差不差的。</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306111542999.webp" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <h1 id="解题过程">解题过程</h1>
 <p>ida64打开后，定位start，然后进入main函数也就是sub_404d25</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#ff7b72">__int64</span> <span style="color:#ff7b72">__fastcall</span> <span style="color:#d2a8ff;font-weight:bold">sub_404D25</span>(<span style="color:#ff7b72">__int64</span> a1, <span style="color:#ff7b72">__int64</span> a2, <span style="color:#ff7b72">__int64</span> a3, <span style="color:#ff7b72">__int64</span> a4, <span style="color:#ff7b72">int</span> a5, <span style="color:#ff7b72">int</span> a6)
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#268bd2">__int64</span> <span style="color:#268bd2">__fastcall</span> <span style="color:#268bd2">sub_404D25</span>(<span style="color:#268bd2">__int64</span> a1, <span style="color:#268bd2">__int64</span> a2, <span style="color:#268bd2">__int64</span> a3, <span style="color:#268bd2">__int64</span> a4, <span style="color:#dc322f">int</span> a5, <span style="color:#dc322f">int</span> a6)
 </span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">__int64</span> v6; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> result; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> v8[<span style="color:#a5d6ff">2</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+10h] [rbp-420h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v9[<span style="color:#a5d6ff">1008</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+20h] [rbp-410h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">__int64</span> v10; <span style="color:#8b949e;font-style:italic">// [rsp+418h] [rbp-18h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>  v10 <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#d2a8ff;font-weight:bold">__readfsqword</span>(<span style="color:#a5d6ff">0x28u</span>);
-</span></span><span style="display:flex;"><span>  v8[<span style="color:#a5d6ff">0</span>] <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0LL</span>;
-</span></span><span style="display:flex;"><span>  v8[<span style="color:#a5d6ff">1</span>] <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0LL</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">memset</span>(v9, <span style="color:#a5d6ff">0</span>, <span style="color:#ff7b72">sizeof</span>(v9));
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">scanf</span>((<span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span>)<span style="color:#a5d6ff">&#34;%100s&#34;</span>, (<span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span>)v8, (<span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span>)v9, <span style="color:#a5d6ff">0</span>, a5, a6);
-</span></span><span style="display:flex;"><span>  v6 <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#d2a8ff;font-weight:bold">sub_46F4F0</span>(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5D5520, v8);
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">sub_46E060</span>(v6, sub_46EE20);
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">sub_404C21</span>(v8);
-</span></span><span style="display:flex;"><span>  result <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0LL</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">if</span> ( <span style="color:#d2a8ff;font-weight:bold">__readfsqword</span>(<span style="color:#a5d6ff">0x28u</span>) <span style="color:#ff7b72;font-weight:bold">!=</span> v10 )
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">sub_535290</span>();
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">return</span> result;
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__int64</span> v6; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> result; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> v8[<span style="color:#2aa198">2</span>]; <span style="color:#586e75">// [rsp+10h] [rbp-420h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v9[<span style="color:#2aa198">1008</span>]; <span style="color:#586e75">// [rsp+20h] [rbp-410h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int64</span> v10; <span style="color:#586e75">// [rsp+418h] [rbp-18h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>
+</span></span><span style="display:flex;"><span>  v10 <span style="color:#719e07">=</span> <span style="color:#268bd2">__readfsqword</span>(<span style="color:#2aa198">0x28u</span>);
+</span></span><span style="display:flex;"><span>  v8[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">0LL</span>;
+</span></span><span style="display:flex;"><span>  v8[<span style="color:#2aa198">1</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">0LL</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">memset</span>(v9, <span style="color:#2aa198">0</span>, <span style="color:#719e07">sizeof</span>(v9));
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">scanf</span>((<span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span>)<span style="color:#2aa198">&#34;%100s&#34;</span>, (<span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span>)v8, (<span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span>)v9, <span style="color:#2aa198">0</span>, a5, a6);
+</span></span><span style="display:flex;"><span>  v6 <span style="color:#719e07">=</span> <span style="color:#268bd2">sub_46F4F0</span>(<span style="color:#719e07">&amp;</span>unk_5D5520, v8);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_46E060</span>(v6, sub_46EE20);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_404C21</span>(v8);
+</span></span><span style="display:flex;"><span>  result <span style="color:#719e07">=</span> <span style="color:#2aa198">0LL</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#268bd2">__readfsqword</span>(<span style="color:#2aa198">0x28u</span>) <span style="color:#719e07">!=</span> v10 )
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_535290</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> result;
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>分析之后发现关键逻辑应该是在sub_404C21中，直接进入sub_404C21</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306111542361.png" alt="image.png" style="zoom:50%;" /></center>
+</span></span></code></pre></div><p>分析之后发现关键逻辑应该是在sub_404C21中，直接进入sub_404C21</p>
+<!-- raw HTML omitted -->
 <p>进入之后发现调试无法跟踪下去，怀疑使用DWARF来隐藏逻辑</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>readelf <span style="color:#ff7b72;font-weight:bold">-</span>Wwf ezbyte_patch <span style="color:#ff7b72;font-weight:bold">&gt;</span> output.txt
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>查看DWARF代码，通过搜索函数地址<code>sub_404BF5</code>的地址定位到</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306111542673.png" alt="image.png" style="zoom:67%;" /></center>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>readelf <span style="color:#719e07">-</span>Wwf ezbyte_patch <span style="color:#719e07">&gt;</span> output.txt
+</span></span></code></pre></div><p>查看DWARF代码，通过搜索函数地址<code>sub_404BF5</code>的地址定位到</p>
+<!-- raw HTML omitted -->
 <p>全部展开，发现隐藏了一段逻辑</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">22
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">23
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">24
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">25
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">26
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">27
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">28
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">29
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">30
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">31
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">32
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">33
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">34
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">35
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">36
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">37
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">38
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">39
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">40
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">41
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">42
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#a5d6ff">00000040</span> <span style="color:#a5d6ff">00000000000000</span><span style="color:#a5d6ff">94</span> <span style="color:#a5d6ff">00000044</span> FDE cie<span style="color:#ff7b72;font-weight:bold">=</span><span style="color:#a5d6ff">00000000</span> pc<span style="color:#ff7b72;font-weight:bold">=</span><span style="color:#a5d6ff">0000000000404</span>bf5.<span style="color:#a5d6ff">.0000000000404</span>c21
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_advance_loc</span>: <span style="color:#a5d6ff">5</span> to <span style="color:#a5d6ff">0000000000404</span>bfa
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_def_cfa_offset</span>: <span style="color:#a5d6ff">16</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_offset</span>: <span style="color:#d2a8ff;font-weight:bold">r6</span> (rbp) at cfa<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">16</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_advance_loc</span>: <span style="color:#a5d6ff">3</span> to <span style="color:#a5d6ff">0000000000404</span>bfd
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_def_cfa_register</span>: <span style="color:#d2a8ff;font-weight:bold">r6</span> (rbp)
-</span></span><span style="display:flex;"><span>  <span style="color:#79c0ff;font-weight:bold">DW_CFA_val_expression</span>: <span style="color:#d2a8ff;font-weight:bold">r12</span> (r12) (
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">2616514329260088143</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">1237891274917891239</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">1892739</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">DW_OP_breg12</span> (r12)<span style="color:#ff7b72;font-weight:bold">:</span> <span style="color:#a5d6ff">0</span>; 
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#2aa198">00000040</span> <span style="color:#2aa198">00000000000000</span><span style="color:#2aa198">94</span> <span style="color:#2aa198">00000044</span> FDE cie<span style="color:#719e07">=</span><span style="color:#2aa198">00000000</span> pc<span style="color:#719e07">=</span><span style="color:#2aa198">0000000000404</span>bf5.<span style="color:#2aa198">.0000000000404</span>c21
+</span></span><span style="display:flex;"><span>  DW_CFA_advance_loc: <span style="color:#2aa198">5</span> to <span style="color:#2aa198">0000000000404</span>bfa
+</span></span><span style="display:flex;"><span>  DW_CFA_def_cfa_offset: <span style="color:#2aa198">16</span>
+</span></span><span style="display:flex;"><span>  DW_CFA_offset: <span style="color:#268bd2">r6</span> (rbp) at cfa<span style="color:#719e07">-</span><span style="color:#2aa198">16</span>
+</span></span><span style="display:flex;"><span>  DW_CFA_advance_loc: <span style="color:#2aa198">3</span> to <span style="color:#2aa198">0000000000404</span>bfd
+</span></span><span style="display:flex;"><span>  DW_CFA_def_cfa_register: <span style="color:#268bd2">r6</span> (rbp)
+</span></span><span style="display:flex;"><span>  DW_CFA_val_expression: <span style="color:#268bd2">r12</span> (r12) (
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">2616514329260088143</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">1237891274917891239</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">1892739</span>; 
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">DW_OP_breg12</span> (r12)<span style="color:#719e07">:</span> <span style="color:#2aa198">0</span>; 
 </span></span><span style="display:flex;"><span>    DW_OP_plus; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">8502251781212277489</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">1209847170981118947</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">8971237</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">DW_OP_breg13</span> (r13)<span style="color:#ff7b72;font-weight:bold">:</span> <span style="color:#a5d6ff">0</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">8502251781212277489</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">1209847170981118947</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">8971237</span>; 
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">DW_OP_breg13</span> (r13)<span style="color:#719e07">:</span> <span style="color:#2aa198">0</span>; 
 </span></span><span style="display:flex;"><span>    DW_OP_plus; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
 </span></span><span style="display:flex;"><span>    DW_OP_or; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">2451795628338718684</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">1098791727398412397</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">1512312</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">DW_OP_breg14</span> (r14)<span style="color:#ff7b72;font-weight:bold">:</span> <span style="color:#a5d6ff">0</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">2451795628338718684</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">1098791727398412397</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">1512312</span>; 
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">DW_OP_breg14</span> (r14)<span style="color:#719e07">:</span> <span style="color:#2aa198">0</span>; 
 </span></span><span style="display:flex;"><span>    DW_OP_plus; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
 </span></span><span style="display:flex;"><span>    DW_OP_or; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">8722213363631027234</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">1890878197237214971</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#79c0ff;font-weight:bold">DW_OP_constu</span>: <span style="color:#a5d6ff">9123704</span>; 
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">DW_OP_breg15</span> (r15)<span style="color:#ff7b72;font-weight:bold">:</span> <span style="color:#a5d6ff">0</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">8722213363631027234</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">1890878197237214971</span>; 
+</span></span><span style="display:flex;"><span>    DW_OP_constu: <span style="color:#2aa198">9123704</span>; 
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">DW_OP_breg15</span> (r15)<span style="color:#719e07">:</span> <span style="color:#2aa198">0</span>; 
 </span></span><span style="display:flex;"><span>    DW_OP_plus; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
 </span></span><span style="display:flex;"><span>    DW_OP_xor; 
@@ -451,29 +295,15 @@
 </span></span><span style="display:flex;"><span>  DW_CFA_nop
 </span></span><span style="display:flex;"><span>  DW_CFA_nop
 </span></span><span style="display:flex;"><span>  DW_CFA_nop
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>通过查询DWARF指令，理解这段逻辑。这段逻辑实际是
+</span></span></code></pre></div><p>通过查询DWARF指令，理解这段逻辑。这段逻辑实际是
 分析发现，读取r12~r15，做异或和加法，判断最终值是否为0。再加上sub_404C21中的部分flag字符写出解密脚本。</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">6
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>r12<span style="color:#ff7b72;font-weight:bold">=</span>(<span style="color:#a5d6ff">2616514329260088143</span><span style="color:#ff7b72;font-weight:bold">^</span><span style="color:#a5d6ff">1237891274917891239</span>)<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">1892739</span>
-</span></span><span style="display:flex;"><span>r13<span style="color:#ff7b72;font-weight:bold">=</span>(<span style="color:#a5d6ff">8502251781212277489</span><span style="color:#ff7b72;font-weight:bold">^</span><span style="color:#a5d6ff">1209847170981118947</span>)<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">8971237</span>
-</span></span><span style="display:flex;"><span>r14<span style="color:#ff7b72;font-weight:bold">=</span>(<span style="color:#a5d6ff">2451795628338718684</span><span style="color:#ff7b72;font-weight:bold">^</span><span style="color:#a5d6ff">1098791727398412397</span>)<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">1512312</span>
-</span></span><span style="display:flex;"><span>r15<span style="color:#ff7b72;font-weight:bold">=</span>(<span style="color:#a5d6ff">8722213363631027234</span><span style="color:#ff7b72;font-weight:bold">^</span><span style="color:#a5d6ff">1890878197237214971</span>)<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">9123704</span>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>r12<span style="color:#719e07">=</span>(<span style="color:#2aa198">2616514329260088143</span><span style="color:#719e07">^</span><span style="color:#2aa198">1237891274917891239</span>)<span style="color:#719e07">-</span><span style="color:#2aa198">1892739</span>
+</span></span><span style="display:flex;"><span>r13<span style="color:#719e07">=</span>(<span style="color:#2aa198">8502251781212277489</span><span style="color:#719e07">^</span><span style="color:#2aa198">1209847170981118947</span>)<span style="color:#719e07">-</span><span style="color:#2aa198">8971237</span>
+</span></span><span style="display:flex;"><span>r14<span style="color:#719e07">=</span>(<span style="color:#2aa198">2451795628338718684</span><span style="color:#719e07">^</span><span style="color:#2aa198">1098791727398412397</span>)<span style="color:#719e07">-</span><span style="color:#2aa198">1512312</span>
+</span></span><span style="display:flex;"><span>r15<span style="color:#719e07">=</span>(<span style="color:#2aa198">8722213363631027234</span><span style="color:#719e07">^</span><span style="color:#2aa198">1890878197237214971</span>)<span style="color:#719e07">-</span><span style="color:#2aa198">9123704</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>print(<span style="color:#79c0ff">b</span><span style="color:#a5d6ff">&#39;flag{&#39;</span><span style="color:#ff7b72;font-weight:bold">+</span>r12<span style="color:#ff7b72;font-weight:bold">.</span>to_bytes(<span style="color:#a5d6ff">8</span>,<span style="color:#a5d6ff">&#39;little&#39;</span>)<span style="color:#ff7b72;font-weight:bold">+</span>r13<span style="color:#ff7b72;font-weight:bold">.</span>to_bytes(<span style="color:#a5d6ff">8</span>,<span style="color:#a5d6ff">&#39;little&#39;</span>)<span style="color:#ff7b72;font-weight:bold">+</span>r14<span style="color:#ff7b72;font-weight:bold">.</span>to_bytes(<span style="color:#a5d6ff">8</span>,<span style="color:#a5d6ff">&#39;little&#39;</span>)<span style="color:#ff7b72;font-weight:bold">+</span>r15<span style="color:#ff7b72;font-weight:bold">.</span>to_bytes(<span style="color:#a5d6ff">8</span>,<span style="color:#a5d6ff">&#39;little&#39;</span>)<span style="color:#ff7b72;font-weight:bold">+</span><span style="color:#79c0ff">b</span><span style="color:#a5d6ff">&#39;3861}&#39;</span>)
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>得到flag是<code>flag{e609efb5-e70e-4e94-ac69-ac31d96c3861}</code></p>
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(<span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;flag{&#39;</span><span style="color:#719e07">+</span>r12<span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>,<span style="color:#2aa198">&#39;little&#39;</span>)<span style="color:#719e07">+</span>r13<span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>,<span style="color:#2aa198">&#39;little&#39;</span>)<span style="color:#719e07">+</span>r14<span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>,<span style="color:#2aa198">&#39;little&#39;</span>)<span style="color:#719e07">+</span>r15<span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>,<span style="color:#2aa198">&#39;little&#39;</span>)<span style="color:#719e07">+</span><span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;3861}&#39;</span>)
+</span></span></code></pre></div><p>得到flag是<code>flag{e609efb5-e70e-4e94-ac69-ac31d96c3861}</code></p>
 <h1 id="参考">参考</h1>
 <p>
 <a href="https://www.cnblogs.com/catch/p/3604516.html" target="_blank" rel="noopener">c++ 异常处理（1）</a></p>
@@ -532,7 +362,7 @@
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -545,7 +375,7 @@
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -570,7 +400,7 @@
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -578,15 +408,15 @@
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -606,6 +436,12 @@
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -644,24 +480,6 @@
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -687,6 +505,9 @@
     
 
     
+  
+
+
   </body>
 </html>
 

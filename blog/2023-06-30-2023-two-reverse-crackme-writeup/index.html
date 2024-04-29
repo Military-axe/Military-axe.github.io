@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
   <title>2023 Two Reverse CrackMe WriteUp</title>
@@ -24,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -35,7 +40,7 @@
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -137,14 +142,6 @@
           
           
           
-            <nav id="TableOfContents">
-  <ul>
-    <li><a href="#junk">junk</a></li>
-    <li><a href="#mov">mov</a></li>
-    <li><a href="#参考">参考</a></li>
-  </ul>
-</nav>
-          
           <p>前几天打了一个应该是天融信的比赛，题目不难，简单记录一下。</p>
 <p>一道是花指令+rc4，一道是mov混淆</p>
 <h1 id="junk">junk</h1>
@@ -152,113 +149,52 @@
 <p>打开题目后看到</p>
 <p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306301617162.png" alt="image-20230630161552079"></p>
 <p>这是经典的<code>jz,jnz</code>的花指令。只需要将第一个跳转指令换成jmp就可以。这里选择用idapython写一个脚本来去花</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff7b72">from</span> <span style="color:#ff7b72">ida_bytes</span> <span style="color:#ff7b72">import</span> patch_bytes, get_bytes
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">from</span> ida_bytes <span style="color:#719e07">import</span> patch_bytes, get_bytes
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>address <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0x4010C7</span>
-</span></span><span style="display:flex;"><span>length <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0x10000</span>
-</span></span><span style="display:flex;"><span>ptr <span style="color:#ff7b72;font-weight:bold">=</span> address
+</span></span><span style="display:flex;"><span>address <span style="color:#719e07">=</span> <span style="color:#2aa198">0x4010C7</span>
+</span></span><span style="display:flex;"><span>length <span style="color:#719e07">=</span> <span style="color:#2aa198">0x10000</span>
+</span></span><span style="display:flex;"><span>ptr <span style="color:#719e07">=</span> address
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">while</span> address<span style="color:#ff7b72;font-weight:bold">+</span>length <span style="color:#ff7b72;font-weight:bold">&gt;=</span> ptr:
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> get_bytes(ptr,<span style="color:#a5d6ff">3</span>) <span style="color:#ff7b72;font-weight:bold">!=</span> <span style="color:#79c0ff">b</span><span style="color:#a5d6ff">&#39;</span><span style="color:#79c0ff">\x0f\x84\x09</span><span style="color:#a5d6ff">&#39;</span> <span style="color:#ff7b72;font-weight:bold">or</span> get_bytes(ptr<span style="color:#ff7b72;font-weight:bold">+</span><span style="color:#a5d6ff">6</span>, <span style="color:#a5d6ff">3</span>) <span style="color:#ff7b72;font-weight:bold">!=</span> <span style="color:#79c0ff">b</span><span style="color:#a5d6ff">&#39;</span><span style="color:#79c0ff">\x0f\x85\x03</span><span style="color:#a5d6ff">&#39;</span>:
-</span></span><span style="display:flex;"><span>        ptr <span style="color:#ff7b72;font-weight:bold">+=</span> <span style="color:#a5d6ff">1</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#ff7b72">continue</span>
-</span></span><span style="display:flex;"><span>    patch_bytes(ptr, <span style="color:#79c0ff">b</span><span style="color:#a5d6ff">&#39;</span><span style="color:#79c0ff">\xeb\x0d\x90\x90\x90</span><span style="color:#a5d6ff">&#39;</span>)
-</span></span><span style="display:flex;"><span>    ptr <span style="color:#ff7b72;font-weight:bold">+=</span> <span style="color:#a5d6ff">12</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>然后将所有代码取消定义再重新解析，然后选中main开头到结尾，定义函数。在F5就可以看到代码了</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">22
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#ff7b72">int</span> <span style="color:#ff7b72">__cdecl</span> <span style="color:#d2a8ff;font-weight:bold">main</span>(<span style="color:#ff7b72">int</span> argc, <span style="color:#ff7b72">const</span> <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">**</span>argv, <span style="color:#ff7b72">const</span> <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">**</span>envp)
+</span></span><span style="display:flex;"><span><span style="color:#719e07">while</span> address<span style="color:#719e07">+</span>length <span style="color:#719e07">&gt;=</span> ptr:
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> get_bytes(ptr,<span style="color:#2aa198">3</span>) <span style="color:#719e07">!=</span> <span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;</span><span style="color:#cb4b16">\x0f\x84\x09</span><span style="color:#2aa198">&#39;</span> <span style="color:#719e07">or</span> get_bytes(ptr<span style="color:#719e07">+</span><span style="color:#2aa198">6</span>, <span style="color:#2aa198">3</span>) <span style="color:#719e07">!=</span> <span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;</span><span style="color:#cb4b16">\x0f\x85\x03</span><span style="color:#2aa198">&#39;</span>:
+</span></span><span style="display:flex;"><span>        ptr <span style="color:#719e07">+=</span> <span style="color:#2aa198">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">continue</span>
+</span></span><span style="display:flex;"><span>    patch_bytes(ptr, <span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;</span><span style="color:#cb4b16">\xeb\x0d\x90\x90\x90</span><span style="color:#2aa198">&#39;</span>)
+</span></span><span style="display:flex;"><span>    ptr <span style="color:#719e07">+=</span> <span style="color:#2aa198">12</span>
+</span></span></code></pre></div><p>然后将所有代码取消定义再重新解析，然后选中main开头到结尾，定义函数。在F5就可以看到代码了</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">__cdecl</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>envp)
 </span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">char</span> v4; <span style="color:#8b949e;font-style:italic">// [esp+0h] [ebp-160h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v5[<span style="color:#a5d6ff">256</span>]; <span style="color:#8b949e;font-style:italic">// [esp+30h] [ebp-130h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> Buf1; <span style="color:#8b949e;font-style:italic">// [esp+130h] [ebp-30h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  _BYTE v7[<span style="color:#a5d6ff">3</span>]; <span style="color:#8b949e;font-style:italic">// [esp+131h] [ebp-2Fh] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">int</span> v8[<span style="color:#a5d6ff">2</span>]; <span style="color:#8b949e;font-style:italic">// [esp+150h] [ebp-10h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v9; <span style="color:#8b949e;font-style:italic">// [esp+158h] [ebp-8h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">memset</span>(v5, <span style="color:#a5d6ff">0</span>, <span style="color:#ff7b72">sizeof</span>(v5));
-</span></span><span style="display:flex;"><span>  v8[<span style="color:#a5d6ff">0</span>] <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">272716322</span>;
-</span></span><span style="display:flex;"><span>  v8[<span style="color:#a5d6ff">1</span>] <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">2018915346</span>;
-</span></span><span style="display:flex;"><span>  v9 <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">sub_401050</span>(<span style="color:#a5d6ff">&#34;%29s&#34;</span>, <span style="color:#ff7b72;font-weight:bold">&amp;</span>Buf1);
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">sub_401080</span>(v5, v8, (<span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>)v8 <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#d2a8ff;font-weight:bold">strlen</span>((<span style="color:#ff7b72">const</span> <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>)v8) <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">1</span> <span style="color:#ff7b72;font-weight:bold">-</span> ((<span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>)v8 <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">1</span>));
-</span></span><span style="display:flex;"><span>  <span style="color:#d2a8ff;font-weight:bold">sub_4011F0</span>(v5, <span style="color:#ff7b72;font-weight:bold">&amp;</span>Buf1, <span style="color:#ff7b72;font-weight:bold">&amp;</span>v7[<span style="color:#d2a8ff;font-weight:bold">strlen</span>(<span style="color:#ff7b72;font-weight:bold">&amp;</span>Buf1)] <span style="color:#ff7b72;font-weight:bold">-</span> v7);
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">if</span> ( <span style="color:#ff7b72;font-weight:bold">!</span><span style="color:#d2a8ff;font-weight:bold">memcmp</span>(<span style="color:#ff7b72;font-weight:bold">&amp;</span>Buf1, <span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_404018, <span style="color:#a5d6ff">0x1Du</span>) )
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">sub_401020</span>(<span style="color:#a5d6ff">&#34;yes~~~~~~~~~~~~~~~~~</span><span style="color:#79c0ff">\n</span><span style="color:#a5d6ff">&#34;</span>, v4);
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">else</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#d2a8ff;font-weight:bold">sub_401020</span>(<span style="color:#a5d6ff">&#34;no!!!!!!!!!!!!!!!!!!!!!!!</span><span style="color:#79c0ff">\n</span><span style="color:#a5d6ff">&#34;</span>, v4);
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">return</span> <span style="color:#a5d6ff">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v4; <span style="color:#586e75">// [esp+0h] [ebp-160h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v5[<span style="color:#2aa198">256</span>]; <span style="color:#586e75">// [esp+30h] [ebp-130h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> Buf1; <span style="color:#586e75">// [esp+130h] [ebp-30h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  _BYTE v7[<span style="color:#2aa198">3</span>]; <span style="color:#586e75">// [esp+131h] [ebp-2Fh] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">int</span> v8[<span style="color:#2aa198">2</span>]; <span style="color:#586e75">// [esp+150h] [ebp-10h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v9; <span style="color:#586e75">// [esp+158h] [ebp-8h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">memset</span>(v5, <span style="color:#2aa198">0</span>, <span style="color:#719e07">sizeof</span>(v5));
+</span></span><span style="display:flex;"><span>  v8[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">-</span><span style="color:#2aa198">272716322</span>;
+</span></span><span style="display:flex;"><span>  v8[<span style="color:#2aa198">1</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">2018915346</span>;
+</span></span><span style="display:flex;"><span>  v9 <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_401050</span>(<span style="color:#2aa198">&#34;%29s&#34;</span>, <span style="color:#719e07">&amp;</span>Buf1);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_401080</span>(v5, v8, (<span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>)v8 <span style="color:#719e07">+</span> <span style="color:#268bd2">strlen</span>((<span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>)v8) <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span> <span style="color:#719e07">-</span> ((<span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>)v8 <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_4011F0</span>(v5, <span style="color:#719e07">&amp;</span>Buf1, <span style="color:#719e07">&amp;</span>v7[<span style="color:#268bd2">strlen</span>(<span style="color:#719e07">&amp;</span>Buf1)] <span style="color:#719e07">-</span> v7);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span><span style="color:#268bd2">memcmp</span>(<span style="color:#719e07">&amp;</span>Buf1, <span style="color:#719e07">&amp;</span>unk_404018, <span style="color:#2aa198">0x1Du</span>) )
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;yes~~~~~~~~~~~~~~~~~</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, v4);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">else</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;no!!!!!!!!!!!!!!!!!!!!!!!</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, v4);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>去混淆后直接看到是rc4裸的，直接秒了</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">9
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff7b72">from</span> <span style="color:#ff7b72">Crypto.Cipher</span> <span style="color:#ff7b72">import</span> ARC4
+</span></span></code></pre></div><p>去混淆后直接看到是rc4裸的，直接秒了</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">from</span> Crypto.Cipher <span style="color:#719e07">import</span> ARC4
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>c <span style="color:#ff7b72;font-weight:bold">=</span> [<span style="color:#a5d6ff">0x56</span>, <span style="color:#a5d6ff">0x05</span>, <span style="color:#a5d6ff">0x03</span>, <span style="color:#a5d6ff">0x86</span>, <span style="color:#a5d6ff">0x7D</span>, <span style="color:#a5d6ff">0xEC</span>, <span style="color:#a5d6ff">0xF9</span>, <span style="color:#a5d6ff">0xAB</span>, <span style="color:#a5d6ff">0x26</span>, <span style="color:#a5d6ff">0xAA</span>, <span style="color:#a5d6ff">0x2D</span>, <span style="color:#a5d6ff">0x10</span>, <span style="color:#a5d6ff">0xB1</span>, <span style="color:#a5d6ff">0xD9</span>, <span style="color:#a5d6ff">0xD5</span>, <span style="color:#a5d6ff">0x8D</span>, <span style="color:#a5d6ff">0x0F</span>, <span style="color:#a5d6ff">0xC6</span>, <span style="color:#a5d6ff">0x49</span>, <span style="color:#a5d6ff">0xA7</span>, <span style="color:#a5d6ff">0xFB</span>, <span style="color:#a5d6ff">0x9D</span>, <span style="color:#a5d6ff">0xB1</span>, <span style="color:#a5d6ff">0xA4</span>, <span style="color:#a5d6ff">0x4D</span>, <span style="color:#a5d6ff">0x2D</span>, <span style="color:#a5d6ff">0x85</span>, <span style="color:#a5d6ff">0x2F</span>, <span style="color:#a5d6ff">0x9A</span>]
+</span></span><span style="display:flex;"><span>c <span style="color:#719e07">=</span> [<span style="color:#2aa198">0x56</span>, <span style="color:#2aa198">0x05</span>, <span style="color:#2aa198">0x03</span>, <span style="color:#2aa198">0x86</span>, <span style="color:#2aa198">0x7D</span>, <span style="color:#2aa198">0xEC</span>, <span style="color:#2aa198">0xF9</span>, <span style="color:#2aa198">0xAB</span>, <span style="color:#2aa198">0x26</span>, <span style="color:#2aa198">0xAA</span>, <span style="color:#2aa198">0x2D</span>, <span style="color:#2aa198">0x10</span>, <span style="color:#2aa198">0xB1</span>, <span style="color:#2aa198">0xD9</span>, <span style="color:#2aa198">0xD5</span>, <span style="color:#2aa198">0x8D</span>, <span style="color:#2aa198">0x0F</span>, <span style="color:#2aa198">0xC6</span>, <span style="color:#2aa198">0x49</span>, <span style="color:#2aa198">0xA7</span>, <span style="color:#2aa198">0xFB</span>, <span style="color:#2aa198">0x9D</span>, <span style="color:#2aa198">0xB1</span>, <span style="color:#2aa198">0xA4</span>, <span style="color:#2aa198">0x4D</span>, <span style="color:#2aa198">0x2D</span>, <span style="color:#2aa198">0x85</span>, <span style="color:#2aa198">0x2F</span>, <span style="color:#2aa198">0x9A</span>]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>key <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#79c0ff">b</span><span style="color:#a5d6ff">&#39;</span><span style="color:#79c0ff">\xEF\xBE\xAD\xDE</span><span style="color:#a5d6ff">&#39;</span>[::<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">1</span>]<span style="color:#ff7b72;font-weight:bold">+</span><span style="color:#79c0ff">b</span><span style="color:#a5d6ff">&#39;xV4</span><span style="color:#79c0ff">\x12</span><span style="color:#a5d6ff">&#39;</span>[::<span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">1</span>]
+</span></span><span style="display:flex;"><span>key <span style="color:#719e07">=</span> <span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;</span><span style="color:#cb4b16">\xEF\xBE\xAD\xDE</span><span style="color:#2aa198">&#39;</span>[::<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>]<span style="color:#719e07">+</span><span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;xV4</span><span style="color:#cb4b16">\x12</span><span style="color:#2aa198">&#39;</span>[::<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>cipher <span style="color:#ff7b72;font-weight:bold">=</span> ARC4<span style="color:#ff7b72;font-weight:bold">.</span>new(key)
-</span></span><span style="display:flex;"><span>m <span style="color:#ff7b72;font-weight:bold">=</span> cipher<span style="color:#ff7b72;font-weight:bold">.</span>decrypt(bytes(c))
-</span></span><span style="display:flex;"><span>print(bytes(m))
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>flag: <code>flag{jUnkc0dE_C0oO00o0oo0ode}</code></p>
+</span></span><span style="display:flex;"><span>cipher <span style="color:#719e07">=</span> ARC4<span style="color:#719e07">.</span>new(key)
+</span></span><span style="display:flex;"><span>m <span style="color:#719e07">=</span> cipher<span style="color:#719e07">.</span>decrypt(<span style="color:#b58900">bytes</span>(c))
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(<span style="color:#b58900">bytes</span>(m))
+</span></span></code></pre></div><p>flag: <code>flag{jUnkc0dE_C0oO00o0oo0ode}</code></p>
 <p>题目链接: 
 <a href="https://github.com/Military-axe/ctf/tree/master/2023/junk" target="_blank" rel="noopener">ctf/2023/junk at master · Military-axe/ctf · GitHub</a></p>
 <h1 id="mov">mov</h1>
@@ -269,29 +205,15 @@
 <p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306301658039.png" alt="image-20230630165848973"></p>
 <p>断下来后，单步跟踪发现是讲输入每个先异或0x12再加上0x34</p>
 <p>exp:</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">8
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>c <span style="color:#ff7b72;font-weight:bold">=</span> [<span style="color:#a5d6ff">0xA8</span>, <span style="color:#a5d6ff">0xB2</span>, <span style="color:#a5d6ff">0xA7</span>, <span style="color:#a5d6ff">0xA9</span>, <span style="color:#a5d6ff">0x9D</span>, <span style="color:#a5d6ff">0xB3</span>, <span style="color:#a5d6ff">0x56</span>, <span style="color:#a5d6ff">0x98</span>, <span style="color:#a5d6ff">0xA8</span>, <span style="color:#a5d6ff">0x9B</span>, <span style="color:#a5d6ff">0x5B</span>, <span style="color:#a5d6ff">0xA5</span>, <span style="color:#a5d6ff">0x5A</span>,
-</span></span><span style="display:flex;"><span>     <span style="color:#a5d6ff">0x9A</span>, <span style="color:#a5d6ff">0x56</span>, <span style="color:#a5d6ff">0x94</span>, <span style="color:#a5d6ff">0x81</span>, <span style="color:#a5d6ff">0x9E</span>, <span style="color:#a5d6ff">0xB1</span>, <span style="color:#a5d6ff">0x94</span>, <span style="color:#a5d6ff">0x94</span>, <span style="color:#a5d6ff">0x94</span>, <span style="color:#a5d6ff">0x94</span>, <span style="color:#a5d6ff">0x94</span>, <span style="color:#a5d6ff">0x94</span>, <span style="color:#a5d6ff">0xA3</span>]
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>c <span style="color:#719e07">=</span> [<span style="color:#2aa198">0xA8</span>, <span style="color:#2aa198">0xB2</span>, <span style="color:#2aa198">0xA7</span>, <span style="color:#2aa198">0xA9</span>, <span style="color:#2aa198">0x9D</span>, <span style="color:#2aa198">0xB3</span>, <span style="color:#2aa198">0x56</span>, <span style="color:#2aa198">0x98</span>, <span style="color:#2aa198">0xA8</span>, <span style="color:#2aa198">0x9B</span>, <span style="color:#2aa198">0x5B</span>, <span style="color:#2aa198">0xA5</span>, <span style="color:#2aa198">0x5A</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#2aa198">0x9A</span>, <span style="color:#2aa198">0x56</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0x81</span>, <span style="color:#2aa198">0x9E</span>, <span style="color:#2aa198">0xB1</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0xA3</span>]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">for</span> i <span style="color:#ff7b72;font-weight:bold">in</span> range(len(c)):
-</span></span><span style="display:flex;"><span>    c[i] <span style="color:#ff7b72;font-weight:bold">-=</span> <span style="color:#a5d6ff">0x34</span>
-</span></span><span style="display:flex;"><span>    c[i] <span style="color:#ff7b72;font-weight:bold">^=</span> <span style="color:#a5d6ff">0x12</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#b58900">len</span>(c)):
+</span></span><span style="display:flex;"><span>    c[i] <span style="color:#719e07">-=</span> <span style="color:#2aa198">0x34</span>
+</span></span><span style="display:flex;"><span>    c[i] <span style="color:#719e07">^=</span> <span style="color:#2aa198">0x12</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>print(bytes(c))
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>flag: <code>flag{m0vfu5c4t0r_xorrrrrr}</code></p>
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(<span style="color:#b58900">bytes</span>(c))
+</span></span></code></pre></div><p>flag: <code>flag{m0vfu5c4t0r_xorrrrrr}</code></p>
 <p>题目链接：
 <a href="https://github.com/Military-axe/ctf/tree/master/2023/move" target="_blank" rel="noopener">ctf/2023/move at master · Military-axe/ctf · GitHub</a></p>
 <h1 id="参考">参考</h1>
@@ -346,7 +268,7 @@
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -359,7 +281,7 @@
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -384,7 +306,7 @@
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -392,15 +314,15 @@
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -420,6 +342,12 @@
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -458,24 +386,6 @@
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -501,6 +411,9 @@
     
 
     
+  
+
+
   </body>
 </html>
 

@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
   <title>Binary Diffing 1</title>
@@ -24,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -35,7 +40,7 @@
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -109,18 +114,6 @@
 </nav>
 
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css"
-    integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"
-    integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4"
-    crossorigin="anonymous"></script>
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
-    integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
-
-
 <div id="main">
   <div id="content">
     <div>
@@ -148,101 +141,6 @@
         <div class="entry-content">
           
           
-          
-            <nav id="TableOfContents">
-  <ul>
-    <li><a href="#背景">背景</a>
-      <ul>
-        <li><a href="#bin-diff">Bin diff</a></li>
-        <li><a href="#随机森林41">随机森林</a></li>
-        <li><a href="#n-grams42">N-grams</a></li>
-      </ul>
-    </li>
-    <li><a href="#文章">文章</a>
-      <ul>
-        <li><a href="#bitshred-feature-hashing-malware-for-scalable-triage-and-semantic-analysis1">Bitshred: feature hashing malware for scalable triage and semantic analysis.</a>
-          <ul>
-            <li><a href="#摘要">摘要</a></li>
-          </ul>
-        </li>
-        <li><a href="#binary-function-clustering-using-semantic-hashes2">Binary function clustering using semantic hashes.</a>
-          <ul>
-            <li><a href="#摘要-1">摘要</a></li>
-          </ul>
-        </li>
-        <li><a href="#binslayer-accurate-comparison-of-binary-executables-3">Binslayer: accurate comparison of binary executables. </a>
-          <ul>
-            <li><a href="#摘要-2">摘要</a></li>
-          </ul>
-        </li>
-        <li><a href="#control-flow-based-malware-variant-detection-4">control flow-based malware variant detection. </a>
-          <ul>
-            <li><a href="#摘要-3">摘要</a></li>
-          </ul>
-        </li>
-        <li><a href="#mutantx-s-scalable-malware-clustering-based-on-static-features-5">MutantX-S: Scalable Malware Clustering Based on Static Features. </a>
-          <ul>
-            <li><a href="#摘要-4">摘要</a></li>
-            <li><a href="#具体">具体</a></li>
-          </ul>
-        </li>
-        <li><a href="#semantics-based-obfuscation-resilient-binary-code-similarity-comparison-with-applications-to-software-plagiarism-detection6">Semantics-based obfuscation-resilient binary code similarity comparison with applications to software plagiarism detection</a>
-          <ul>
-            <li><a href="#摘要-5">摘要</a></li>
-          </ul>
-        </li>
-        <li><a href="#leveraging-semantic-signatures-for-bug-search-in-binary-programs7">Leveraging semantic signatures for bug search in binary programs</a>
-          <ul>
-            <li><a href="#摘要-6">摘要</a></li>
-          </ul>
-        </li>
-        <li><a href="#when-coding-style-survives-compilation-de-anonymizing-programmers-from-executable-binaries8">When Coding Style Survives Compilation: De-anonymizing Programmers from Executable Binaries</a>
-          <ul>
-            <li><a href="#摘要-7">摘要</a></li>
-            <li><a href="#具体-1">具体</a></li>
-          </ul>
-        </li>
-        <li><a href="#cross-architecture-bug-search-in-binary-executables9">Cross-architecture bug search in binary executables.</a>
-          <ul>
-            <li><a href="#摘要-8">摘要</a></li>
-            <li><a href="#具体-2">具体</a></li>
-          </ul>
-        </li>
-        <li><a href="#bingo-cross-architecture-cross-os-binary-search10">BinGo: cross-architecture cross-OS binary search</a>
-          <ul>
-            <li><a href="#摘要-9">摘要</a></li>
-            <li><a href="#具体-3">具体</a></li>
-          </ul>
-        </li>
-        <li><a href="#statistical-similarity-of-binaries11">Statistical similarity of binaries.</a>
-          <ul>
-            <li><a href="#摘要-10">摘要</a></li>
-            <li><a href="#具体-4">具体</a></li>
-          </ul>
-        </li>
-        <li><a href="#discovre-efficient-cross-architecture-identification-of-bugs-in-binary-code12">discovRE: Efficient Cross-Architecture Identification of Bugs in Binary Code</a>
-          <ul>
-            <li><a href="#摘要-11">摘要</a></li>
-            <li><a href="#具体-5">具体</a></li>
-          </ul>
-        </li>
-        <li><a href="#scalable-graph-based-bug-search-for-firmware-images-13">Scalable graph-based bug search for firmware images. </a>
-          <ul>
-            <li><a href="#摘要-12">摘要</a></li>
-            <li><a href="#具体-6">具体</a></li>
-          </ul>
-        </li>
-        <li><a href="#cross-architecture-binary-semantics-understanding-via-similar-code-comparison14">Cross-Architecture Binary Semantics Understanding via Similar Code Comparison</a>
-          <ul>
-            <li><a href="#摘要-13">摘要</a></li>
-            <li><a href="#具体-7">具体</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-    <li><a href="#参考">参考</a></li>
-  </ul>
-</nav>
           
           <p>最近想看看binary diffing的内容，直接从头看看一篇篇翻，涉及到很多机器学习内容，很多不懂的，慢慢来看吧。这里先看了10几篇，很多都只看了一个摘要。
 主要是了解一下思路，看看这个领域的内容的研究历史，Binary Diffing 1暂时只看到2016年的paper，后续继续更新，主要文章引用如下</p>
@@ -330,7 +228,7 @@
 <p>最后,在压缩特征向量的集合应用<strong>基于原型的聚类算法</strong>和分区样本到不同的集群,每个代表一组类似的恶意程序。</p>
 <p>预处理就是从内存中提取原始指令，不适用于现在的复杂场景，比如自解码等</p>
 <p>指令编码实际上是人工设定了一部分指令编码来代替对应的汇编指令组（比如这一些指令表示从寄存存取数据）</p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202308191555432.png" alt="image-20230814101200464" style="zoom:50%;" />
+<!-- raw HTML omitted -->
 <p>分析使用标准的
 <a href="https://zhuanlan.zhihu.com/p/32829048" target="_blank" rel="noopener">N-gram分析法</a>，序列上有一个固定大小的移动窗口，窗口内容就是恶意样本内容</p>
 <p>N-gram的N是n个子序列，对应的就是N个操作码，构建了一个|S|维的向量空间(\(|S|=|O|^N\)，O是所有可能操作码的集合)的结构向量\(V\)，\(V\)的每个维数是一个特定的操作码。</p>
@@ -410,12 +308,12 @@ $$
 <li>通过考虑完整的函数语义来实现精确性。</li>
 <li>可拓展至大型真实二进制文件。</li>
 </ol>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202308191554427.png" alt="image-20230816210021713" style="zoom:67%;" />
+<!-- raw HTML omitted -->
 <p>BinGo会首先内联所有库和用户自定义函数（捕获完整语义），然后选择性剪枝（图2Trace Pruning）来减少路径，避免路径爆炸。针对困难2，提出了一个专门的选择内联算法。</p>
 <p>将汇编代码转化为IR（中间代码）来做到拓展性。设定了过滤器，可以在匹配之前去除大量不相关的函数。设定了一个函数过滤算法，目的是减少匹配的函数，提高效率。针对困难3。</p>
 <p>提取程序的长度变量部分轨迹，在不同水平层面对函数建模（与底层架构无关）。之后可以从函数模型中提取函数语义用于函数相似性评分。针对的是困难1，下图是提取长度部分，提取长度的算法是用2014年的
 <a href="https://csaws.cs.technion.ac.il/~yahave/papers/pldi14-tracelets.pdf" target="_blank" rel="noopener">David的论文</a></p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202308191554831.png" alt="image-20230816213030895" style="zoom:80%;" />
+<!-- raw HTML omitted -->
 <p><strong>语义提取</strong></p>
 <p>提取部分长度轨迹后，可以从中提取语义，提取三元组\(&lt;mem,reg,flag&gt;\)（内存，寄存器，条件跳转位）。主要捕捉3元组前后变化状态之间的关系。可以使用约束求解（Z3）来判断语义相似度，但是真实世界使用代价巨大，所以引入了机器学习。</p>
 <blockquote>
@@ -423,9 +321,9 @@ $$
 </blockquote>
 <p><strong>功能匹配</strong></p>
 <p>利用不同的长度轨迹线来建模函数，分3中粒度（1，2，3），所有轨迹线共同组成函数模型。针对下图为例做解释</p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202308191554585.png" alt="image-20230816215552603" style="zoom:50%;" />
+<!-- raw HTML omitted -->
 <p>函数模型的签名为\(M_{sig} = {&lt;1&gt;,&lt;2&gt;,&hellip;,&lt;1,2&gt;,&lt;2,5&gt;,&hellip;,&lt;1,2,4&gt;,&lt;2,4,7&gt;}\)</p>
-<p>函数模型的目标为\(M_{tar}={<c>,<b>,&hellip;,&lt;a,b&gt;,&lt;b,c&gt;,&hellip;,&lt;a,b,c&gt;,&lt;b,c,f&gt;}\)</p>
+<p>函数模型的目标为\(M_{tar}={<!-- raw HTML omitted -->,<!-- raw HTML omitted -->,&hellip;,&lt;a,b&gt;,&lt;b,c&gt;,&hellip;,&lt;a,b,c&gt;,&lt;b,c,f&gt;}\)</p>
 <p>支持n-to-m,1-to-1,1-to-n,n-to-1,1-to-1的匹配。计算相似度公式如下
 $$
 sim(M_{sig}, M_{tar}) = \frac{M_{sig}\cap M_{tar}}{M_{sig}}
@@ -436,7 +334,7 @@ $$</p>
 <p>我们要解决的问题是在剥离的二进制文件中找到相似的程序。我们提出了一种新的统计方法来测量两个程序之间的相似性。我们的相似性概念使我们即使在使用不同编译器编译或修改过代码的情况下也能找到相似代码。我们的主要思路是通过组合使用相似性：将代码分解为更小的可比较片段，定义片段之间的语义相似性，并使用统计推理将片段相似性提升为程序之间的相似性。我们在一个名为 Esh 的工具中实现了我们的方法，并将其应用于查找各种跨编译器和版本的突出漏洞，包括 Heartbleed、Shellshock 和 Venom。我们的研究表明，Esh 的结果准确率很高，几乎没有误报&ndash;这对于在剥离的二进制文件中进行漏洞搜索来说是一个至关重要的因素。</p>
 <h3 id="具体-4">具体</h3>
 <p>从图相似性来的思路，c，e两个代码来自openssl不同编译器的结果，d是无关代码。将目标代码分割成更小的链，通过对比链的相似度推广到更大部分的相似度</p>
-<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202308191554644.png" alt="image-20230817140805611" style="zoom:80%;" />
+<!-- raw HTML omitted -->
 <p><strong>合成相似性</strong></p>
 <p>将程序分解成较小的片段，称之为“链”，这些“链”来进行比较。</p>
 <p>比较链使用“程序验证器”，传入相同的输入来检查中间值和输出值是否相同，不等同时会根据匹配值占总字符串总值来统计推理。</p>
@@ -512,17 +410,9 @@ $$</p>
 <p>语义签名还有SCA，SCA是由执行中调用的系统调用名称喝参数组成，下图就是上图的系统调用</p>
 <p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202308191554963.png" alt="image-20230819153037409"></p>
 <p>系统调用有一些是指针，所以需要提取出指针对应的数据。然后文章就是提取指针数据，压缩数据，规范指针的一些操作。序列样式如下</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-tex" data-lang="tex"><span style="display:flex;"><span>0x00000001    0x00000027
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-tex" data-lang="tex"><span style="display:flex;"><span>0x00000001    0x00000027
 </span></span><span style="display:flex;"><span>0x00000005    0x00000005
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>序列相似性比较</strong></p>
+</span></span></code></pre></div><p><strong>序列相似性比较</strong></p>
 <p>对比序列有很多算法，这篇文章使用的是最长公共序列（LCS），使用jaccard指数计算序列A和B的相似度。\(|A\cap B|\)表示他们的LCS长度，\(|A|,|B|\)分别表示A和B的长度
 $$
 J(A,B) = \frac{|A\cap B|}{|A\cup B|}=\frac{|A\cap B|}{|A|+|B|-|A\cap B|}
@@ -644,7 +534,7 @@ $$</p>
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -657,7 +547,7 @@ $$</p>
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -682,7 +572,7 @@ $$</p>
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -690,15 +580,15 @@ $$</p>
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -718,6 +608,12 @@ $$</p>
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -756,24 +652,6 @@ $$</p>
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -799,6 +677,9 @@ $$</p>
     
 
     
+  
+
+
   </body>
 </html>
 

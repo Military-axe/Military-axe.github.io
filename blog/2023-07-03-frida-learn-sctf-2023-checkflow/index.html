@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
   <title>Frida learn &amp;&amp; sctf 2023 checkFlow</title>
@@ -24,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -35,7 +40,7 @@
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -109,18 +114,6 @@
 </nav>
 
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css"
-    integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"
-    integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4"
-    crossorigin="anonymous"></script>
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
-    integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
-
-
 <div id="main">
   <div id="content">
     <div>
@@ -131,7 +124,7 @@
 
 <header>
   <p class="meta">Jul 3, 2023
-     - 8 minute read 
+     - 6 minute read 
     
 
     
@@ -149,748 +142,356 @@
           
           
           
-            <nav id="TableOfContents">
-  <ul>
-    <li><a href="#frida-hook-函数">frida hook 函数</a></li>
-    <li><a href="#checkflow">checkFlow</a>
-      <ul>
-        <li><a href="#frida-from-nu1l-wp">frida from NU1L WP</a></li>
-        <li><a href="#ldpc-from-official-wp">LDPC from Official WP</a></li>
-      </ul>
-    </li>
-    <li><a href="#参考">参考</a></li>
-  </ul>
-</nav>
-          
           <p>没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下</p>
 <h1 id="frida-hook-函数">frida hook 函数</h1>
 <p>平时看frida hook函数都是在android中，这里主要还是在elf和pe上。</p>
 <p>下面的脚本是frida attach到进程上，并捕获对应函数，函数给地址就可以，当函数指针一样。然后将值打印出来。</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">frida</span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">sys</span>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">import</span> frida
+</span></span><span style="display:flex;"><span><span style="color:#719e07">import</span> sys
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>session <span style="color:#ff7b72;font-weight:bold">=</span> frida<span style="color:#ff7b72;font-weight:bold">.</span>attach(<span style="color:#a5d6ff">&#34;hello&#34;</span>)
-</span></span><span style="display:flex;"><span>script <span style="color:#ff7b72;font-weight:bold">=</span> session<span style="color:#ff7b72;font-weight:bold">.</span>create_script(<span style="color:#a5d6ff">&#34;&#34;&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">Interceptor.attach(ptr(&#34;</span><span style="color:#a5d6ff">%s</span><span style="color:#a5d6ff">&#34;), {
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">    onEnter(args) {
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">        send(args[0].toInt32());
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">    }
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">});
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">&#34;&#34;&#34;</span> <span style="color:#ff7b72;font-weight:bold">%</span> int(sys<span style="color:#ff7b72;font-weight:bold">.</span>argv[<span style="color:#a5d6ff">1</span>], <span style="color:#a5d6ff">16</span>))
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">def</span> <span style="color:#d2a8ff;font-weight:bold">on_message</span>(message, data):
-</span></span><span style="display:flex;"><span>    print(message)
-</span></span><span style="display:flex;"><span>script<span style="color:#ff7b72;font-weight:bold">.</span>on(<span style="color:#a5d6ff">&#39;message&#39;</span>, on_message)
-</span></span><span style="display:flex;"><span>script<span style="color:#ff7b72;font-weight:bold">.</span>load()
-</span></span><span style="display:flex;"><span>sys<span style="color:#ff7b72;font-weight:bold">.</span>stdin<span style="color:#ff7b72;font-weight:bold">.</span>read()
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>命令行传入需要hook的函数的地址。可以gdb attach进去看再detch出来。或者关掉pie自己算一下偏移。</p>
+</span></span><span style="display:flex;"><span>session <span style="color:#719e07">=</span> frida<span style="color:#719e07">.</span>attach(<span style="color:#2aa198">&#34;hello&#34;</span>)
+</span></span><span style="display:flex;"><span>script <span style="color:#719e07">=</span> session<span style="color:#719e07">.</span>create_script(<span style="color:#2aa198">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">Interceptor.attach(ptr(&#34;</span><span style="color:#2aa198">%s</span><span style="color:#2aa198">&#34;), {
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">    onEnter(args) {
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">        send(args[0].toInt32());
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">});
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">&#34;&#34;&#34;</span> <span style="color:#719e07">%</span> <span style="color:#b58900">int</span>(sys<span style="color:#719e07">.</span>argv[<span style="color:#2aa198">1</span>], <span style="color:#2aa198">16</span>))
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">on_message</span>(message, data):
+</span></span><span style="display:flex;"><span>    <span style="color:#b58900">print</span>(message)
+</span></span><span style="display:flex;"><span>script<span style="color:#719e07">.</span>on(<span style="color:#2aa198">&#39;message&#39;</span>, on_message)
+</span></span><span style="display:flex;"><span>script<span style="color:#719e07">.</span>load()
+</span></span><span style="display:flex;"><span>sys<span style="color:#719e07">.</span>stdin<span style="color:#719e07">.</span>read()
+</span></span></code></pre></div><p>命令行传入需要hook的函数的地址。可以gdb attach进去看再detch出来。或者关掉pie自己算一下偏移。</p>
 <p>捕获函数指针并调用可以这么写</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">frida</span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">sys</span>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">import</span> frida
+</span></span><span style="display:flex;"><span><span style="color:#719e07">import</span> sys
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>session <span style="color:#ff7b72;font-weight:bold">=</span> frida<span style="color:#ff7b72;font-weight:bold">.</span>attach(<span style="color:#a5d6ff">&#34;hello&#34;</span>)
-</span></span><span style="display:flex;"><span>script <span style="color:#ff7b72;font-weight:bold">=</span> session<span style="color:#ff7b72;font-weight:bold">.</span>create_script(<span style="color:#a5d6ff">&#34;&#34;&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">const f = new NativeFunction(ptr(&#34;</span><span style="color:#a5d6ff">%s</span><span style="color:#a5d6ff">&#34;), &#39;void&#39;, [&#39;int&#39;]);
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">f(1911);
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">f(1911);
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">f(1911);
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">&#34;&#34;&#34;</span> <span style="color:#ff7b72;font-weight:bold">%</span> int(sys<span style="color:#ff7b72;font-weight:bold">.</span>argv[<span style="color:#a5d6ff">1</span>], <span style="color:#a5d6ff">16</span>))
-</span></span><span style="display:flex;"><span>script<span style="color:#ff7b72;font-weight:bold">.</span>load()
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>用<code>new NativeFunction(ptr(&quot;%s&quot;), 'void', ['int'])</code>来捕获，第一个参数是函数指针，第二个是返回值，第三个是函数的参数类型列表。</p>
+</span></span><span style="display:flex;"><span>session <span style="color:#719e07">=</span> frida<span style="color:#719e07">.</span>attach(<span style="color:#2aa198">&#34;hello&#34;</span>)
+</span></span><span style="display:flex;"><span>script <span style="color:#719e07">=</span> session<span style="color:#719e07">.</span>create_script(<span style="color:#2aa198">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">const f = new NativeFunction(ptr(&#34;</span><span style="color:#2aa198">%s</span><span style="color:#2aa198">&#34;), &#39;void&#39;, [&#39;int&#39;]);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">f(1911);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">f(1911);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">f(1911);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">&#34;&#34;&#34;</span> <span style="color:#719e07">%</span> <span style="color:#b58900">int</span>(sys<span style="color:#719e07">.</span>argv[<span style="color:#2aa198">1</span>], <span style="color:#2aa198">16</span>))
+</span></span><span style="display:flex;"><span>script<span style="color:#719e07">.</span>load()
+</span></span></code></pre></div><p>用<code>new NativeFunction(ptr(&quot;%s&quot;), 'void', ['int'])</code>来捕获，第一个参数是函数指针，第二个是返回值，第三个是函数的参数类型列表。</p>
 <p>有意思的是，如果在逆向或者分析时不知道确定类型，只知道是指针，那我们可以直接说是指针类型（只要确定是要被引用的就可以用指针类型）。</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>new NativeFunction(ptr(&#34;%s&#34;), &#39;void&#39;, [&#39;pointer&#39;])
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>比如字符串类型的参数，直接传指针就可以。</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">frida</span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">sys</span>
+<pre tabindex="0"><code>new NativeFunction(ptr(&#34;%s&#34;), &#39;void&#39;, [&#39;pointer&#39;])
+</code></pre><p>比如字符串类型的参数，直接传指针就可以。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">import</span> frida
+</span></span><span style="display:flex;"><span><span style="color:#719e07">import</span> sys
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>session <span style="color:#ff7b72;font-weight:bold">=</span> frida<span style="color:#ff7b72;font-weight:bold">.</span>attach(<span style="color:#a5d6ff">&#34;hi&#34;</span>)
-</span></span><span style="display:flex;"><span>script <span style="color:#ff7b72;font-weight:bold">=</span> session<span style="color:#ff7b72;font-weight:bold">.</span>create_script(<span style="color:#a5d6ff">&#34;&#34;&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">const st = Memory.allocUtf8String(&#34;TESTMEPLZ!&#34;);
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">const f = new NativeFunction(ptr(&#34;</span><span style="color:#a5d6ff">%s</span><span style="color:#a5d6ff">&#34;), &#39;int&#39;, [&#39;pointer&#39;]);
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">    // In NativeFunction param 2 is the return value type,
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">    // and param 3 is an array of input types
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">f(st);
-</span></span></span><span style="display:flex;"><span><span style="color:#a5d6ff">&#34;&#34;&#34;</span> <span style="color:#ff7b72;font-weight:bold">%</span> int(sys<span style="color:#ff7b72;font-weight:bold">.</span>argv[<span style="color:#a5d6ff">1</span>], <span style="color:#a5d6ff">16</span>))
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">def</span> <span style="color:#d2a8ff;font-weight:bold">on_message</span>(message, data):
-</span></span><span style="display:flex;"><span>    print(message)
-</span></span><span style="display:flex;"><span>script<span style="color:#ff7b72;font-weight:bold">.</span>on(<span style="color:#a5d6ff">&#39;message&#39;</span>, on_message)
-</span></span><span style="display:flex;"><span>script<span style="color:#ff7b72;font-weight:bold">.</span>load()
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>对于调用PE中的一些api也可以这样，不同的是api一般我们需要“找到”，然后才能调用，（只出js代码）。</p>
+</span></span><span style="display:flex;"><span>session <span style="color:#719e07">=</span> frida<span style="color:#719e07">.</span>attach(<span style="color:#2aa198">&#34;hi&#34;</span>)
+</span></span><span style="display:flex;"><span>script <span style="color:#719e07">=</span> session<span style="color:#719e07">.</span>create_script(<span style="color:#2aa198">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">const st = Memory.allocUtf8String(&#34;TESTMEPLZ!&#34;);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">const f = new NativeFunction(ptr(&#34;</span><span style="color:#2aa198">%s</span><span style="color:#2aa198">&#34;), &#39;int&#39;, [&#39;pointer&#39;]);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">    // In NativeFunction param 2 is the return value type,
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">    // and param 3 is an array of input types
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">f(st);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">&#34;&#34;&#34;</span> <span style="color:#719e07">%</span> <span style="color:#b58900">int</span>(sys<span style="color:#719e07">.</span>argv[<span style="color:#2aa198">1</span>], <span style="color:#2aa198">16</span>))
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">on_message</span>(message, data):
+</span></span><span style="display:flex;"><span>    <span style="color:#b58900">print</span>(message)
+</span></span><span style="display:flex;"><span>script<span style="color:#719e07">.</span>on(<span style="color:#2aa198">&#39;message&#39;</span>, on_message)
+</span></span><span style="display:flex;"><span>script<span style="color:#719e07">.</span>load()
+</span></span></code></pre></div><p>对于调用PE中的一些api也可以这样，不同的是api一般我们需要“找到”，然后才能调用，（只出js代码）。</p>
 <p>这时候需要用到<code>Module</code>模块，同时对于我们自己生成的一些数据可能要用Memory模块</p>
 <blockquote>
 <p>Module模块主要是对一些库操作，比如查找库机制，查找库中函数地址等。对frida api的具体学习可以查看官方文档或参考FRIDA-API使用篇</p>
 </blockquote>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">6
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#ff7b72">var</span> pMessageBoxW <span style="color:#ff7b72;font-weight:bold">=</span> Module.findExportByName(<span style="color:#a5d6ff">&#34;user32.dll&#34;</span>, <span style="color:#a5d6ff">&#39;MessageBoxA&#39;</span>)
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">var</span> lpText <span style="color:#ff7b72;font-weight:bold">=</span> Memory.allocAnsiString(<span style="color:#a5d6ff">&#34;I&#39;m New MessageBox&#34;</span>);
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">var</span> funMsgBox <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72">new</span> NativeFunction(pMessageBoxW, <span style="color:#a5d6ff">&#39;uint32&#39;</span>,[<span style="color:#a5d6ff">&#39;uint32&#39;</span>,<span style="color:#a5d6ff">&#39;pointer&#39;</span>,<span style="color:#a5d6ff">&#39;pointer&#39;</span>,<span style="color:#a5d6ff">&#39;uint32&#39;</span>]);
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#268bd2">var</span> pMessageBoxW <span style="color:#719e07">=</span> Module.findExportByName(<span style="color:#2aa198">&#34;user32.dll&#34;</span>, <span style="color:#2aa198">&#39;MessageBoxA&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">var</span> lpText <span style="color:#719e07">=</span> Memory.allocAnsiString(<span style="color:#2aa198">&#34;I&#39;m New MessageBox&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">var</span> funMsgBox <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> NativeFunction(pMessageBoxW, <span style="color:#2aa198">&#39;uint32&#39;</span>,[<span style="color:#2aa198">&#39;uint32&#39;</span>,<span style="color:#2aa198">&#39;pointer&#39;</span>,<span style="color:#2aa198">&#39;pointer&#39;</span>,<span style="color:#2aa198">&#39;uint32&#39;</span>]);
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic">// 调用
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>funMsgBox(<span style="color:#a5d6ff">0</span>,ptr(lpText),ptr(lpText),<span style="color:#a5d6ff">0</span>);
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h1 id="checkflow">checkFlow</h1>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 调用
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>funMsgBox(<span style="color:#2aa198">0</span>,ptr(lpText),ptr(lpText),<span style="color:#2aa198">0</span>);
+</span></span></code></pre></div><h1 id="checkflow">checkFlow</h1>
 <p>这题分析两个write up的做法，一个是NU1L的，一个是官方WP，因为NU1L使用的做法就是frida注入来爆破。官方wp说这是一个算法，也能学到一些东西。先按照NU1L的来分析。</p>
 <p>题目地址：
 <a href="https://github.com/Military-axe/ctf/tree/master/2023/checkflow" target="_blank" rel="noopener">ctf/2023/checkflow at master · Military-axe/ctf · GitHub</a></p>
 <h2 id="frida-from-nu1l-wp">frida from NU1L WP</h2>
 <p>打开程序分析后，发现是c++静态编译+去符号的程序。我个人直接使用Finger恢复符号。官方WP说可以用bindiff或者flair来恢复符号，这个flair可以研究一下。因为Finger恢复符号是存在一定的假阳性的，而且我直接恢复程序所有的函数，还用了挺长时间（十几分钟？）</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">  9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 22
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 23
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 24
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 25
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 26
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 27
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 28
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 29
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 30
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 31
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 32
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 33
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 34
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 35
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 36
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 37
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 38
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 39
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 40
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 41
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 42
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 43
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 44
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 45
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 46
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 47
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 48
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 49
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 50
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 51
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 52
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 53
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 54
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 55
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 56
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 57
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 58
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 59
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 60
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 61
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 62
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 63
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 64
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 65
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 66
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 67
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 68
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 69
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 70
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 71
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 72
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 73
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 74
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 75
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 76
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 77
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 78
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 79
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 80
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 81
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 82
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 83
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 84
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 85
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 86
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 87
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 88
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 89
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 90
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 91
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 92
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 93
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 94
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 95
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 96
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 97
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 98
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 99
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">100
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">101
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">102
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">103
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">104
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">105
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">106
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">107
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">108
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">109
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">110
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">111
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">112
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">113
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">114
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">115
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">116
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">117
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">118
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">119
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">120
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">121
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">122
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">123
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">124
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">125
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">126
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">127
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">128
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">129
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">130
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">131
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">132
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">133
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">134
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">135
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">136
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">137
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">138
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">139
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">140
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">141
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">142
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">143
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">144
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">145
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">146
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">147
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">148
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">149
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">150
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">151
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">152
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">153
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">154
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">155
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">156
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">157
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">158
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">159
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">160
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">161
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">162
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">163
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">164
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">165
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">166
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">167
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">168
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#ff7b72">__int64</span> <span style="color:#d2a8ff;font-weight:bold">sub_4062C5</span>()
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#268bd2">__int64</span> <span style="color:#268bd2">sub_4062C5</span>()
 </span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">__int64</span> v0; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">int</span> v1; <span style="color:#8b949e;font-style:italic">// eax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">bool</span> v2; <span style="color:#8b949e;font-style:italic">// bl
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> v3; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span> v4; <span style="color:#8b949e;font-style:italic">// eax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">bool</span> v5; <span style="color:#8b949e;font-style:italic">// bl
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> v6; <span style="color:#8b949e;font-style:italic">// rbx
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> v7; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span> v8; <span style="color:#8b949e;font-style:italic">// eax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">bool</span> v9; <span style="color:#8b949e;font-style:italic">// bl
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> v10; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> v11; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">__int64</span> v12; <span style="color:#8b949e;font-style:italic">// rbx
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">__int64</span> v13; <span style="color:#8b949e;font-style:italic">// rax
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v15; <span style="color:#8b949e;font-style:italic">// [rsp+Eh] [rbp-162h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v16; <span style="color:#8b949e;font-style:italic">// [rsp+Fh] [rbp-161h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">int</span> i; <span style="color:#8b949e;font-style:italic">// [rsp+10h] [rbp-160h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">int</span> v18; <span style="color:#8b949e;font-style:italic">// [rsp+14h] [rbp-15Ch]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span> j; <span style="color:#8b949e;font-style:italic">// [rsp+18h] [rbp-158h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span> v20; <span style="color:#8b949e;font-style:italic">// [rsp+1Ch] [rbp-154h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>v21; <span style="color:#8b949e;font-style:italic">// [rsp+20h] [rbp-150h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>v22; <span style="color:#8b949e;font-style:italic">// [rsp+28h] [rbp-148h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>v23; <span style="color:#8b949e;font-style:italic">// [rsp+30h] [rbp-140h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>v24; <span style="color:#8b949e;font-style:italic">// [rsp+38h] [rbp-138h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>v25; <span style="color:#8b949e;font-style:italic">// [rsp+40h] [rbp-130h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> <span style="color:#ff7b72;font-weight:bold">*</span>v26; <span style="color:#8b949e;font-style:italic">// [rsp+48h] [rbp-128h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v27[<span style="color:#a5d6ff">32</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+50h] [rbp-120h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v28[<span style="color:#a5d6ff">32</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+70h] [rbp-100h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v29[<span style="color:#a5d6ff">32</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+90h] [rbp-E0h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v30[<span style="color:#a5d6ff">32</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+B0h] [rbp-C0h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v31[<span style="color:#a5d6ff">32</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+D0h] [rbp-A0h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v32[<span style="color:#a5d6ff">32</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+F0h] [rbp-80h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v33[<span style="color:#a5d6ff">32</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+110h] [rbp-60h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">char</span> v34[<span style="color:#a5d6ff">40</span>]; <span style="color:#8b949e;font-style:italic">// [rsp+130h] [rbp-40h] BYREF
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>  <span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">__int64</span> v35; <span style="color:#8b949e;font-style:italic">// [rsp+158h] [rbp-18h]
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>  v35 <span style="color:#ff7b72;font-weight:bold">=</span> __readfsqword(<span style="color:#a5d6ff">0x28u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__int64</span> v0; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">int</span> v1; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">bool</span> v2; <span style="color:#586e75">// bl
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> v3; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span> v4; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">bool</span> v5; <span style="color:#586e75">// bl
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> v6; <span style="color:#586e75">// rbx
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> v7; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span> v8; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">bool</span> v9; <span style="color:#586e75">// bl
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> v10; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> v11; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int64</span> v12; <span style="color:#586e75">// rbx
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#268bd2">__int64</span> v13; <span style="color:#586e75">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v15; <span style="color:#586e75">// [rsp+Eh] [rbp-162h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v16; <span style="color:#586e75">// [rsp+Fh] [rbp-161h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">int</span> i; <span style="color:#586e75">// [rsp+10h] [rbp-160h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">int</span> v18; <span style="color:#586e75">// [rsp+14h] [rbp-15Ch]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span> j; <span style="color:#586e75">// [rsp+18h] [rbp-158h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span> v20; <span style="color:#586e75">// [rsp+1Ch] [rbp-154h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>v21; <span style="color:#586e75">// [rsp+20h] [rbp-150h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>v22; <span style="color:#586e75">// [rsp+28h] [rbp-148h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>v23; <span style="color:#586e75">// [rsp+30h] [rbp-140h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>v24; <span style="color:#586e75">// [rsp+38h] [rbp-138h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>v25; <span style="color:#586e75">// [rsp+40h] [rbp-130h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> <span style="color:#719e07">*</span>v26; <span style="color:#586e75">// [rsp+48h] [rbp-128h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v27[<span style="color:#2aa198">32</span>]; <span style="color:#586e75">// [rsp+50h] [rbp-120h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v28[<span style="color:#2aa198">32</span>]; <span style="color:#586e75">// [rsp+70h] [rbp-100h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v29[<span style="color:#2aa198">32</span>]; <span style="color:#586e75">// [rsp+90h] [rbp-E0h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v30[<span style="color:#2aa198">32</span>]; <span style="color:#586e75">// [rsp+B0h] [rbp-C0h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v31[<span style="color:#2aa198">32</span>]; <span style="color:#586e75">// [rsp+D0h] [rbp-A0h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v32[<span style="color:#2aa198">32</span>]; <span style="color:#586e75">// [rsp+F0h] [rbp-80h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v33[<span style="color:#2aa198">32</span>]; <span style="color:#586e75">// [rsp+110h] [rbp-60h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">char</span> v34[<span style="color:#2aa198">40</span>]; <span style="color:#586e75">// [rsp+130h] [rbp-40h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>  <span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int64</span> v35; <span style="color:#586e75">// [rsp+158h] [rbp-18h]
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>
+</span></span><span style="display:flex;"><span>  v35 <span style="color:#719e07">=</span> __readfsqword(<span style="color:#2aa198">0x28u</span>);
 </span></span><span style="display:flex;"><span>  sub_406AE5();
-</span></span><span style="display:flex;"><span>  std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char__<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char__const__(v30);
-</span></span><span style="display:flex;"><span>  sub_481E90(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E32E0, <span style="color:#a5d6ff">&#34;Input the flow:</span><span style="color:#79c0ff">\n</span><span style="color:#a5d6ff">&#34;</span>);
-</span></span><span style="display:flex;"><span>  sub_40E100(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E3400, v30);
-</span></span><span style="display:flex;"><span>  v22 <span style="color:#ff7b72;font-weight:bold">=</span> v28;
-</span></span><span style="display:flex;"><span>  v21 <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72;font-weight:bold">&amp;</span>v16;
-</span></span><span style="display:flex;"><span>  std<span style="color:#ff7b72;font-weight:bold">::</span>vector_int__2__2__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_int__2__2___<span style="color:#ff7b72;font-weight:bold">::</span>vector_ulong_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_int__2__2___const__(v29, <span style="color:#a5d6ff">12LL</span>, <span style="color:#ff7b72;font-weight:bold">&amp;</span>v16);
-</span></span><span style="display:flex;"><span>  std<span style="color:#ff7b72;font-weight:bold">::</span>vector_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap___std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap____<span style="color:#ff7b72;font-weight:bold">::</span>vector_ulong_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap___const__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap____const__(
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char__<span style="color:#719e07">::</span>basic_string_std<span style="color:#719e07">::</span>allocator_char__const__(v30);
+</span></span><span style="display:flex;"><span>  sub_481E90(<span style="color:#719e07">&amp;</span>unk_5E32E0, <span style="color:#2aa198">&#34;Input the flow:</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>);
+</span></span><span style="display:flex;"><span>  sub_40E100(<span style="color:#719e07">&amp;</span>unk_5E3400, v30);
+</span></span><span style="display:flex;"><span>  v22 <span style="color:#719e07">=</span> v28;
+</span></span><span style="display:flex;"><span>  v21 <span style="color:#719e07">=</span> <span style="color:#719e07">&amp;</span>v16;
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>vector_int__2__2__std<span style="color:#719e07">::</span>allocator_int__2__2___<span style="color:#719e07">::</span>vector_ulong_std<span style="color:#719e07">::</span>allocator_int__2__2___const__(v29, <span style="color:#2aa198">12LL</span>, <span style="color:#719e07">&amp;</span>v16);
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>vector_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap___std<span style="color:#719e07">::</span>allocator_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap____<span style="color:#719e07">::</span>vector_ulong_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap___const__std<span style="color:#719e07">::</span>allocator_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap____const__(
 </span></span><span style="display:flex;"><span>    v27,
-</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">1LL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">1LL</span>,
 </span></span><span style="display:flex;"><span>    v29,
 </span></span><span style="display:flex;"><span>    v28);
 </span></span><span style="display:flex;"><span>  sub_407658(v29);
-</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#ff7b72;font-weight:bold">::</span>new_allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char___<span style="color:#ff7b72;font-weight:bold">::</span>_new_allocator___0(<span style="color:#ff7b72;font-weight:bold">&amp;</span>v16);
-</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#ff7b72;font-weight:bold">::</span>new_allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char___<span style="color:#ff7b72;font-weight:bold">::</span>_new_allocator___1(v28);
-</span></span><span style="display:flex;"><span>  v24 <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72;font-weight:bold">&amp;</span>v16;
-</span></span><span style="display:flex;"><span>  v23 <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72;font-weight:bold">&amp;</span>v15;
-</span></span><span style="display:flex;"><span>  std<span style="color:#ff7b72;font-weight:bold">::</span>vector_int__2__2__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_int__2__2___<span style="color:#ff7b72;font-weight:bold">::</span>vector_ulong_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_int__2__2___const__(v29, <span style="color:#a5d6ff">6LL</span>, <span style="color:#ff7b72;font-weight:bold">&amp;</span>v15);
-</span></span><span style="display:flex;"><span>  std<span style="color:#ff7b72;font-weight:bold">::</span>vector_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap___std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap____<span style="color:#ff7b72;font-weight:bold">::</span>vector_ulong_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap___const__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>vector_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_Solution<span style="color:#ff7b72;font-weight:bold">::</span>SiteSnap____const__(
+</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#719e07">::</span>new_allocator_std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char___<span style="color:#719e07">::</span>_new_allocator___0(<span style="color:#719e07">&amp;</span>v16);
+</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#719e07">::</span>new_allocator_std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char___<span style="color:#719e07">::</span>_new_allocator___1(v28);
+</span></span><span style="display:flex;"><span>  v24 <span style="color:#719e07">=</span> <span style="color:#719e07">&amp;</span>v16;
+</span></span><span style="display:flex;"><span>  v23 <span style="color:#719e07">=</span> <span style="color:#719e07">&amp;</span>v15;
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>vector_int__2__2__std<span style="color:#719e07">::</span>allocator_int__2__2___<span style="color:#719e07">::</span>vector_ulong_std<span style="color:#719e07">::</span>allocator_int__2__2___const__(v29, <span style="color:#2aa198">6LL</span>, <span style="color:#719e07">&amp;</span>v15);
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>vector_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap___std<span style="color:#719e07">::</span>allocator_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap____<span style="color:#719e07">::</span>vector_ulong_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap___const__std<span style="color:#719e07">::</span>allocator_std<span style="color:#719e07">::</span>vector_Solution<span style="color:#719e07">::</span>SiteSnap_std<span style="color:#719e07">::</span>allocator_Solution<span style="color:#719e07">::</span>SiteSnap____const__(
 </span></span><span style="display:flex;"><span>    v28,
-</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">1LL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">1LL</span>,
 </span></span><span style="display:flex;"><span>    v29,
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72;font-weight:bold">&amp;</span>v16);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">&amp;</span>v16);
 </span></span><span style="display:flex;"><span>  sub_407658(v29);
-</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#ff7b72;font-weight:bold">::</span>new_allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char___<span style="color:#ff7b72;font-weight:bold">::</span>_new_allocator___0(<span style="color:#ff7b72;font-weight:bold">&amp;</span>v15);
-</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#ff7b72;font-weight:bold">::</span>new_allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char___<span style="color:#ff7b72;font-weight:bold">::</span>_new_allocator___1(<span style="color:#ff7b72;font-weight:bold">&amp;</span>v16);
-</span></span><span style="display:flex;"><span>  v25 <span style="color:#ff7b72;font-weight:bold">=</span> v29;
-</span></span><span style="display:flex;"><span>  sub_407782(v31, <span style="color:#a5d6ff">&#34;000000000000&#34;</span>, v29);
-</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#ff7b72;font-weight:bold">::</span>new_allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char___<span style="color:#ff7b72;font-weight:bold">::</span>_new_allocator__(v29);
-</span></span><span style="display:flex;"><span>  std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char__<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char__const__(v32);
-</span></span><span style="display:flex;"><span>  std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char__<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char__const__(v33);
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">for</span> ( i <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0</span>; ; i <span style="color:#ff7b72;font-weight:bold">+=</span> <span style="color:#a5d6ff">12</span> )
+</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#719e07">::</span>new_allocator_std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char___<span style="color:#719e07">::</span>_new_allocator___0(<span style="color:#719e07">&amp;</span>v15);
+</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#719e07">::</span>new_allocator_std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char___<span style="color:#719e07">::</span>_new_allocator___1(<span style="color:#719e07">&amp;</span>v16);
+</span></span><span style="display:flex;"><span>  v25 <span style="color:#719e07">=</span> v29;
+</span></span><span style="display:flex;"><span>  sub_407782(v31, <span style="color:#2aa198">&#34;000000000000&#34;</span>, v29);
+</span></span><span style="display:flex;"><span>  _gnu_cxx<span style="color:#719e07">::</span>new_allocator_std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char___<span style="color:#719e07">::</span>_new_allocator__(v29);
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char__<span style="color:#719e07">::</span>basic_string_std<span style="color:#719e07">::</span>allocator_char__const__(v32);
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char__<span style="color:#719e07">::</span>basic_string_std<span style="color:#719e07">::</span>allocator_char__const__(v33);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">for</span> ( i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; ; i <span style="color:#719e07">+=</span> <span style="color:#2aa198">12</span> )
 </span></span><span style="display:flex;"><span>  {
-</span></span><span style="display:flex;"><span>    v12 <span style="color:#ff7b72;font-weight:bold">=</span> i;
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> ( v12 <span style="color:#ff7b72;font-weight:bold">&gt;=</span> sub_493F60(v30) )
-</span></span><span style="display:flex;"><span>      <span style="color:#ff7b72">break</span>;
-</span></span><span style="display:flex;"><span>    std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char__<span style="color:#ff7b72;font-weight:bold">::</span>substr_ulong_ulong_(v34, v30, i, <span style="color:#a5d6ff">12LL</span>);
+</span></span><span style="display:flex;"><span>    v12 <span style="color:#719e07">=</span> i;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> ( v12 <span style="color:#719e07">&gt;=</span> sub_493F60(v30) )
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>    std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char__<span style="color:#719e07">::</span>substr_ulong_ulong_(v34, v30, i, <span style="color:#2aa198">12LL</span>);
 </span></span><span style="display:flex;"><span>    sub_493D80(v33, v34);
-</span></span><span style="display:flex;"><span>    llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> ( sub_493F60(v33) <span style="color:#ff7b72;font-weight:bold">!=</span> <span style="color:#a5d6ff">12</span> )
+</span></span><span style="display:flex;"><span>    llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> ( sub_493F60(v33) <span style="color:#719e07">!=</span> <span style="color:#2aa198">12</span> )
 </span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      v0 <span style="color:#ff7b72;font-weight:bold">=</span> sub_481E90(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E32E0, <span style="color:#a5d6ff">&#34;Length error.&#34;</span>);
-</span></span><span style="display:flex;"><span>      sub_480730(v0, std<span style="color:#ff7b72;font-weight:bold">::</span>endl_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char___std<span style="color:#ff7b72;font-weight:bold">::</span>basic_ostream_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char_____);
-</span></span><span style="display:flex;"><span>      exit(<span style="color:#a5d6ff">1LL</span>);
+</span></span><span style="display:flex;"><span>      v0 <span style="color:#719e07">=</span> sub_481E90(<span style="color:#719e07">&amp;</span>unk_5E32E0, <span style="color:#2aa198">&#34;Length error.&#34;</span>);
+</span></span><span style="display:flex;"><span>      sub_480730(v0, std<span style="color:#719e07">::</span>endl_char_std<span style="color:#719e07">::</span>char_traits_char___std<span style="color:#719e07">::</span>basic_ostream_char_std<span style="color:#719e07">::</span>char_traits_char_____);
+</span></span><span style="display:flex;"><span>      exit(<span style="color:#2aa198">1LL</span>);
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> ( <span style="color:#ff7b72;font-weight:bold">!</span>(<span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">__int8</span>)sub_407028(v33, v27, v28) )
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span>(<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span>)sub_407028(v33, v27, v28) )
 </span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      v11 <span style="color:#ff7b72;font-weight:bold">=</span> sub_481E90(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E32E0, <span style="color:#a5d6ff">&#34;Emmmmmm......Wrong.&#34;</span>);
-</span></span><span style="display:flex;"><span>      sub_480730(v11, std<span style="color:#ff7b72;font-weight:bold">::</span>endl_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char___std<span style="color:#ff7b72;font-weight:bold">::</span>basic_ostream_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char_____);
-</span></span><span style="display:flex;"><span>      exit(<span style="color:#a5d6ff">1LL</span>);
+</span></span><span style="display:flex;"><span>      v11 <span style="color:#719e07">=</span> sub_481E90(<span style="color:#719e07">&amp;</span>unk_5E32E0, <span style="color:#2aa198">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>      sub_480730(v11, std<span style="color:#719e07">::</span>endl_char_std<span style="color:#719e07">::</span>char_traits_char___std<span style="color:#719e07">::</span>basic_ostream_char_std<span style="color:#719e07">::</span>char_traits_char_____);
+</span></span><span style="display:flex;"><span>      exit(<span style="color:#2aa198">1LL</span>);
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> ( i )
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> ( i )
 </span></span><span style="display:flex;"><span>    {
 </span></span><span style="display:flex;"><span>      sub_496AA0(v34, v31);
-</span></span><span style="display:flex;"><span>      v18 <span style="color:#ff7b72;font-weight:bold">=</span> sub_407141(v34);
-</span></span><span style="display:flex;"><span>      llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>      v18 <span style="color:#719e07">=</span> sub_407141(v34);
+</span></span><span style="display:flex;"><span>      llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">else</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">else</span>
 </span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      v18 <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72;font-weight:bold">-</span><span style="color:#a5d6ff">1</span>;
+</span></span><span style="display:flex;"><span>      v18 <span style="color:#719e07">=</span> <span style="color:#719e07">-</span><span style="color:#2aa198">1</span>;
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    sub_496AA0(v34, v33);
-</span></span><span style="display:flex;"><span>    v1 <span style="color:#ff7b72;font-weight:bold">=</span> sub_407141(v34);
-</span></span><span style="display:flex;"><span>    v2 <span style="color:#ff7b72;font-weight:bold">=</span> v18 <span style="color:#ff7b72;font-weight:bold">&lt;</span> v1;
-</span></span><span style="display:flex;"><span>    llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> ( <span style="color:#ff7b72;font-weight:bold">!</span>v2 )
+</span></span><span style="display:flex;"><span>    v1 <span style="color:#719e07">=</span> sub_407141(v34);
+</span></span><span style="display:flex;"><span>    v2 <span style="color:#719e07">=</span> v18 <span style="color:#719e07">&lt;</span> v1;
+</span></span><span style="display:flex;"><span>    llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span>v2 )
 </span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      v10 <span style="color:#ff7b72;font-weight:bold">=</span> sub_481E90(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E32E0, <span style="color:#a5d6ff">&#34;Emmmmmm......Wrong.&#34;</span>);
-</span></span><span style="display:flex;"><span>      sub_480730(v10, std<span style="color:#ff7b72;font-weight:bold">::</span>endl_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char___std<span style="color:#ff7b72;font-weight:bold">::</span>basic_ostream_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char_____);
-</span></span><span style="display:flex;"><span>      exit(<span style="color:#a5d6ff">1LL</span>);
+</span></span><span style="display:flex;"><span>      v10 <span style="color:#719e07">=</span> sub_481E90(<span style="color:#719e07">&amp;</span>unk_5E32E0, <span style="color:#2aa198">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>      sub_480730(v10, std<span style="color:#719e07">::</span>endl_char_std<span style="color:#719e07">::</span>char_traits_char___std<span style="color:#719e07">::</span>basic_ostream_char_std<span style="color:#719e07">::</span>char_traits_char_____);
+</span></span><span style="display:flex;"><span>      exit(<span style="color:#2aa198">1LL</span>);
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">for</span> ( j <span style="color:#ff7b72;font-weight:bold">=</span> v18 <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">1</span>; ; <span style="color:#ff7b72;font-weight:bold">++</span>j )
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> ( j <span style="color:#719e07">=</span> v18 <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>; ; <span style="color:#719e07">++</span>j )
 </span></span><span style="display:flex;"><span>    {
 </span></span><span style="display:flex;"><span>      sub_496AA0(v34, v33);
-</span></span><span style="display:flex;"><span>      v4 <span style="color:#ff7b72;font-weight:bold">=</span> sub_407141(v34);
-</span></span><span style="display:flex;"><span>      v5 <span style="color:#ff7b72;font-weight:bold">=</span> j <span style="color:#ff7b72;font-weight:bold">&lt;</span> v4;
-</span></span><span style="display:flex;"><span>      llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
-</span></span><span style="display:flex;"><span>      <span style="color:#ff7b72">if</span> ( <span style="color:#ff7b72;font-weight:bold">!</span>v5 )
-</span></span><span style="display:flex;"><span>        <span style="color:#ff7b72">break</span>;
+</span></span><span style="display:flex;"><span>      v4 <span style="color:#719e07">=</span> sub_407141(v34);
+</span></span><span style="display:flex;"><span>      v5 <span style="color:#719e07">=</span> j <span style="color:#719e07">&lt;</span> v4;
+</span></span><span style="display:flex;"><span>      llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span>v5 )
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">break</span>;
 </span></span><span style="display:flex;"><span>      sub_4070E1(v34, j);
 </span></span><span style="display:flex;"><span>      sub_493D80(v32, v34);
-</span></span><span style="display:flex;"><span>      llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
-</span></span><span style="display:flex;"><span>      <span style="color:#ff7b72">if</span> ( (<span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">__int8</span>)sub_407028(v32, v27, v28) )
+</span></span><span style="display:flex;"><span>      llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">if</span> ( (<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span>)sub_407028(v32, v27, v28) )
 </span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        v3 <span style="color:#ff7b72;font-weight:bold">=</span> sub_481E90(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E32E0, <span style="color:#a5d6ff">&#34;Emmmmmm......Wrong.&#34;</span>);
-</span></span><span style="display:flex;"><span>        sub_480730(v3, std<span style="color:#ff7b72;font-weight:bold">::</span>endl_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char___std<span style="color:#ff7b72;font-weight:bold">::</span>basic_ostream_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char_____);
-</span></span><span style="display:flex;"><span>        exit(<span style="color:#a5d6ff">1LL</span>);
+</span></span><span style="display:flex;"><span>        v3 <span style="color:#719e07">=</span> sub_481E90(<span style="color:#719e07">&amp;</span>unk_5E32E0, <span style="color:#2aa198">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>        sub_480730(v3, std<span style="color:#719e07">::</span>endl_char_std<span style="color:#719e07">::</span>char_traits_char___std<span style="color:#719e07">::</span>basic_ostream_char_std<span style="color:#719e07">::</span>char_traits_char_____);
+</span></span><span style="display:flex;"><span>        exit(<span style="color:#2aa198">1LL</span>);
 </span></span><span style="display:flex;"><span>      }
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    v6 <span style="color:#ff7b72;font-weight:bold">=</span> (<span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">int</span>)(i <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">12</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> ( v6 <span style="color:#ff7b72;font-weight:bold">==</span> sub_493F60(v30) )
+</span></span><span style="display:flex;"><span>    v6 <span style="color:#719e07">=</span> (<span style="color:#dc322f">unsigned</span> <span style="color:#dc322f">int</span>)(i <span style="color:#719e07">+</span> <span style="color:#2aa198">12</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> ( v6 <span style="color:#719e07">==</span> sub_493F60(v30) )
 </span></span><span style="display:flex;"><span>    {
 </span></span><span style="display:flex;"><span>      sub_496AA0(v34, v33);
-</span></span><span style="display:flex;"><span>      v20 <span style="color:#ff7b72;font-weight:bold">=</span> sub_407141(v34) <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">1</span>;
-</span></span><span style="display:flex;"><span>      llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
-</span></span><span style="display:flex;"><span>      <span style="color:#ff7b72">while</span> ( <span style="color:#a5d6ff">1</span> )
+</span></span><span style="display:flex;"><span>      v20 <span style="color:#719e07">=</span> sub_407141(v34) <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>      llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">while</span> ( <span style="color:#2aa198">1</span> )
 </span></span><span style="display:flex;"><span>      {
-</span></span><span style="display:flex;"><span>        v26 <span style="color:#ff7b72;font-weight:bold">=</span> v29;
-</span></span><span style="display:flex;"><span>        sub_407782(v34, <span style="color:#a5d6ff">&#34;111111111111&#34;</span>, v29);
-</span></span><span style="display:flex;"><span>        v8 <span style="color:#ff7b72;font-weight:bold">=</span> sub_407141(v34);
-</span></span><span style="display:flex;"><span>        v9 <span style="color:#ff7b72;font-weight:bold">=</span> v8 <span style="color:#ff7b72;font-weight:bold">&gt;=</span> v20;
-</span></span><span style="display:flex;"><span>        llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
-</span></span><span style="display:flex;"><span>        _gnu_cxx<span style="color:#ff7b72;font-weight:bold">::</span>new_allocator_std<span style="color:#ff7b72;font-weight:bold">::</span>__cxx11<span style="color:#ff7b72;font-weight:bold">::</span>basic_string_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char__std<span style="color:#ff7b72;font-weight:bold">::</span>allocator_char___<span style="color:#ff7b72;font-weight:bold">::</span>_new_allocator__(v29);
-</span></span><span style="display:flex;"><span>        <span style="color:#ff7b72">if</span> ( <span style="color:#ff7b72;font-weight:bold">!</span>v9 )
-</span></span><span style="display:flex;"><span>          <span style="color:#ff7b72">break</span>;
+</span></span><span style="display:flex;"><span>        v26 <span style="color:#719e07">=</span> v29;
+</span></span><span style="display:flex;"><span>        sub_407782(v34, <span style="color:#2aa198">&#34;111111111111&#34;</span>, v29);
+</span></span><span style="display:flex;"><span>        v8 <span style="color:#719e07">=</span> sub_407141(v34);
+</span></span><span style="display:flex;"><span>        v9 <span style="color:#719e07">=</span> v8 <span style="color:#719e07">&gt;=</span> v20;
+</span></span><span style="display:flex;"><span>        llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>        _gnu_cxx<span style="color:#719e07">::</span>new_allocator_std<span style="color:#719e07">::</span>__cxx11<span style="color:#719e07">::</span>basic_string_char_std<span style="color:#719e07">::</span>char_traits_char__std<span style="color:#719e07">::</span>allocator_char___<span style="color:#719e07">::</span>_new_allocator__(v29);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span>v9 )
+</span></span><span style="display:flex;"><span>          <span style="color:#719e07">break</span>;
 </span></span><span style="display:flex;"><span>        sub_4070E1(v34, v20);
 </span></span><span style="display:flex;"><span>        sub_493D80(v32, v34);
-</span></span><span style="display:flex;"><span>        llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v34);
-</span></span><span style="display:flex;"><span>        <span style="color:#ff7b72">if</span> ( (<span style="color:#ff7b72">unsigned</span> <span style="color:#ff7b72">__int8</span>)sub_407028(v32, v27, v28) )
+</span></span><span style="display:flex;"><span>        llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> ( (<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span>)sub_407028(v32, v27, v28) )
 </span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>          v7 <span style="color:#ff7b72;font-weight:bold">=</span> sub_481E90(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E32E0, <span style="color:#a5d6ff">&#34;Emmmmmm......Wrong.&#34;</span>);
-</span></span><span style="display:flex;"><span>          sub_480730(v7, std<span style="color:#ff7b72;font-weight:bold">::</span>endl_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char___std<span style="color:#ff7b72;font-weight:bold">::</span>basic_ostream_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char_____);
-</span></span><span style="display:flex;"><span>          exit(<span style="color:#a5d6ff">1LL</span>);
+</span></span><span style="display:flex;"><span>          v7 <span style="color:#719e07">=</span> sub_481E90(<span style="color:#719e07">&amp;</span>unk_5E32E0, <span style="color:#2aa198">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>          sub_480730(v7, std<span style="color:#719e07">::</span>endl_char_std<span style="color:#719e07">::</span>char_traits_char___std<span style="color:#719e07">::</span>basic_ostream_char_std<span style="color:#719e07">::</span>char_traits_char_____);
+</span></span><span style="display:flex;"><span>          exit(<span style="color:#2aa198">1LL</span>);
 </span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>        <span style="color:#ff7b72;font-weight:bold">++</span>v20;
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">++</span>v20;
 </span></span><span style="display:flex;"><span>      }
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    ngx_http_lua_ffi_parse_http_time(v31, v33);
 </span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>  v13 <span style="color:#ff7b72;font-weight:bold">=</span> sub_481E90(<span style="color:#ff7b72;font-weight:bold">&amp;</span>unk_5E32E0, <span style="color:#a5d6ff">&#34;Get the flag to MD5, and package with sctf{}&#34;</span>);
-</span></span><span style="display:flex;"><span>  sub_480730(v13, std<span style="color:#ff7b72;font-weight:bold">::</span>endl_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char___std<span style="color:#ff7b72;font-weight:bold">::</span>basic_ostream_char_std<span style="color:#ff7b72;font-weight:bold">::</span>char_traits_char_____);
-</span></span><span style="display:flex;"><span>  llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v33);
-</span></span><span style="display:flex;"><span>  llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v32);
-</span></span><span style="display:flex;"><span>  llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v31);
+</span></span><span style="display:flex;"><span>  v13 <span style="color:#719e07">=</span> sub_481E90(<span style="color:#719e07">&amp;</span>unk_5E32E0, <span style="color:#2aa198">&#34;Get the flag to MD5, and package with sctf{}&#34;</span>);
+</span></span><span style="display:flex;"><span>  sub_480730(v13, std<span style="color:#719e07">::</span>endl_char_std<span style="color:#719e07">::</span>char_traits_char___std<span style="color:#719e07">::</span>basic_ostream_char_std<span style="color:#719e07">::</span>char_traits_char_____);
+</span></span><span style="display:flex;"><span>  llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v33);
+</span></span><span style="display:flex;"><span>  llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v32);
+</span></span><span style="display:flex;"><span>  llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v31);
 </span></span><span style="display:flex;"><span>  sub_40772C(v28);
 </span></span><span style="display:flex;"><span>  sub_40772C(v27);
-</span></span><span style="display:flex;"><span>  llvm<span style="color:#ff7b72;font-weight:bold">::</span>SmallVector_uint_4u_<span style="color:#ff7b72;font-weight:bold">::</span>_SmallVector___3(v30);
-</span></span><span style="display:flex;"><span>  <span style="color:#ff7b72">return</span> <span style="color:#a5d6ff">0LL</span>;
+</span></span><span style="display:flex;"><span>  llvm<span style="color:#719e07">::</span>SmallVector_uint_4u_<span style="color:#719e07">::</span>_SmallVector___3(v30);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#2aa198">0LL</span>;
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>可以看到<code>sub_407028</code>这个函数是一个关键的检查函数，通过调试发现，输入并不会改变docheck函数中的状态值，也就说我们可以不停构造输入去爆破，直到能过check。</p>
+</span></span></code></pre></div><p>可以看到<code>sub_407028</code>这个函数是一个关键的检查函数，通过调试发现，输入并不会改变docheck函数中的状态值，也就说我们可以不停构造输入去爆破，直到能过check。</p>
 <p>上述程序两次调用<code>sub_407028</code>，实际上分段检查flag，每一段是12个字符。并且经过调试，字符只能是0或者1，那么12个bit就是小于4096是可以爆破的。</p>
 <p>如果使用frida来爆破，那首先需要这个循环不停执行，所以需要patch出一个死循环，在<code>sub_407028</code>的位置。并且要保证vector这些初始化已经结束，因为3个参数，第一个是输入，其他两个是两个vector。所以尝试直接在函数调用时patch成死循环，再通过gdb attach的方法，attach进去查看参数地址，在frida脚本中可以直接以指针形式指向这两个参数地址。</p>
 <p>patch前</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406531</span>                               <span style="color:#79c0ff;font-weight:bold">loc_406531:</span>                             <span style="color:#8b949e;font-style:italic">; CODE XREF: sub_4062C5+235↑j
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406531</span> <span style="color:#f85149">48</span> <span style="color:#f85149">8</span><span style="color:#d2a8ff;font-weight:bold">D</span> <span style="color:#a5d6ff">95</span> <span style="color:#a5d6ff">00</span> <span style="color:#79c0ff;font-weight:bold">FF</span> <span style="color:#79c0ff;font-weight:bold">FF</span> <span style="color:#79c0ff;font-weight:bold">FF</span>          <span style="color:#79c0ff;font-weight:bold">lea</span>     <span style="color:#79c0ff;font-weight:bold">rdx</span>, [<span style="color:#79c0ff;font-weight:bold">rbp</span><span style="color:#f85149">+</span><span style="color:#79c0ff;font-weight:bold">var_100</span>]
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406538</span> <span style="color:#f85149">48</span> <span style="color:#f85149">8</span><span style="color:#d2a8ff;font-weight:bold">D</span> <span style="color:#a5d6ff">8</span><span style="color:#79c0ff;font-weight:bold">D</span> <span style="color:#79c0ff;font-weight:bold">E0</span> <span style="color:#79c0ff;font-weight:bold">FE</span> <span style="color:#79c0ff;font-weight:bold">FF</span> <span style="color:#79c0ff;font-weight:bold">FF</span>          <span style="color:#79c0ff;font-weight:bold">lea</span>     <span style="color:#79c0ff;font-weight:bold">rcx</span>, [<span style="color:#79c0ff;font-weight:bold">rbp</span><span style="color:#f85149">+</span><span style="color:#79c0ff;font-weight:bold">var_120</span>]
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">000000000040653</span><span style="color:#d2a8ff;font-weight:bold">F</span> <span style="color:#a5d6ff">48</span> <span style="color:#a5d6ff">8</span><span style="color:#79c0ff;font-weight:bold">D</span> <span style="color:#a5d6ff">45</span> <span style="color:#79c0ff;font-weight:bold">A0</span>                   <span style="color:#79c0ff;font-weight:bold">lea</span>     <span style="color:#79c0ff;font-weight:bold">rax</span>, [<span style="color:#79c0ff;font-weight:bold">rbp</span><span style="color:#f85149">+</span><span style="color:#79c0ff;font-weight:bold">var_60</span>]
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406543</span> <span style="color:#f85149">48</span> <span style="color:#f85149">89</span> <span style="color:#d2a8ff;font-weight:bold">CE</span>                      <span style="color:#79c0ff;font-weight:bold">mov</span>     <span style="color:#79c0ff;font-weight:bold">rsi</span>, <span style="color:#79c0ff;font-weight:bold">rcx</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406546</span> <span style="color:#f85149">48</span> <span style="color:#f85149">89</span> <span style="color:#d2a8ff;font-weight:bold">C7</span>                      <span style="color:#79c0ff;font-weight:bold">mov</span>     <span style="color:#79c0ff;font-weight:bold">rdi</span>, <span style="color:#79c0ff;font-weight:bold">rax</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406549</span> <span style="color:#d2a8ff;font-weight:bold">E8</span> <span style="color:#79c0ff;font-weight:bold">DA</span> <span style="color:#a5d6ff">0</span><span style="color:#79c0ff;font-weight:bold">A</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span>                <span style="color:#79c0ff;font-weight:bold">call</span>    <span style="color:#79c0ff;font-weight:bold">sub_407028</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406549</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">000000000040654</span><span style="color:#d2a8ff;font-weight:bold">E</span> <span style="color:#a5d6ff">84</span> <span style="color:#79c0ff;font-weight:bold">C0</span>                         <span style="color:#79c0ff;font-weight:bold">test</span>    <span style="color:#79c0ff;font-weight:bold">al</span>, <span style="color:#79c0ff;font-weight:bold">al</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406550</span> <span style="color:#f85149">0</span><span style="color:#d2a8ff;font-weight:bold">F</span> <span style="color:#a5d6ff">84</span> <span style="color:#a5d6ff">09</span> <span style="color:#a5d6ff">03</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span>             <span style="color:#79c0ff;font-weight:bold">jz</span>      <span style="color:#79c0ff;font-weight:bold">loc_40685F</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>patch后</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406531</span>                               <span style="color:#79c0ff;font-weight:bold">loc_406531:</span>                             <span style="color:#8b949e;font-style:italic">; CODE XREF: sub_4062C5+235↑j
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406531</span>                                                                       <span style="color:#8b949e;font-style:italic">; sub_4062C5+289↓j
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406531</span> <span style="color:#f85149">48</span> <span style="color:#f85149">8</span><span style="color:#d2a8ff;font-weight:bold">D</span> <span style="color:#a5d6ff">95</span> <span style="color:#a5d6ff">00</span> <span style="color:#79c0ff;font-weight:bold">FF</span> <span style="color:#79c0ff;font-weight:bold">FF</span> <span style="color:#79c0ff;font-weight:bold">FF</span>          <span style="color:#79c0ff;font-weight:bold">lea</span>     <span style="color:#79c0ff;font-weight:bold">rdx</span>, [<span style="color:#79c0ff;font-weight:bold">rbp</span><span style="color:#f85149">+</span><span style="color:#79c0ff;font-weight:bold">var_100</span>]
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406538</span> <span style="color:#f85149">48</span> <span style="color:#f85149">8</span><span style="color:#d2a8ff;font-weight:bold">D</span> <span style="color:#a5d6ff">8</span><span style="color:#79c0ff;font-weight:bold">D</span> <span style="color:#79c0ff;font-weight:bold">E0</span> <span style="color:#79c0ff;font-weight:bold">FE</span> <span style="color:#79c0ff;font-weight:bold">FF</span> <span style="color:#79c0ff;font-weight:bold">FF</span>          <span style="color:#79c0ff;font-weight:bold">lea</span>     <span style="color:#79c0ff;font-weight:bold">rcx</span>, [<span style="color:#79c0ff;font-weight:bold">rbp</span><span style="color:#f85149">+</span><span style="color:#79c0ff;font-weight:bold">var_120</span>]
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">000000000040653</span><span style="color:#d2a8ff;font-weight:bold">F</span> <span style="color:#a5d6ff">48</span> <span style="color:#a5d6ff">8</span><span style="color:#79c0ff;font-weight:bold">D</span> <span style="color:#a5d6ff">45</span> <span style="color:#79c0ff;font-weight:bold">A0</span>                   <span style="color:#79c0ff;font-weight:bold">lea</span>     <span style="color:#79c0ff;font-weight:bold">rax</span>, [<span style="color:#79c0ff;font-weight:bold">rbp</span><span style="color:#f85149">+</span><span style="color:#79c0ff;font-weight:bold">var_60</span>]
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406543</span> <span style="color:#f85149">48</span> <span style="color:#f85149">89</span> <span style="color:#d2a8ff;font-weight:bold">CE</span>                      <span style="color:#79c0ff;font-weight:bold">mov</span>     <span style="color:#79c0ff;font-weight:bold">rsi</span>, <span style="color:#79c0ff;font-weight:bold">rcx</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406546</span> <span style="color:#f85149">48</span> <span style="color:#f85149">89</span> <span style="color:#d2a8ff;font-weight:bold">C7</span>                      <span style="color:#79c0ff;font-weight:bold">mov</span>     <span style="color:#79c0ff;font-weight:bold">rdi</span>, <span style="color:#79c0ff;font-weight:bold">rax</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406549</span> <span style="color:#d2a8ff;font-weight:bold">E8</span> <span style="color:#79c0ff;font-weight:bold">DA</span> <span style="color:#a5d6ff">0</span><span style="color:#79c0ff;font-weight:bold">A</span> <span style="color:#a5d6ff">00</span> <span style="color:#a5d6ff">00</span>                <span style="color:#79c0ff;font-weight:bold">call</span>    <span style="color:#79c0ff;font-weight:bold">sub_407028</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">0000000000406549</span>
-</span></span><span style="display:flex;"><span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">000000000040654</span><span style="color:#d2a8ff;font-weight:bold">E</span> <span style="color:#79c0ff;font-weight:bold">EB</span> <span style="color:#79c0ff;font-weight:bold">E1</span>                         <span style="color:#79c0ff;font-weight:bold">jmp</span>     <span style="color:#79c0ff;font-weight:bold">short</span> <span style="color:#79c0ff;font-weight:bold">loc_406531</span>                <span style="color:#8b949e;font-style:italic">; Keypatch modified this from:
-</span></span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"></span><span style="color:#79c0ff;font-weight:bold">.text:</span><span style="color:#f85149">000000000040654</span><span style="color:#d2a8ff;font-weight:bold">E</span>                                                                       <span style="color:#8b949e;font-style:italic">;   test al, al
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>patch成这样后，调用完<code>sub_4070208</code>后会继续调用原本的参数地址，再进入函数，形成一个死循环（保留原本参数是为了在frida脚本没hook之前能正常运行，不让程序崩溃）</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span>.text:0000000000406531                               loc_406531:                             <span style="color:#586e75">; CODE XREF: sub_4062C5+235↑j
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>.text:0000000000406531 48 8<span style="color:#268bd2">D</span> <span style="color:#2aa198">95</span> <span style="color:#2aa198">00</span> <span style="color:#cb4b16">FF</span> <span style="color:#cb4b16">FF</span> <span style="color:#cb4b16">FF</span>          <span style="color:#cb4b16">lea</span>     <span style="color:#cb4b16">rdx</span>, [<span style="color:#cb4b16">rbp</span>+<span style="color:#cb4b16">var_100</span>]
+</span></span><span style="display:flex;"><span>.text:0000000000406538 48 8<span style="color:#268bd2">D</span> <span style="color:#2aa198">8</span><span style="color:#cb4b16">D</span> <span style="color:#cb4b16">E0</span> <span style="color:#cb4b16">FE</span> <span style="color:#cb4b16">FF</span> <span style="color:#cb4b16">FF</span>          <span style="color:#cb4b16">lea</span>     <span style="color:#cb4b16">rcx</span>, [<span style="color:#cb4b16">rbp</span>+<span style="color:#cb4b16">var_120</span>]
+</span></span><span style="display:flex;"><span>.text:000000000040653<span style="color:#268bd2">F</span> <span style="color:#2aa198">48</span> <span style="color:#2aa198">8</span><span style="color:#cb4b16">D</span> <span style="color:#2aa198">45</span> <span style="color:#cb4b16">A0</span>                   <span style="color:#cb4b16">lea</span>     <span style="color:#cb4b16">rax</span>, [<span style="color:#cb4b16">rbp</span>+<span style="color:#cb4b16">var_60</span>]
+</span></span><span style="display:flex;"><span>.text:0000000000406543 48 89 <span style="color:#268bd2">CE</span>                      <span style="color:#cb4b16">mov</span>     <span style="color:#cb4b16">rsi</span>, <span style="color:#cb4b16">rcx</span>
+</span></span><span style="display:flex;"><span>.text:0000000000406546 48 89 <span style="color:#268bd2">C7</span>                      <span style="color:#cb4b16">mov</span>     <span style="color:#cb4b16">rdi</span>, <span style="color:#cb4b16">rax</span>
+</span></span><span style="display:flex;"><span>.text:0000000000406549 <span style="color:#268bd2">E8</span> <span style="color:#cb4b16">DA</span> <span style="color:#2aa198">0</span><span style="color:#cb4b16">A</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span>                <span style="color:#cb4b16">call</span>    <span style="color:#cb4b16">sub_407028</span>
+</span></span><span style="display:flex;"><span>.text:0000000000406549
+</span></span><span style="display:flex;"><span>.text:000000000040654<span style="color:#268bd2">E</span> <span style="color:#2aa198">84</span> <span style="color:#cb4b16">C0</span>                         <span style="color:#cb4b16">test</span>    <span style="color:#cb4b16">al</span>, <span style="color:#cb4b16">al</span>
+</span></span><span style="display:flex;"><span>.text:0000000000406550 0<span style="color:#268bd2">F</span> <span style="color:#2aa198">84</span> <span style="color:#2aa198">09</span> <span style="color:#2aa198">03</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span>             <span style="color:#cb4b16">jz</span>      <span style="color:#cb4b16">loc_40685F</span>
+</span></span></code></pre></div><p>patch后</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span>.text:0000000000406531                               loc_406531:                             <span style="color:#586e75">; CODE XREF: sub_4062C5+235↑j
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>.text:0000000000406531                                                                       <span style="color:#586e75">; sub_4062C5+289↓j
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>.text:0000000000406531 48 8<span style="color:#268bd2">D</span> <span style="color:#2aa198">95</span> <span style="color:#2aa198">00</span> <span style="color:#cb4b16">FF</span> <span style="color:#cb4b16">FF</span> <span style="color:#cb4b16">FF</span>          <span style="color:#cb4b16">lea</span>     <span style="color:#cb4b16">rdx</span>, [<span style="color:#cb4b16">rbp</span>+<span style="color:#cb4b16">var_100</span>]
+</span></span><span style="display:flex;"><span>.text:0000000000406538 48 8<span style="color:#268bd2">D</span> <span style="color:#2aa198">8</span><span style="color:#cb4b16">D</span> <span style="color:#cb4b16">E0</span> <span style="color:#cb4b16">FE</span> <span style="color:#cb4b16">FF</span> <span style="color:#cb4b16">FF</span>          <span style="color:#cb4b16">lea</span>     <span style="color:#cb4b16">rcx</span>, [<span style="color:#cb4b16">rbp</span>+<span style="color:#cb4b16">var_120</span>]
+</span></span><span style="display:flex;"><span>.text:000000000040653<span style="color:#268bd2">F</span> <span style="color:#2aa198">48</span> <span style="color:#2aa198">8</span><span style="color:#cb4b16">D</span> <span style="color:#2aa198">45</span> <span style="color:#cb4b16">A0</span>                   <span style="color:#cb4b16">lea</span>     <span style="color:#cb4b16">rax</span>, [<span style="color:#cb4b16">rbp</span>+<span style="color:#cb4b16">var_60</span>]
+</span></span><span style="display:flex;"><span>.text:0000000000406543 48 89 <span style="color:#268bd2">CE</span>                      <span style="color:#cb4b16">mov</span>     <span style="color:#cb4b16">rsi</span>, <span style="color:#cb4b16">rcx</span>
+</span></span><span style="display:flex;"><span>.text:0000000000406546 48 89 <span style="color:#268bd2">C7</span>                      <span style="color:#cb4b16">mov</span>     <span style="color:#cb4b16">rdi</span>, <span style="color:#cb4b16">rax</span>
+</span></span><span style="display:flex;"><span>.text:0000000000406549 <span style="color:#268bd2">E8</span> <span style="color:#cb4b16">DA</span> <span style="color:#2aa198">0</span><span style="color:#cb4b16">A</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span>                <span style="color:#cb4b16">call</span>    <span style="color:#cb4b16">sub_407028</span>
+</span></span><span style="display:flex;"><span>.text:0000000000406549
+</span></span><span style="display:flex;"><span>.text:000000000040654<span style="color:#268bd2">E</span> <span style="color:#cb4b16">EB</span> <span style="color:#cb4b16">E1</span>                         <span style="color:#cb4b16">jmp</span>     <span style="color:#cb4b16">short</span> <span style="color:#cb4b16">loc_406531</span>                <span style="color:#586e75">; Keypatch modified this from:
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>.text:000000000040654<span style="color:#268bd2">E</span>                                                                       <span style="color:#586e75">;   test al, al
+</span></span></span></code></pre></div><p>patch成这样后，调用完<code>sub_4070208</code>后会继续调用原本的参数地址，再进入函数，形成一个死循环（保留原本参数是为了在frida脚本没hook之前能正常运行，不让程序崩溃）</p>
 <p>启动patch后的程序，gdb attch上去后，断在sub_407028上，看一下两个vector的指针地址</p>
 <p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307031328915.png" alt="image-20230703132805333"></p>
 <p>然后写js脚本</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">22
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">23
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">24
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span>console.log(<span style="color:#a5d6ff">&#34;[+] load script&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span>console.log(<span style="color:#2aa198">&#34;[+] load script&#34;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">var</span> doCheck <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72">new</span> NativeFunction(<span style="color:#ff7b72">new</span> NativePointer(<span style="color:#a5d6ff">0x407028</span>), <span style="color:#a5d6ff">&#39;bool&#39;</span>, [<span style="color:#a5d6ff">&#39;pointer&#39;</span>, <span style="color:#a5d6ff">&#39;pointer&#39;</span>, <span style="color:#a5d6ff">&#39;pointer&#39;</span>])
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">var</span> string_init <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#ff7b72">new</span> NativeFunction(<span style="color:#ff7b72">new</span> NativePointer(<span style="color:#a5d6ff">0x407782</span>), <span style="color:#a5d6ff">&#39;pointer&#39;</span>, [<span style="color:#a5d6ff">&#39;pointer&#39;</span>, <span style="color:#a5d6ff">&#39;pointer&#39;</span>])
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">var</span> s <span style="color:#ff7b72;font-weight:bold">=</span> Memory.alloc(<span style="color:#a5d6ff">100</span>)
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">var</span> doCheck <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> NativeFunction(<span style="color:#719e07">new</span> NativePointer(<span style="color:#2aa198">0x407028</span>), <span style="color:#2aa198">&#39;bool&#39;</span>, [<span style="color:#2aa198">&#39;pointer&#39;</span>, <span style="color:#2aa198">&#39;pointer&#39;</span>, <span style="color:#2aa198">&#39;pointer&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">var</span> string_init <span style="color:#719e07">=</span> <span style="color:#719e07">new</span> NativeFunction(<span style="color:#719e07">new</span> NativePointer(<span style="color:#2aa198">0x407782</span>), <span style="color:#2aa198">&#39;pointer&#39;</span>, [<span style="color:#2aa198">&#39;pointer&#39;</span>, <span style="color:#2aa198">&#39;pointer&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">var</span> s <span style="color:#719e07">=</span> Memory.alloc(<span style="color:#2aa198">100</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">function</span> intTo12BitBinaryString(num) {
-</span></span><span style="display:flex;"><span>    num <span style="color:#ff7b72;font-weight:bold">=</span> num <span style="color:#ff7b72;font-weight:bold">&amp;</span> <span style="color:#a5d6ff">0xFFF</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">let</span> binaryString <span style="color:#ff7b72;font-weight:bold">=</span> num.toString(<span style="color:#a5d6ff">2</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">while</span> (binaryString.length <span style="color:#ff7b72;font-weight:bold">&lt;</span> <span style="color:#a5d6ff">12</span>) {
-</span></span><span style="display:flex;"><span>        binaryString <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">&#39;0&#39;</span> <span style="color:#ff7b72;font-weight:bold">+</span> binaryString;
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">function</span> intTo12BitBinaryString(num) {
+</span></span><span style="display:flex;"><span>    num <span style="color:#719e07">=</span> num <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFFF</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> binaryString <span style="color:#719e07">=</span> num.toString(<span style="color:#2aa198">2</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> (binaryString.length <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">12</span>) {
+</span></span><span style="display:flex;"><span>        binaryString <span style="color:#719e07">=</span> <span style="color:#2aa198">&#39;0&#39;</span> <span style="color:#719e07">+</span> binaryString;
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">return</span> binaryString;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> binaryString;
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">for</span> (<span style="color:#ff7b72">var</span> i <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0</span>; i <span style="color:#ff7b72;font-weight:bold">&lt;</span> <span style="color:#a5d6ff">4096</span>; i<span style="color:#ff7b72;font-weight:bold">++</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">var</span> ss <span style="color:#ff7b72;font-weight:bold">=</span> intTo12BitBinaryString(i)
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> (<span style="color:#268bd2">var</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">4096</span>; i<span style="color:#719e07">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">var</span> ss <span style="color:#719e07">=</span> intTo12BitBinaryString(i)
 </span></span><span style="display:flex;"><span>    string_init(s, Memory.allocUtf8String(ss))
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> (doCheck(s, <span style="color:#ff7b72">new</span> NativePointer(<span style="color:#a5d6ff">0x00007ffff0c05b60</span>), <span style="color:#ff7b72">new</span> NativePointer(<span style="color:#a5d6ff">0x00007ffff0c05b80</span>))) {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> (doCheck(s, <span style="color:#719e07">new</span> NativePointer(<span style="color:#2aa198">0x00007ffff0c05b60</span>), <span style="color:#719e07">new</span> NativePointer(<span style="color:#2aa198">0x00007ffff0c05b80</span>))) {
 </span></span><span style="display:flex;"><span>        console.log(ss)
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>console.log(<span style="color:#a5d6ff">&#34;[+] script end&#34;</span>)
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>gdb detach后运行frida脚本。爆破出来的结果是能通过0x406549检查的输入，但是NU1L的脚本就到这了，与实际结果还是有差的，并且每次运行的结果会不同。考虑到可能是patch的方法不好，每次循环使用同样的vector可能会有问题。但是NU1L也没说怎么patch的。只是按上面这样调用是可以得到结果，只是不能用于解题。</p>
+</span></span><span style="display:flex;"><span>console.log(<span style="color:#2aa198">&#34;[+] script end&#34;</span>)
+</span></span></code></pre></div><p>gdb detach后运行frida脚本。爆破出来的结果是能通过0x406549检查的输入，但是NU1L的脚本就到这了，与实际结果还是有差的，并且每次运行的结果会不同。考虑到可能是patch的方法不好，每次循环使用同样的vector可能会有问题。但是NU1L也没说怎么patch的。只是按上面这样调用是可以得到结果，只是不能用于解题。</p>
 <h2 id="ldpc-from-official-wp">LDPC from Official WP</h2>
 <p>官方WP显示这是一个LDPC校验码</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>原码:
-</span></span><span style="display:flex;"><span>          |0 1 0|
-</span></span><span style="display:flex;"><span>生成矩阵:
-</span></span><span style="display:flex;"><span>          |1 0 0 0 1 1|
-</span></span><span style="display:flex;"><span>          |0 1 0 1 0 1|
-</span></span><span style="display:flex;"><span>          |0 0 1 1 1 0|
-</span></span><span style="display:flex;"><span>LDPC校验码生成, 就是矩阵乘法(元素乘法使用与运算代替, 加法使用异或代替):
-</span></span><span style="display:flex;"><span>          |1 0 0 0 1 1|
-</span></span><span style="display:flex;"><span>|0 1 0| * |0 1 0 1 0 1| = |0 1 0 1 0 1|
-</span></span><span style="display:flex;"><span>          |0 0 1 1 1 0|
-</span></span><span style="display:flex;"><span>经过矩阵乘法得到的1 * 6矩阵就是LDPC校验码. 其中: 前三位是原码, 后三位是校验码
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>可以看到，源码是前三位，校验码是后三位。也就是生成过程中，校验码只和生成矩阵的后三列有关。</p>
+<pre tabindex="0"><code>原码:
+          |0 1 0|
+生成矩阵:
+          |1 0 0 0 1 1|
+          |0 1 0 1 0 1|
+          |0 0 1 1 1 0|
+LDPC校验码生成, 就是矩阵乘法(元素乘法使用与运算代替, 加法使用异或代替):
+          |1 0 0 0 1 1|
+|0 1 0| * |0 1 0 1 0 1| = |0 1 0 1 0 1|
+          |0 0 1 1 1 0|
+经过矩阵乘法得到的1 * 6矩阵就是LDPC校验码. 其中: 前三位是原码, 后三位是校验码
+</code></pre><p>可以看到，源码是前三位，校验码是后三位。也就是生成过程中，校验码只和生成矩阵的后三列有关。</p>
 <p>根据后三列的不同，可以得到不同的源码与校验码的关系，如果是上面的矩阵，则源码(x1,x2,x3)与校验码(y1,y2,y3)的关系如下</p>
 <p>$$ y_1 = x_2\oplus x_3 $$
 $$ y_2 = x_1\oplus x_3 $$
 $$ y_3 = x_1\oplus x_2 $$</p>
 <p>同样的，根据上面的映射我们也能得到对应的矩阵。</p>
 <p>然后程序一开始初始化了一个矩阵</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">6
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>|1 1 1 0 1 1 0 1 0 1 0 1|
-</span></span><span style="display:flex;"><span>|1 0 0 1 1 0 1 1 0 1 0 0|
-</span></span><span style="display:flex;"><span>|0 1 1 1 0 0 1 0 1 0 0 1|
-</span></span><span style="display:flex;"><span>|0 1 0 0 0 1 1 0 1 1 1 0|
-</span></span><span style="display:flex;"><span>|1 0 1 1 1 0 0 0 1 0 1 0|
-</span></span><span style="display:flex;"><span>|0 0 0 0 0 1 0 1 0 0 1 1|
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>然后程序的逻辑是</p>
+<pre tabindex="0"><code>|1 1 1 0 1 1 0 1 0 1 0 1|
+|1 0 0 1 1 0 1 1 0 1 0 0|
+|0 1 1 1 0 0 1 0 1 0 0 1|
+|0 1 0 0 0 1 1 0 1 1 1 0|
+|1 0 1 1 1 0 0 0 1 0 1 0|
+|0 0 0 0 0 1 0 1 0 0 1 1|
+</code></pre><p>然后程序的逻辑是</p>
 <p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307031436901.png" alt="image-20230703143655965"></p>
 <p>也就是找出这个生成矩阵，能验证的所有LDPC码，并按从小到大的顺序排列</p>
-<div class="highlight"><div style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">22
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">23
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">24
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">25
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">26
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">27
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#64686c">28
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#c9d1d9;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">numpy</span> <span style="color:#ff7b72">as</span> <span style="color:#ff7b72">np</span>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">import</span> numpy <span style="color:#719e07">as</span> np
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>N <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">12</span>
-</span></span><span style="display:flex;"><span>K <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">6</span>
-</span></span><span style="display:flex;"><span>H <span style="color:#ff7b72;font-weight:bold">=</span> np<span style="color:#ff7b72;font-weight:bold">.</span>array(
+</span></span><span style="display:flex;"><span>N <span style="color:#719e07">=</span> <span style="color:#2aa198">12</span>
+</span></span><span style="display:flex;"><span>K <span style="color:#719e07">=</span> <span style="color:#2aa198">6</span>
+</span></span><span style="display:flex;"><span>H <span style="color:#719e07">=</span> np<span style="color:#719e07">.</span>array(
 </span></span><span style="display:flex;"><span>    [
-</span></span><span style="display:flex;"><span>        [<span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>],
-</span></span><span style="display:flex;"><span>        [<span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>],
-</span></span><span style="display:flex;"><span>        [<span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>],
-</span></span><span style="display:flex;"><span>        [<span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>],
-</span></span><span style="display:flex;"><span>        [<span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>],
-</span></span><span style="display:flex;"><span>        [<span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">0</span>, <span style="color:#a5d6ff">1</span>, <span style="color:#a5d6ff">1</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">1</span>],
 </span></span><span style="display:flex;"><span>    ]
 </span></span><span style="display:flex;"><span>)
-</span></span><span style="display:flex;"><span><span style="color:#8b949e;font-style:italic"># print(H)</span>
-</span></span><span style="display:flex;"><span>b <span style="color:#ff7b72;font-weight:bold">=</span> []
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">for</span> i <span style="color:#ff7b72;font-weight:bold">in</span> range(<span style="color:#a5d6ff">2</span><span style="color:#ff7b72;font-weight:bold">**</span>N):  <span style="color:#8b949e;font-style:italic"># 2^10 = 1024</span>
-</span></span><span style="display:flex;"><span>    a <span style="color:#ff7b72;font-weight:bold">=</span> format(i, <span style="color:#a5d6ff">&#34;b&#34;</span>)  <span style="color:#8b949e;font-style:italic"># 列举出所有可能的校验码</span>
-</span></span><span style="display:flex;"><span>    b<span style="color:#ff7b72;font-weight:bold">.</span>append(<span style="color:#a5d6ff">&#34;</span><span style="color:#a5d6ff">{:0&gt;12s}</span><span style="color:#a5d6ff">&#34;</span><span style="color:#ff7b72;font-weight:bold">.</span>format(a))
-</span></span><span style="display:flex;"><span>v <span style="color:#ff7b72;font-weight:bold">=</span> np<span style="color:#ff7b72;font-weight:bold">.</span>zeros((<span style="color:#a5d6ff">2</span><span style="color:#ff7b72;font-weight:bold">**</span>N, N))  <span style="color:#8b949e;font-style:italic"># 存储所有的校验码的元组</span>
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">for</span> i <span style="color:#ff7b72;font-weight:bold">in</span> range(<span style="color:#a5d6ff">2</span><span style="color:#ff7b72;font-weight:bold">**</span>N):  <span style="color:#8b949e;font-style:italic"># 从⼩到⼤</span>
-</span></span><span style="display:flex;"><span>    v[i] <span style="color:#ff7b72;font-weight:bold">=</span> b[i]
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">for</span> j <span style="color:#ff7b72;font-weight:bold">in</span> range(N):  <span style="color:#8b949e;font-style:italic"># 存储校验码</span>
-</span></span><span style="display:flex;"><span>        v[i][j] <span style="color:#ff7b72;font-weight:bold">=</span> b[i][j]  <span style="color:#8b949e;font-style:italic"># v是0000000~1111111</span>
-</span></span><span style="display:flex;"><span>w <span style="color:#ff7b72;font-weight:bold">=</span> np<span style="color:#ff7b72;font-weight:bold">.</span>zeros((<span style="color:#a5d6ff">1</span>, N <span style="color:#ff7b72;font-weight:bold">-</span> K))
-</span></span><span style="display:flex;"><span><span style="color:#ff7b72">for</span> i <span style="color:#ff7b72;font-weight:bold">in</span> range(<span style="color:#a5d6ff">2</span><span style="color:#ff7b72;font-weight:bold">**</span>N):
-</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> np<span style="color:#ff7b72;font-weight:bold">.</span>all(np<span style="color:#ff7b72;font-weight:bold">.</span>dot(v[i], H<span style="color:#ff7b72;font-weight:bold">.</span>T) <span style="color:#ff7b72;font-weight:bold">%</span> <span style="color:#a5d6ff">2</span> <span style="color:#ff7b72;font-weight:bold">==</span> w):
-</span></span><span style="display:flex;"><span>        print(v[i])
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h1 id="参考">参考</h1>
+</span></span><span style="display:flex;"><span><span style="color:#586e75"># print(H)</span>
+</span></span><span style="display:flex;"><span>b <span style="color:#719e07">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#2aa198">2</span><span style="color:#719e07">**</span>N):  <span style="color:#586e75"># 2^10 = 1024</span>
+</span></span><span style="display:flex;"><span>    a <span style="color:#719e07">=</span> <span style="color:#b58900">format</span>(i, <span style="color:#2aa198">&#34;b&#34;</span>)  <span style="color:#586e75"># 列举出所有可能的校验码</span>
+</span></span><span style="display:flex;"><span>    b<span style="color:#719e07">.</span>append(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">{:0&gt;12s}</span><span style="color:#2aa198">&#34;</span><span style="color:#719e07">.</span>format(a))
+</span></span><span style="display:flex;"><span>v <span style="color:#719e07">=</span> np<span style="color:#719e07">.</span>zeros((<span style="color:#2aa198">2</span><span style="color:#719e07">**</span>N, N))  <span style="color:#586e75"># 存储所有的校验码的元组</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#2aa198">2</span><span style="color:#719e07">**</span>N):  <span style="color:#586e75"># 从⼩到⼤</span>
+</span></span><span style="display:flex;"><span>    v[i] <span style="color:#719e07">=</span> b[i]
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> j <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(N):  <span style="color:#586e75"># 存储校验码</span>
+</span></span><span style="display:flex;"><span>        v[i][j] <span style="color:#719e07">=</span> b[i][j]  <span style="color:#586e75"># v是0000000~1111111</span>
+</span></span><span style="display:flex;"><span>w <span style="color:#719e07">=</span> np<span style="color:#719e07">.</span>zeros((<span style="color:#2aa198">1</span>, N <span style="color:#719e07">-</span> K))
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#2aa198">2</span><span style="color:#719e07">**</span>N):
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> np<span style="color:#719e07">.</span>all(np<span style="color:#719e07">.</span>dot(v[i], H<span style="color:#719e07">.</span>T) <span style="color:#719e07">%</span> <span style="color:#2aa198">2</span> <span style="color:#719e07">==</span> w):
+</span></span><span style="display:flex;"><span>        <span style="color:#b58900">print</span>(v[i])
+</span></span></code></pre></div><h1 id="参考">参考</h1>
 <p>
 <a href="https://frida.re/docs/functions/" target="_blank" rel="noopener">Functions | Frida • A world-class dynamic instrumentation toolkit</a></p>
 <p>
@@ -948,7 +549,7 @@ $$ y_3 = x_1\oplus x_2 $$</p>
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -961,7 +562,7 @@ $$ y_3 = x_1\oplus x_2 $$</p>
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -986,7 +587,7 @@ $$ y_3 = x_1\oplus x_2 $$</p>
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -994,15 +595,15 @@ $$ y_3 = x_1\oplus x_2 $$</p>
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -1022,6 +623,12 @@ $$ y_3 = x_1\oplus x_2 $$</p>
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -1060,24 +667,6 @@ $$ y_3 = x_1\oplus x_2 $$</p>
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -1103,6 +692,9 @@ $$ y_3 = x_1\oplus x_2 $$</p>
     
 
     
+  
+
+
   </body>
 </html>
 

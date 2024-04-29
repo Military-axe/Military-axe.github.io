@@ -7,6 +7,11 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
   <title>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation</title>
@@ -24,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
@@ -35,7 +40,7 @@
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -109,18 +114,6 @@
 </nav>
 
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css"
-    integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"
-    integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4"
-    crossorigin="anonymous"></script>
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
-    integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
-
-
 <div id="main">
   <div id="content">
     <div>
@@ -149,46 +142,6 @@
           
           
           
-            <nav id="TableOfContents">
-  <ul>
-    <li><a href="#论文主旨">论文主旨</a>
-      <ul>
-        <li><a href="#困难点">困难点</a></li>
-        <li><a href="#作者思路">作者思路</a></li>
-      </ul>
-    </li>
-    <li><a href="#项目细节">项目细节</a>
-      <ul>
-        <li><a href="#去除部分关键字">去除部分关键字</a></li>
-        <li><a href="#转换控制逻辑结构">转换控制逻辑结构</a></li>
-        <li><a href="#添加空操作指令">添加空操作指令</a></li>
-        <li><a href="#pyfet结构">PYFET结构</a>
-          <ul>
-            <li><a href="#定位错误">定位错误</a></li>
-            <li><a href="#处理隐性错误">处理隐性错误</a></li>
-            <li><a href="#迭代转换">迭代转换</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-    <li><a href="#实验评估">实验评估</a>
-      <ul>
-        <li><a href="#反编译效果验证">反编译效果验证</a></li>
-        <li><a href="#正确性验证">正确性验证</a></li>
-        <li><a href="#转换的影响">转换的影响</a></li>
-      </ul>
-    </li>
-    <li><a href="#对抗pjorion与opcode-remap-python技术">对抗PjOrion与opcode remap python技术</a>
-      <ul>
-        <li><a href="#opcode-remap-python">opcode remap python</a></li>
-        <li><a href="#pjorion">PjOrion</a></li>
-      </ul>
-    </li>
-    <li><a href="#思考">思考</a></li>
-    <li><a href="#参考">参考</a></li>
-  </ul>
-</nav>
-          
           <p>2023 S&amp;P论文，讲述的是python反编译的研究工作，总结了大量的反编译特征，针对恶意代码分析领域，提供一种新的解决方案。
 从逆向和工程的角度来说，这项工作有很多值得学习的部分。</p>
 <h1 id="论文主旨">论文主旨</h1>
@@ -205,10 +158,10 @@
 <p><strong>在逆向分析的时候并不一定追求精确还原代码（即保证反编译结果的语义正确性）</strong>，所以我们完全可以<strong>做一些妥协，把一些不好处理的地方简化掉或者修改掉</strong>，使得decompiler能够工作下去。</p>
 <h2 id="去除部分关键字">去除部分关键字</h2>
 <p>在逆向时，如果没有这些关键字，我们还是理解语义</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102048004.png" alt="image.png" style="zoom:50%;" /></center>
+<!-- raw HTML omitted -->
 <h2 id="转换控制逻辑结构">转换控制逻辑结构</h2>
 <p>去掉部分结构或者替换成一些简单的结构是可行的</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102048198.png" alt="image.png" style="zoom:50%;" /></center>
+<!-- raw HTML omitted -->
 <h2 id="添加空操作指令">添加空操作指令</h2>
 <p>python本身具有一个NOP操作指令，但是现有的反编译器无法识别和翻译这个指令。次项目实现了类似的空操作指令，是得反编译器能翻译和识别。
 空操作指令的用处是</p>
@@ -217,17 +170,17 @@
 <li>对齐已经替换的指令</li>
 </ol>
 <h2 id="pyfet结构">PYFET结构</h2>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102048665.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <p>主要有两个组成部分，错误识别，迭代转换自动解决检测到的错误</p>
 <h3 id="定位错误">定位错误</h3>
 <p>通过来自反编译器的错误信息来定位错误位置，如果没有错误信息但是又反编译失败了则不认为是显性错误，可以查看下面的隐性错误。报错信息的模式如下</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102048325.png" alt="image.png" style="zoom: 80%;" /></center>
+<!-- raw HTML omitted -->
 <h3 id="处理隐性错误">处理隐性错误</h3>
 <p>处理隐性错误的流程。
 如果识别出一个与隐形错误匹配的代码片段，则对照隐性错误，得到两个值，一个是原本的可能为隐形错\(S_{error}\)一个是对照后可能的正确模式\(S_{correct}\).将这两个源码重新编译一遍（同一个编译器），得到\(I_{error}, I_{correct}\)。然后回到原二进制文件中对应的位置，看匹配\(I_{error}, I_{correct}\)中哪一个，从而发现隐性错误，继续反编译。</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102048320.png" alt="image.png" style="zoom:50%;" /></center>
+<!-- raw HTML omitted -->
 <p>常见的隐形错误模式的修复前后对比，这里只显示6组。</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102048664.png" alt="image.png" style="zoom:50%;" /></center>
+<!-- raw HTML omitted -->
 <h3 id="迭代转换">迭代转换</h3>
 <ul>
 <li>首先获取cfg，并选择包含错误位置的目标块</li>
@@ -235,22 +188,22 @@
 <li>对转换后的结果，运行错误识别来检查转换后的是否解决最初的目标错误，如果没有成功会找当前块的邻近块来反复执行这个过程。</li>
 <li>当没有目标块可以处理，也没有找到成功的转换的时候，就失败</li>
 </ul>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102103958.png" alt="image.png" style="zoom:67%;" /></center>
+<!-- raw HTML omitted -->
 <p>上图的例子就是0块发生错误，但是无法通过转换来解决，这时候首先找到与0块直接相连的几个1块，通过尝试转换，1块任然不行再拓展到2块。已经解决过的块是不会再加入这个流程，直接解决问题或者没有其他块了。下面是基本块选择算法。</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102103990.png" alt="image.png" style="zoom:67%;" /></center>
+<!-- raw HTML omitted -->
 <p>从工程角度看一下细节，其中对于指令的匹配和替换是使用正则表达式和定义了一些转换规则。
 正则表达式是匹配指令链</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102103030.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <p>上图表示匹配一个<code>POP_JUMP_IF_FALSE</code>,<code>POP_JUMP_IF_TRUE</code>指令链加一个跳转块，再RE-1这种情况下会直接第三列的结果，RE-2没有匹配成功就不改变，RE-3对应的情况和RE-1不同，考虑下面这种情况</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102103826.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <p>这种if语句超过三个参数，不再只有两个块，所以使用RE-1是不行的，需要多个块都跳转。也就是通过正则匹配指令链和参数后，根据不同情况，每种指令链都有多个可能情况需要对应。</p>
 <h1 id="实验评估">实验评估</h1>
 <h2 id="反编译效果验证">反编译效果验证</h2>
 <p>收集了38351个不同的python恶意样本，选取了现有的5中反编译器Uncompyle6, Decompyle3, Uncompyle2, Unpyc37, and Decompyle++，确定17117个样本（45.6%）反编译失败</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102104337.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <p>使用这17117个样本去验证本项目的有效性，PYFET成功解决了所有的反编译错误
 下表显示了样本中隐性和显性错误的数量。</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102104412.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <h2 id="正确性验证">正确性验证</h2>
 <ol>
 <li>选择了100个流行python程序的源码，和二进制文件，总计14949个python文件。然后对30个FET规则选择40个对应报错，总共1200个反编译错误的样本。</li>
@@ -271,7 +224,7 @@
 首先Dropbox是基于python3.8.12版本的python，所以作者先编译python 3.8.12标准库，和Dropbox的二进制文件对比，发现除了opcode，其他部分都是吻合的。
 图b正常编译后其中字节码的样子，图a则是Dropbox反编译看到的字节码，可以看到是不正常的。
 这里可以通过对比和统计找到所有对应的形式，如图e。</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102104058.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <h2 id="pjorion">PjOrion</h2>
 <p>这种混淆技术有四种方法</p>
 <ol>
@@ -281,11 +234,11 @@
 <li>添加随机跳转指令，重构整个文件</li>
 </ol>
 <p>这种混淆其实主要就是隐藏真实的控制流，首先要提取控制流，用下面这条正则来提取控制流</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102117207.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <p>得到的控制流程图大概如下</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102104778.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <p>然后应用FET规则来还原整个程序</p>
-<center><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306102117182.png" alt="image.png" style="zoom:80%;" /></center>
+<!-- raw HTML omitted -->
 <blockquote>
 <p>首先删除那些不可到达的跳转
 然后用上图e的指令重新找到入口点
@@ -348,7 +301,7 @@
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -361,7 +314,7 @@
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -386,7 +339,7 @@
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -394,15 +347,15 @@
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -422,6 +375,12 @@
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -460,24 +419,6 @@
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -503,6 +444,9 @@
     
 
     
+  
+
+
   </body>
 </html>
 

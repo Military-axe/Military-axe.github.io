@@ -7,9 +7,14 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
 
   
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
 
   
-  <title>mi1itray.axe</title>
+  <title>Mi1itray.axe</title>
 
   
   
@@ -24,18 +29,18 @@
 
   
   
-    <link href="https://military-axe.github.io/myfavicon.jpg" rel="icon">
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
   
 
   
-  <link href="/index.xml" rel="alternate" type="application/rss+xml" title="mi1itray.axe" />
+  <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Mi1itray.axe" />
 
   <meta name="description" content="" />
   <meta name="keywords" content="">
   <meta name="author" content="Mi1itray.axe">
 
   
-  <meta name="generator" content="Hugo 0.113.0">
+  <meta name="generator" content="Hugo 0.125.1">
 
   
   
@@ -52,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">mi1itray.axe</a></h1>
+  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -124,8 +129,8 @@
           
 
 <header>
-  <p class="meta">Mar 22, 2024
-     - 9 minute read 
+  <p class="meta">Apr 29, 2024
+     - 14 minute read 
     
 
     
@@ -134,7 +139,37 @@
     
   </p>
   <h1 class="entry-title">
-     Rust编写几种hook的方式 
+     句柄降权绕过CallBacks检查 
+  </h1>
+</header>
+
+          
+            <p><p>ObRegistyCallBacks保护指定进程，可以让我们攻击程序OpenProcess打开指定进程后获取的句柄权限是我们指定的权限范围, 比如不能读取进程内存, 不能终止进程。</p>
+<p>如何绕过这种保护，可以使用句柄降权/提权的方法，就可以对提高已经获取到的句柄权限。</p></p>
+            
+              <footer>
+                <a href="https://military-axe.github.io/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/" rel="full-article">Would you like to know more? →</a>
+              </footer>
+            
+          
+        </article>
+        
+        <article>
+          
+          
+
+<header>
+  <p class="meta">Mar 22, 2024
+     - 7 minute read 
+    
+
+    
+    
+      - <a class="label" href="https://military-axe.github.io/categories/reverse/">Reverse </a>
+    
+  </p>
+  <h1 class="entry-title">
+    <a href="https://military-axe.github.io/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
   </h1>
 </header>
 
@@ -160,7 +195,7 @@
 
 <header>
   <p class="meta">Mar 19, 2024
-     - 12 minute read 
+     - 9 minute read 
     
 
     
@@ -283,36 +318,6 @@
           
         </article>
         
-        <article>
-          
-          
-
-<header>
-  <p class="meta">Sep 27, 2023
-     - 16 minute read 
-    
-
-    
-    
-      - <a class="label" href="https://military-axe.github.io/categories/reverse/">Reverse </a>
-    
-  </p>
-  <h1 class="entry-title">
-    <a href="https://military-axe.github.io/blog/2023-09-27-2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/">2023 研究生国赛 Reverse</a>
-  </h1>
-</header>
-
-          
-            <p><p>4道题做了3到，都不太方便纯静态，动调倒是都挺简单的. 最后一题unity的游戏没什么经验，不知道怎么下手，CE也没下就放弃了</p>
-<p>更新：又看了一下其实unity还是很简单，只是忘记dnspy该展开那个类了，（我说怎么看不到代码呢</p></p>
-            
-              <footer>
-                <a href="https://military-axe.github.io/blog/2023-09-27-2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/" rel="full-article">Would you like to know more? →</a>
-              </footer>
-            
-          
-        </article>
-        
       
       
       
@@ -371,7 +376,7 @@
         <p>mi1itray.axe&rsquo;s blog</p>
 <p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
 <p>You can use gpg to contact me, My public key in 
-<a href="gpg_publickey.asc">here</a></p>
+<a href="./gpg_publickey.asc">here</a></p>
 
       
     </p>
@@ -384,7 +389,7 @@
 
 <ul class="sidebar-nav">
   <li class="sidebar-nav-item">
-    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe/" title="https://github.com/Military-axe/"><i class="fa fa-github fa-3x"></i></a>
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
     
     
     
@@ -409,7 +414,7 @@
     
       <section class="odd">
         
-          <h1>Friend link</h1>
+          <h1>Friend Link</h1>
         
         
           <li>
@@ -417,15 +422,15 @@
           </li>
         
           <li>
-            <a href="http://locksec.top" title="l0ck" >l0ck</a>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
           </li>
         
           <li>
-            <a href="https://www.cnblogs.com/Ar3sh1/" title="Ar3sh1" >Ar3sh1</a>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
           </li>
         
           <li>
-            <a href="https://WyHlj.github.io/" title="fl3cha2o" >fl3cha2o</a>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
           </li>
         
           <li>
@@ -445,6 +450,12 @@
         <ul id="recent_posts">
           
           
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
             
           
             
@@ -483,24 +494,6 @@
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/">2023 羊城杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-09-01-rtag-cli-tools-dev/">Rtag cli tools dev</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-08-19-binary-diffing-1/">Binary Diffing 1</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -525,6 +518,9 @@
     
 
     
+  
+
+
   </body>
 </html>
    
