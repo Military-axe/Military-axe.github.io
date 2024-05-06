@@ -6,8 +6,15 @@
     <description>Recent content on Mi1itray.axe</description>
     <generator>Hugo 0.125.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 29 Apr 2024 22:01:29 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 06 May 2024 11:17:50 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>通过修改物理内存实现跨进程内存读写</title>
+      <link>https://military-axe.github.io/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</link>
+      <pubDate>Mon, 06 May 2024 11:17:50 +0800</pubDate>
+      <guid>https://military-axe.github.io/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</guid>
+      <description>&lt;p&gt;跨进程内存读写有多种方式，这里主要了解一下修改物理内存来实现跨进程内存修改方法。这种方法主要是无痕，对比修改cr3来说要无痕的多。&lt;/p&gt;&#xA;&lt;p&gt;后面再试试修改cr3和修改MDL映射来做到跨进程内存读写方式。&lt;/p&gt;</description>
+    </item>
     <item>
       <title>句柄降权绕过CallBacks检查</title>
       <link>https://military-axe.github.io/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/</link>
