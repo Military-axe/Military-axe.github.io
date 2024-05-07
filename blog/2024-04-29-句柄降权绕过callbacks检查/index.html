@@ -1266,7 +1266,8 @@ code.has-jax {
 <p>防护方是通过驱动来遍历私有句柄表，然后修改攻击者进程的私有句柄表中指向被保护进程的句柄属性。</p>
 <p>那我们也可以写一个驱动来不停的修改我们自身进程的私有句柄权限，将句柄权限改成full control</p>
 <h3 id="断链">断链</h3>
-<p>防护方是通过遍历私有句柄链表来查找攻击方的私有句柄表，那我们可以将私有句柄从链表上断掉，放置一个空/假的私有句柄表结构体或者直接让我们的进程私有句柄表从链表上断开</p>
+<p>防护方是通过遍历私有句柄链表来查找攻击方的私有句柄表，那我们可以将私有句柄从链表上断掉，放置一个空/假的私有句柄表结构体或者直接让我们的进程私有句柄表从链表上断开。可以参考github项目
+<a href="https://github.com/nbqofficial/HideDriver" target="_blank" rel="noopener">HideDriver</a></p>
 <h2 id="obregistercallbacks-保护">ObRegisterCallbacks 保护</h2>
 <p>实际上上述的句柄降权/提权都是针对callbacks保护来做的，很多厂商是使用这个微软公开的API来保护自身进程句柄的权限.</p>
 <p>ObRegisterCallbacks 例程为线程、进程和桌面句柄操作注册一系列回调例程。也就是我们可以给我们进程句柄设定一个回调函数，当我们的进程句柄被NtOpenProcess打开后，就会执行这个回调函数。如果我们在回调函数中修改这个句柄的权限，那么任何进程获取我们进程句柄将得到修改过后权限的句柄。</p>
@@ -1327,6 +1328,8 @@ code.has-jax {
 <a href="https://medium.com/@ashabdalhalim/a-light-on-windows-10s-object-header-typeindex-value-e8f907e7073a" target="_blank" rel="noopener">https://medium.com/@ashabdalhalim/a-light-on-windows-10s-object-header-typeindex-value-e8f907e7073a</a></p>
 <p>
 <a href="https://spikysabra.gitbook.io/kernelcactus/pocs/handle-elevation" target="_blank" rel="noopener">https://spikysabra.gitbook.io/kernelcactus/pocs/handle-elevation</a></p>
+<p>
+<a href="https://github.com/nbqofficial/HideDriver" target="_blank" rel="noopener">HideDriver ( Direct kernel object manipulation ) | github.com</a></p>
 <blockquote>
 <p>驱动注册系统回调函数</p>
 </blockquote>
