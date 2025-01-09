@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>Windows进程隐藏初探</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+
+  
+  
+    <link href="http://localhost:1313/favicon.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe">
+
+  
+  <meta name="generator" content="Hugo 0.125.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="http://localhost:1313/">» Blog</option>
+      
+        <option value="http://localhost:1313/categories">» Categories</option>
+      
+        <option value="http://localhost:1313/tags">» Tags</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        
+
+<header>
+  <p class="meta">May 30, 2024
+     - 9 minute read 
+    
+
+    
+    
+      - <a class="label" href="http://localhost:1313/categories/driver/">Driver </a>
+    
+  </p>
+  <h1 class="entry-title">
+    <a href="http://localhost:1313/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+  </h1>
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+
+</header>
+
+
+        <div class="entry-content">
+          
+          
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#windows进程隐藏初探">Windows进程隐藏初探</a>
+      <ul>
+        <li><a href="#r3隐藏信息">R3隐藏信息</a>
+          <ul>
+            <li><a href="#r3伪造信息">R3伪造信息</a></li>
+            <li><a href="#r3消除进程">R3消除进程</a>
+              <ul>
+                <li><a href="#api-hook-hook任务管理器">[API hook] Hook任务管理器</a></li>
+                <li><a href="#全局hook-setwindowshookex">[全局hook] SetWindowsHookEx</a></li>
+                <li><a href="#全局hook-hook-explorer">[全局hook] Hook Explorer</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#r0隐藏信息">R0隐藏信息</a>
+          <ul>
+            <li><a href="#r0伪造信息">R0伪造信息</a></li>
+            <li><a href="#r0消除进程">R0消除进程</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#总结思考">总结思考</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+          
+          <h1 id="windows进程隐藏初探">Windows进程隐藏初探</h1>
+<p>目的是将我们的进程信息修改，让任务管理器这些无法读取到原本真实的信息，从而做到隐藏效果。比如将目的进程修改成系统进程信息。</p>
+<p>主要使用两个层面隐藏</p>
+<ul>
+<li>
+<p>R3的PEB中隐藏信息</p>
+</li>
+<li>
+<p>R0的_EPROCESS中隐藏信息。</p>
+</li>
+</ul>
+<p>隐藏我们也可以从两个方面来看，一种是伪造信息，一种是消除信息。伪造信息是指将一个指定进程伪造成其他进程，消除信息是指让任务管理器这种无法读取到这个进程的信息。</p>
+<h2 id="r3隐藏信息">R3隐藏信息</h2>
+<h3 id="r3伪造信息">R3伪造信息</h3>
+<p>我看一些文章主要隐藏信息如下(实际上不止，但是思路是类似的，但是我测试发现没有什么实际上的用处</p>
+<ul>
+<li>程序名称ImageBaseName</li>
+<li>命令行参数CommandLine</li>
+<li>修改用户组</li>
+</ul>
+<p>思路也很简单，获取PEB结构体，然后修改对应字段的内容，这里我用Rust来写，rust调用windows库函数可以参考我之前写的
+<a href="https://military-axe.github.io/posts/rustbian-xie-ji-chong-hookde-fang-shi/" target="_blank" rel="noopener">文章</a>，这里只写思路和部分代码片段，完整在附录。</p>
+<p>获取本身进程的peb地址，这个很简单，大🔥都知道，读取<code>gs:[60h]</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>    asm!(
+</span></span><span style="display:flex;"><span>        <span style="color:#2aa198">&#34;mov {0}, gs:[0x60]&#34;</span>,
+</span></span><span style="display:flex;"><span>        inout(reg) ppeb
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>如果是将这个代码放在dll中，注入进去需要伪装的进程也可以实现读取peb的效果。但是我这里还是偏向于不使用注入手段，倾向于直接传入进程pid，然后获取peb，这里可以使用<code>ntdll.dll</code>中未导出的函数<code>NtQueryInformationProcess</code>。在rust中可以直接用，c++中需要<code>GetProcAddress(Ntdll, &quot;NtQueryInformationProcess&quot;)</code>来获取</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">fn</span> <span style="color:#268bd2">main</span>() {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> handle <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>        OpenProcess(<span style="color:#cb4b16">PROCESS_QUERY_INFORMATION</span> <span style="color:#719e07">|</span> <span style="color:#cb4b16">PROCESS_VM_READ</span>, <span style="color:#cb4b16">false</span>, <span style="color:#2aa198">9676</span>)
+</span></span><span style="display:flex;"><span>            .expect(<span style="color:#2aa198">&#34;[!] OpenProcess error&#34;</span>)
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> pbi <span style="color:#719e07">=</span> <span style="color:#cb4b16">PROCESS_BASIC_INFORMATION</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">..</span><span style="color:#b58900">Default</span>::default()
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> ppbi <span style="color:#719e07">=</span> <span style="color:#719e07">&amp;</span><span style="color:#719e07">mut</span> pbi <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> _;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> return_length <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span><span style="color:#719e07">u32</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> _ <span style="color:#719e07">=</span> NtQueryInformationProcess(
+</span></span><span style="display:flex;"><span>            handle,
+</span></span><span style="display:flex;"><span>            ProcessBasicInformation,
+</span></span><span style="display:flex;"><span>            ppbi <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>            size_of::<span style="color:#719e07">&lt;</span><span style="color:#cb4b16">PROCESS_BASIC_INFORMATION</span><span style="color:#719e07">&gt;</span>() <span style="color:#719e07">as</span> <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">&amp;</span><span style="color:#719e07">mut</span> return_length,
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>        println!(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">{:#?}</span><span style="color:#2aa198">&#34;</span>, pbi);
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>使用<code>NtQueryInformationProcess</code>可以得到<code>PROCESS_BASIC_INFORMATION</code>结构体</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">#[repr(C)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">pub</span> <span style="color:#719e07">struct</span> <span style="color:#268bd2">PROCESS_BASIC_INFORMATION</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> ExitStatus: <span style="color:#268bd2">NTSTATUS</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> PebBaseAddress: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">PEB</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> AffinityMask: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> BasePriority: <span style="color:#dc322f">i32</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> UniqueProcessId: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> InheritedFromUniqueProcessId: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>可以从结构体中<code>PROCESS_BASIC_INFORMATION-&gt;PebBaseAddress</code>获取peb地址。常见的文章一般是修改<code>ImageBaseNamed</code>和<code>CommandLine</code>来隐藏这两个信息</p>
+<p>ImageBaseNamed和CommandLine的位置查看peb结构体可知</p>
+<ul>
+<li><code>Peb-&gt;ProcessParameters-&gt;ImageBaseNamed</code></li>
+<li><code>Peb-&gt;ProcessParameters-&gt;CommandLine </code></li>
+</ul>
+<p>实际上需要修改的地方还有很多，查看<code>Peb-&gt;ProcessParameters</code>可以看到</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#2aa198">0</span><span style="color:#719e07">:</span> kd<span style="color:#719e07">&gt;</span> dt <span style="color:#2aa198">0x0000020c</span>`<span style="color:#2aa198">6f</span><span style="color:#2aa198">211</span>de0 _RTL_USER_PROCESS_PARAMETERS
+</span></span><span style="display:flex;"><span>nt<span style="color:#719e07">!</span>_RTL_USER_PROCESS_PARAMETERS
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x000</span> MaximumLength    : <span style="color:#2aa198">0x764</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x004</span> Length           : <span style="color:#2aa198">0x764</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x008</span> Flags            : <span style="color:#2aa198">0x4001</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x00c</span> DebugFlags       : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x010</span> ConsoleHandle    : <span style="color:#2aa198">0x00000000</span>`<span style="color:#2aa198">0000004</span><span style="color:#2aa198">8</span> Void
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x018</span> ConsoleFlags     : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x020</span> StandardInput    : <span style="color:#2aa198">0x00000000</span>`<span style="color:#2aa198">0000005</span>c Void
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x028</span> StandardOutput   : <span style="color:#2aa198">0x00000000</span>`<span style="color:#2aa198">00000060</span> Void
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x030</span> StandardError    : <span style="color:#2aa198">0x00000000</span>`<span style="color:#2aa198">00000064</span> Void
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x038</span> CurrentDirectory : _CURDIR
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x050</span> DllPath          : _UNICODE_STRING <span style="color:#2aa198">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x060</span> ImagePathName    : _UNICODE_STRING <span style="color:#2aa198">&#34;C:\Users</span><span style="color:#cb4b16">\a</span><span style="color:#2aa198">xe\Desktop\hide_process_r3.exe&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x070</span> CommandLine      : _UNICODE_STRING <span style="color:#2aa198">&#34;&#34;</span>C:\Users\axe\Desktop\hide_process_r3.exe<span style="color:#2aa198">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x080</span> Environment      : <span style="color:#2aa198">0x0000020c</span>`<span style="color:#2aa198">6f210f</span>e0 Void
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x088</span> StartingX        : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x08c</span> StartingY        : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x090</span> CountX           : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x094</span> CountY           : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x098</span> CountCharsX      : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x09c</span> CountCharsY      : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0a0</span> FillAttribute    : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0a4</span> WindowFlags      : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0a8</span> ShowWindowFlags  : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0b0</span> WindowTitle      : _UNICODE_STRING <span style="color:#2aa198">&#34;C:\Users</span><span style="color:#cb4b16">\a</span><span style="color:#2aa198">xe\Desktop\hide_process_r3.exe&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0c0</span> DesktopInfo      : _UNICODE_STRING <span style="color:#2aa198">&#34;WinSta0\Default&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0d0</span> ShellInfo        : _UNICODE_STRING <span style="color:#2aa198">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0e0</span> RuntimeData      : _UNICODE_STRING <span style="color:#2aa198">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x0f0</span> CurrentDirectores : [<span style="color:#2aa198">32</span>] _RTL_DRIVE_LETTER_CURDIR
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x3f0</span> EnvironmentSize  : <span style="color:#2aa198">0xdf8</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x3f8</span> EnvironmentVersion : <span style="color:#2aa198">3</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x400</span> PackageDependencyData : (null) 
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x408</span> ProcessGroupId   : <span style="color:#2aa198">0x21c</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x40c</span> LoaderThreads    : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x410</span> RedirectionDllName : _UNICODE_STRING <span style="color:#2aa198">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x420</span> HeapPartitionName : _UNICODE_STRING <span style="color:#2aa198">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x430</span> DefaultThreadpoolCpuSetMasks : (null) 
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x438</span> DefaultThreadpoolCpuSetMaskCount : <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#719e07">+</span><span style="color:#2aa198">0x43c</span> DefaultThreadpoolThreadMaximum : <span style="color:#2aa198">0</span>
+</span></span></code></pre></div><p>但是我发现修改了这些字符串后，任务管理器中依然没有被修改，说明任务管理器读取的字符串应该不是PEB中的，可能是EPORCESS中的(在R0中验证)。所以没啥用。</p>
+<p>代码在
+<a href="https://github.com/Military-axe/HideProcessR3" target="_blank" rel="noopener">HideProcessR3</a>项目</p>
+<h3 id="r3消除进程">R3消除进程</h3>
+<blockquote>
+<p>这个部分我觉得是有用的，至少能让一些软件显示不出来我们的进程。</p>
+</blockquote>
+<p>R3消除进程我主要学到两个方面，一个是hook，一个是R3断链</p>
+<h4 id="api-hook-hook任务管理器">[API hook] Hook任务管理器</h4>
+<p>这里主要针对任务管理器进程，让任务管理器获取不到我们的进程。这里其实是hook掉任务管理器的<code>ZwQuerySystemInformation</code>函数，这篇
+<a href="https://bbs.kanxue.com/thread-269919.htm" target="_blank" rel="noopener">看雪的文章</a>已经实现过了c/c++版本的，我这里就用rust的写一遍R3的部分。</p>
+<blockquote>
+<p>看雪文章是手动实现hook的过程，我是使用第三方的hook库，因为任务管理还涉及到一些多线程的问题，简单手动hook可能会有问题。用第三方库则已经帮我解决这个问题了。</p>
+</blockquote>
+<p>任务管理器获取进程信息，底层调用的是<code>ZwQuerySystemInformation</code>函数</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>NTSTATUS WINAPI <span style="color:#268bd2">ZwQuerySystemInformation</span>(
+</span></span><span style="display:flex;"><span>  __in       SYSTEM_INFORMATION_CLASS SystemInformationClass,
+</span></span><span style="display:flex;"><span>  __inout    PVOID SystemInformation,
+</span></span><span style="display:flex;"><span>  __in       ULONG SystemInformationLength,
+</span></span><span style="display:flex;"><span>  __out_opt  PULONG ReturnLength);
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SystemInformationClass</td>
+<td>要检索的类型。是一个SYSTEM_INFORMATION_CLASS的联合体</td>
+</tr>
+<tr>
+<td>SystemInformation</td>
+<td>指向缓冲区的指针，用于接收请求信息。该信息的大小和结构取决于SystemInformationClass</td>
+</tr>
+<tr>
+<td>SystemInformationLength</td>
+<td>SystemInformation参数指向的缓冲区的大小</td>
+</tr>
+<tr>
+<td>ReturnLength</td>
+<td>一个可选指针，指向函数写入请求信息的实际大小的位置</td>
+</tr>
+</tbody>
+</table>
+<p>SystemInformationClass中有很多类型</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">typedef</span> <span style="color:#719e07">enum</span> _SYSTEM_INFORMATION_CLASS {
+</span></span><span style="display:flex;"><span>    SystemBasicInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>,
+</span></span><span style="display:flex;"><span>    SystemPerformanceInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">2</span>,
+</span></span><span style="display:flex;"><span>    SystemTimeOfDayInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">3</span>,
+</span></span><span style="display:flex;"><span>    SystemProcessInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">5</span>,
+</span></span><span style="display:flex;"><span>    SystemProcessorPerformanceInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">8</span>,
+</span></span><span style="display:flex;"><span>    SystemInterruptInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">23</span>,
+</span></span><span style="display:flex;"><span>    SystemExceptionInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">33</span>,
+</span></span><span style="display:flex;"><span>    SystemRegistryQuotaInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">37</span>,
+</span></span><span style="display:flex;"><span>    SystemLookasideInformation <span style="color:#719e07">=</span> <span style="color:#2aa198">45</span>
+</span></span><span style="display:flex;"><span>} SYSTEM_INFORMATION_CLASS;
+</span></span></code></pre></div><p><code>SystemProcessInformation(5)</code>就是进程信息类型，我们hook函数后，目标就是<code>SystemInformationClass</code>的值等于5的情况。</p>
+<p>然后还需要注意到SystemInformation值，这个值的结构体如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">pub</span> <span style="color:#719e07">struct</span> <span style="color:#268bd2">SYSTEM_PROCESS_INFORMATION</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> NextEntryOffset: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> NumberOfThreads: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> Reserved1: [<span style="color:#dc322f">u8</span>; <span style="color:#2aa198">48</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> ImageName: <span style="color:#268bd2">super</span>::<span style="color:#719e07">super</span>::Foundation::<span style="color:#cb4b16">UNICODE_STRING</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> BasePriority: <span style="color:#dc322f">i32</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> UniqueProcessId: <span style="color:#268bd2">super</span>::<span style="color:#719e07">super</span>::Foundation::<span style="color:#cb4b16">HANDLE</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> Reserved2: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> core::ffi::c_void,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> HandleCount: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> SessionId: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> Reserved3: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> core::ffi::c_void,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> PeakVirtualSize: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> VirtualSize: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> Reserved4: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> PeakWorkingSetSize: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> WorkingSetSize: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> Reserved5: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> core::ffi::c_void,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> QuotaPagedPoolUsage: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> Reserved6: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> core::ffi::c_void,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> QuotaNonPagedPoolUsage: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> PagefileUsage: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> PeakPagefileUsage: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> PrivatePageCount: <span style="color:#dc322f">usize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> Reserved7: [<span style="color:#dc322f">i64</span>; <span style="color:#2aa198">6</span>],
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>其中<code>UniqueProcessId</code>表示进程pid，也是我们对比是否是目标进程的值。然后<code>NextEntryOffset</code>表示下一个SYSTEM_PROCESS_INFORMATION距离当前这个结构体的偏移值</p>
+<p><img src="https://s2.loli.net/2024/05/31/QdgwEjzDxVNGXBZ.png" alt=""></p>
+<p>我这里使用<code>retour</code>库来hook，源码中指定需要hook的进程号(任务管理器的进程号)做全局变量</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#586e75">// 需要隐藏的进程id
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">const</span> <span style="color:#cb4b16">HIDE_PID</span>: <span style="color:#dc322f">i32</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">21664</span>;
+</span></span></code></pre></div><p>然后写成一个dll的代码，原理就是inline hook，写法可以参考我之前的
+<a href="https://military-axe.github.io/posts/rustbian-xie-ji-chong-hookde-fang-shi/" target="_blank" rel="noopener">文章</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span>static_detour! {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">static</span> ZwQuerySystemInformationHook: <span style="color:#268bd2">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span>(<span style="color:#cb4b16">SYSTEM_INFORMATION_CLASS</span>, <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void, c_ulong, <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_ulong) -&gt; <span style="color:#268bd2">NTSTATUS</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// A type alias for `ZwQuerySystemInformation` (makes the transmute easy on the eyes)
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">type</span> <span style="color:#268bd2">FnZwQuerySystemInformation</span> <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">SYSTEM_INFORMATION_CLASS</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    c_ulong,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_ulong,
+</span></span><span style="display:flex;"><span>) -&gt; <span style="color:#268bd2">NTSTATUS</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// Called when the DLL is attached to the process.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">main</span>() -&gt; <span style="color:#b58900">Result</span><span style="color:#719e07">&lt;</span>(), <span style="color:#b58900">Box</span><span style="color:#719e07">&lt;</span><span style="color:#719e07">dyn</span> Error<span style="color:#719e07">&gt;&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> address <span style="color:#719e07">=</span> get_module_symbol_address(<span style="color:#2aa198">&#34;ntdll.dll&#34;</span>, <span style="color:#2aa198">&#34;ZwQuerySystemInformation&#34;</span>)
+</span></span><span style="display:flex;"><span>        .expect(<span style="color:#2aa198">&#34;could not find &#39;ZwQuerySystemInformation&#39; address&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> target: <span style="color:#268bd2">FnZwQuerySystemInformation</span> <span style="color:#719e07">=</span> mem::transmute(address);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ZwQuerySystemInformationHook
+</span></span><span style="display:flex;"><span>        .initialize(target, zwquery_system_infomation_detour)<span style="color:#719e07">?</span>
+</span></span><span style="display:flex;"><span>        .enable()<span style="color:#719e07">?</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#b58900">Ok</span>(())
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[allow(unused_assignments)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// Called whenever `ZwQuerySystemInformation` is invoked in the process.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">fn</span> <span style="color:#268bd2">zwquery_system_infomation_detour</span>(
+</span></span><span style="display:flex;"><span>    system_infomation_class: <span style="color:#268bd2">SYSTEM_INFORMATION_CLASS</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">mut</span> system_infomation: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    system_infomation_length: <span style="color:#268bd2">c_ulong</span>,
+</span></span><span style="display:flex;"><span>    return_length: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_ulong,
+</span></span><span style="display:flex;"><span>) -&gt; <span style="color:#268bd2">NTSTATUS</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> prev <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> status <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>        ZwQuerySystemInformationHook.call(
+</span></span><span style="display:flex;"><span>            system_infomation_class,
+</span></span><span style="display:flex;"><span>            system_infomation,
+</span></span><span style="display:flex;"><span>            system_infomation_length,
+</span></span><span style="display:flex;"><span>            return_length,
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> status <span style="color:#719e07">!=</span> <span style="color:#cb4b16">STATUS_SUCCESS</span> <span style="color:#719e07">||</span> system_infomation_class <span style="color:#719e07">!=</span> SystemProcessInformation {
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> status;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> psystem_information: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">SYSTEM_PROCESS_INFORMATION</span> <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">unsafe</span> { mem::transmute(system_infomation) };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">loop</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> <span style="color:#cb4b16">HIDE_PID</span> <span style="color:#719e07">==</span> <span style="color:#719e07">unsafe</span> { (<span style="color:#719e07">*</span>psystem_information).UniqueProcessId.<span style="color:#2aa198">0</span> } <span style="color:#719e07">as</span> <span style="color:#dc322f">i32</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">let</span> st <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { format!(<span style="color:#2aa198">&#34;system information ==&gt; </span><span style="color:#2aa198">{:#?}</span><span style="color:#2aa198">&#34;</span>, <span style="color:#719e07">*</span>psystem_information) };
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">unsafe</span> { MessageBoxA(<span style="color:#b58900">None</span>, <span style="color:#cb4b16">PCSTR</span>::from_raw(st.as_ptr()), s!(<span style="color:#2aa198">&#34;info&#34;</span>), <span style="color:#cb4b16">MB_OK</span>) };
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> prev <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span> {
+</span></span><span style="display:flex;"><span>                system_infomation <span style="color:#719e07">=</span> (psystem_information <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">+</span> (<span style="color:#719e07">unsafe</span> { <span style="color:#719e07">*</span>psystem_information }).NextEntryOffset <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void;
+</span></span><span style="display:flex;"><span>            } <span style="color:#719e07">else</span> <span style="color:#719e07">if</span> (<span style="color:#719e07">unsafe</span> { <span style="color:#719e07">*</span>psystem_information }).NextEntryOffset <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span> {
+</span></span><span style="display:flex;"><span>                (<span style="color:#719e07">unsafe</span> { <span style="color:#719e07">*</span>(prev <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">SYSTEM_PROCESS_INFORMATION</span>) }).NextEntryOffset <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>            } <span style="color:#719e07">else</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>                    (<span style="color:#719e07">*</span>(prev <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">SYSTEM_PROCESS_INFORMATION</span>)).NextEntryOffset <span style="color:#719e07">+=</span>
+</span></span><span style="display:flex;"><span>                        (<span style="color:#719e07">*</span>psystem_information).NextEntryOffset;
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#719e07">else</span> {
+</span></span><span style="display:flex;"><span>            prev <span style="color:#719e07">=</span> psystem_information <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> <span style="color:#719e07">unsafe</span> { (<span style="color:#719e07">*</span>psystem_information).NextEntryOffset <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span> } {
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        psystem_information <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">unsafe</span> { psystem_information <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span> <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>psystem_information).NextEntryOffset <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span> }
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">SYSTEM_PROCESS_INFORMATION</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// Returns a module symbol&#39;s absolute address.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">fn</span> <span style="color:#268bd2">get_module_symbol_address</span>(module: <span style="color:#719e07">&amp;</span><span style="color:#dc322f">str</span>, symbol: <span style="color:#719e07">&amp;</span><span style="color:#dc322f">str</span>) -&gt; <span style="color:#b58900">Option</span><span style="color:#719e07">&lt;</span><span style="color:#dc322f">usize</span><span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> module <span style="color:#719e07">=</span> module
+</span></span><span style="display:flex;"><span>        .encode_utf16()
+</span></span><span style="display:flex;"><span>        .chain(iter::once(<span style="color:#2aa198">0</span>))
+</span></span><span style="display:flex;"><span>        .collect::<span style="color:#719e07">&lt;</span><span style="color:#b58900">Vec</span><span style="color:#719e07">&lt;</span><span style="color:#dc322f">u16</span><span style="color:#719e07">&gt;&gt;</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> symbol <span style="color:#719e07">=</span> CString::new(symbol).unwrap();
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> handle <span style="color:#719e07">=</span> GetModuleHandleW(<span style="color:#cb4b16">PCWSTR</span>(module.as_ptr() <span style="color:#719e07">as</span> _)).unwrap();
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">match</span> GetProcAddress(handle, <span style="color:#cb4b16">PCSTR</span>(symbol.as_ptr() <span style="color:#719e07">as</span> _)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#b58900">Some</span>(func) <span style="color:#719e07">=&gt;</span> <span style="color:#b58900">Some</span>(func <span style="color:#719e07">as</span> <span style="color:#dc322f">usize</span>),
+</span></span><span style="display:flex;"><span>            <span style="color:#b58900">None</span> <span style="color:#719e07">=&gt;</span> <span style="color:#b58900">None</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[no_mangle]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">DllMain</span>(_hinst: <span style="color:#268bd2">HANDLE</span>, reason: <span style="color:#dc322f">u32</span>, _reserved: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void) -&gt; <span style="color:#268bd2">BOOL</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">match</span> reason {
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_ATTACH</span> <span style="color:#719e07">=&gt;</span> {
+</span></span><span style="display:flex;"><span>            println!(<span style="color:#2aa198">&#34;attaching&#34;</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">unsafe</span> { main().unwrap() }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_DETACH</span> <span style="color:#719e07">=&gt;</span> {
+</span></span><span style="display:flex;"><span>            println!(<span style="color:#2aa198">&#34;detaching&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_ATTACH</span> <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_DETACH</span> <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>        _ <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#cb4b16">BOOL</span>::from(<span style="color:#cb4b16">true</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>注入前</p>
+<p><img src="https://s2.loli.net/2024/05/31/D2yiMpuP4QCkt8G.png" alt="image-20240521213951309"></p>
+<p>注入任务管理器后则无法搜索到对应的进程。</p>
+<p><img src="https://s2.loli.net/2024/05/31/O9p6yai3zfNKwuv.png" alt="image-20240521214135198"></p>
+<h4 id="全局hook-setwindowshookex">[全局hook] SetWindowsHookEx</h4>
+<p>上一种API hook的局限性是我需要指定需要hook的进程，比如我需要指定hook任务管理器，为了隐藏进程，我可能还要多hook几个类似的进程，比如ProcessHack，Systeminfo等。但是我很难尽善尽美，把所有需要hook的程序名称都加在其中，所以考虑到全局hook。全局hook则是不需要我指定进程，只要有进程创建（或者复合标准的进程），就往进程中注入dll。SetWindowsHookEx就是这样一个Windows API</p>
+<blockquote>
+<p>为了能够让DLL注入所有的进程中，程序设置WH_GETMESSAGE消息的全局钩子。因为WH_GETMESSAGE类型的钩子会监视消息队列，由于Windows系统是基于消息驱动的，所以所有进程都会有自己的一个消息队列，都会加载WH_GETMESSAGE类型的全局钩子DLL。 &mdash;-《Windows黑客编程技术详解》</p>
+</blockquote>
+<p>windows正常消息处理流程如下：</p>
+<p><img src="https://s2.loli.net/2024/05/31/TIQZJ8ozOMFAbnD.png" alt=""></p>
+<p>使用SetWindowsHookEx之后的消息处理流程则是</p>
+<p><img src="https://s2.loli.net/2024/05/31/hqS8JuYQlEZsmwb.png" alt=""></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>HHOOK <span style="color:#268bd2">SetWindowsHookExA</span>(
+</span></span><span style="display:flex;"><span>  [in] <span style="color:#dc322f">int</span>       idHook,
+</span></span><span style="display:flex;"><span>  [in] HOOKPROC  lpfn,
+</span></span><span style="display:flex;"><span>  [in] HINSTANCE hmod,
+</span></span><span style="display:flex;"><span>  [in] DWORD     dwThreadId
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><ul>
+<li>
+<p>idHook: 需要安装hook的类型，可以安装键盘hook（WH_KEYBOARD），鼠标hook（WH_MOUSE），我们全局hook注入dll的话，需要使用<strong>WH_GETMESSAGE</strong>类型</p>
+</li>
+<li>
+<p>lpfn: 指向相应的挂钩处理过程.若参数dwThreadId为0或者指示了一个其他进程创建的线程之标识符,则参数lpfn必须指向一个动态链接中的挂钩处理过程.否则,参数lpfn可以指向一个与当前进程相关的代码中定义的挂钩处理过程。</p>
+</li>
+<li>
+<p>hmod: DLL 的句柄，其中包含 <em>lpfn</em> 参数指向的挂钩过程。 如果 <em>dwThreadId</em> 参数指定当前进程创建的线程，并且挂钩过程位于与当前进程关联的代码中，则必须将 <em>hMod</em> 参数设置为 <strong>NULL</strong>。</p>
+</li>
+<li>
+<p>dwThreadId：指示了一个线程标识符,挂钩处理过程与线程相关.若此参数值为0,则该挂钩处理过程与所有现存的线程相关</p>
+</li>
+</ul>
+<p>代码参考了这篇
+<a href="https://blog.csdn.net/kingkee/article/details/97390029" target="_blank" rel="noopener">文章</a></p>
+<p>DLL代码:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">// GlobalHook_Test.cpp : 定义 DLL 应用程序的导出函数。
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">//
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span> 
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&#34;stdafx.h&#34;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07"></span> 
+</span></span><span style="display:flex;"><span><span style="color:#719e07">extern</span> HMODULE g_hDllModule;
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 共享内存
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">#pragma data_seg(&#34;mydata&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07"></span>    HHOOK g_hHook <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#pragma data_seg()
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#pragma comment(linker, &#34;/SECTION:mydata,RWS&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07"></span> 
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 钩子回调函数
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>LRESULT <span style="color:#268bd2">GetMsgProc</span>(
+</span></span><span style="display:flex;"><span>	<span style="color:#dc322f">int</span> code,
+</span></span><span style="display:flex;"><span>	WPARAM wParam,
+</span></span><span style="display:flex;"><span>	LPARAM lParam)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">return</span> <span style="color:#719e07">::</span><span style="color:#268bd2">CallNextHookEx</span>(g_hHook, code, wParam, lParam);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 设置全局钩子
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>BOOL <span style="color:#268bd2">SetGlobalHook</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	g_hHook <span style="color:#719e07">=</span> <span style="color:#719e07">::</span><span style="color:#268bd2">SetWindowsHookEx</span>(WH_GETMESSAGE, (HOOKPROC)GetMsgProc, g_hDllModule, <span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">if</span> (<span style="color:#b58900">NULL</span> <span style="color:#719e07">==</span> g_hHook)
+</span></span><span style="display:flex;"><span>	{
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">return</span> FALSE;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 卸载钩子
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>BOOL <span style="color:#268bd2">UnsetGlobalHook</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">if</span> (g_hHook)
+</span></span><span style="display:flex;"><span>	{
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">::</span><span style="color:#268bd2">UnhookWindowsHookEx</span>(g_hHook);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>上面是dll的代码，然后编译调用这个dll的代码</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&#34;stdafx.h&#34;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;Windows.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07"></span> 
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">_tmain</span>(<span style="color:#dc322f">int</span> argc, _TCHAR<span style="color:#719e07">*</span> argv[])
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">typedef</span> <span style="color:#268bd2">BOOL</span>(<span style="color:#719e07">*</span>typedef_SetGlobalHook)();
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">typedef</span> <span style="color:#268bd2">BOOL</span>(<span style="color:#719e07">*</span>typedef_UnsetGlobalHook)();
+</span></span><span style="display:flex;"><span>	HMODULE hDll <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+</span></span><span style="display:flex;"><span>	typedef_SetGlobalHook SetGlobalHook <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+</span></span><span style="display:flex;"><span>	typedef_UnsetGlobalHook UnsetGlobalHook <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+</span></span><span style="display:flex;"><span>	BOOL bRet <span style="color:#719e07">=</span> FALSE;
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">do</span>
+</span></span><span style="display:flex;"><span>	{
+</span></span><span style="display:flex;"><span>		hDll <span style="color:#719e07">=</span> <span style="color:#719e07">::</span><span style="color:#268bd2">LoadLibrary</span>(<span style="color:#2aa198">&#34;GlobalHook_Test.dll&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">if</span> (<span style="color:#b58900">NULL</span> <span style="color:#719e07">==</span> hDll)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;LoadLibrary Error[%d]</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, <span style="color:#719e07">::</span><span style="color:#268bd2">GetLastError</span>());
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>		SetGlobalHook <span style="color:#719e07">=</span> (typedef_SetGlobalHook)<span style="color:#719e07">::</span><span style="color:#268bd2">GetProcAddress</span>(hDll, <span style="color:#2aa198">&#34;SetGlobalHook&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">if</span> (<span style="color:#b58900">NULL</span> <span style="color:#719e07">==</span> SetGlobalHook)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;GetProcAddress Error[%d]</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, <span style="color:#719e07">::</span><span style="color:#268bd2">GetLastError</span>());
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>		bRet <span style="color:#719e07">=</span> <span style="color:#268bd2">SetGlobalHook</span>();
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">if</span> (bRet)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;SetGlobalHook OK.</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>);
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">else</span>
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;SetGlobalHook ERROR.</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>);
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">system</span>(<span style="color:#2aa198">&#34;pause&#34;</span>);
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>		UnsetGlobalHook <span style="color:#719e07">=</span> (typedef_UnsetGlobalHook)<span style="color:#719e07">::</span><span style="color:#268bd2">GetProcAddress</span>(hDll, <span style="color:#2aa198">&#34;UnsetGlobalHook&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">if</span> (<span style="color:#b58900">NULL</span> <span style="color:#719e07">==</span> UnsetGlobalHook)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;GetProcAddress Error[%d]</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, <span style="color:#719e07">::</span><span style="color:#268bd2">GetLastError</span>());
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">UnsetGlobalHook</span>();
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;UnsetGlobalHook OK.</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>);
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>	}<span style="color:#719e07">while</span>(FALSE);
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>	<span style="color:#268bd2">system</span>(<span style="color:#2aa198">&#34;pause&#34;</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这种方法针对于有窗口的程序，如果是命令行的就没有消息传递机制，无法使用SetWindowsHookEx来全局注入。比如<code>Tasklist.exe</code>查看进程，就没法做到隐藏进程</p>
+<h4 id="全局hook-hook-explorer">[全局hook] Hook Explorer</h4>
+<p>这是全局hook的一种思路，通过hook explorer.exe进程，当新进程创建都是作为explorer.exe的子进程，所以首先hook explorer.exe中的<code>CreateProcess</code>。监控每一个进程的创建。当目标进程(任务管理器等)创建时，再向目标进程注入</p>
+<p>// TODO</p>
+<h2 id="r0隐藏信息">R0隐藏信息</h2>
+<h3 id="r0伪造信息">R0伪造信息</h3>
+<p>这里是针对<code>_EPROCESS</code>，修改相应的信息</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">//0xa40 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">struct</span> _EPROCESS
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _KPROCESS Pcb;                                                   <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">struct</span> _EX_PUSH_LOCK ProcessLock;                                       <span style="color:#586e75">//0x438
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    VOID<span style="color:#719e07">*</span> UniqueProcessId;                                                  <span style="color:#586e75">//0x440
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">struct</span> _LIST_ENTRY ActiveProcessLinks;                                  <span style="color:#586e75">//0x448
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    ...
+</span></span><span style="display:flex;"><span>    UCHAR ImageFileName[<span style="color:#2aa198">15</span>];                                                <span style="color:#586e75">//0x5a8
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    ...
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>EPROCESS中有一个属性值是<code>ImageFileName</code>，标志的是程序名称，这个值是可以被修改的，所以可以在驱动层修改</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">typedef</span> <span style="color:#719e07">struct</span> SET_IMAGE_NAME {
+</span></span><span style="display:flex;"><span>    UCHAR bImageName[<span style="color:#2aa198">250</span>];
+</span></span><span style="display:flex;"><span>    UINT64 pid;
+</span></span><span style="display:flex;"><span>}SET_IMAGE_NAME, <span style="color:#719e07">*</span>PSET_IMAGE_NAME ;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#268bd2">SetImageName</span>(PSET_IMAGE_NAME pSetImageName)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PEPROCESS     pEprocess, pCurProcess;
+</span></span><span style="display:flex;"><span>    PUCHAR        pOldImageName;
+</span></span><span style="display:flex;"><span>    SIZE_T        len;
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64 pActiveProcessLinks;
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64 pCurNode;
+</span></span><span style="display:flex;"><span>    UINT64        uProcessId;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pEprocess <span style="color:#719e07">=</span> <span style="color:#268bd2">PsGetCurrentProcess</span>();
+</span></span><span style="display:flex;"><span>    len <span style="color:#719e07">=</span> <span style="color:#268bd2">strlen</span>(pSetImageName<span style="color:#719e07">-&gt;</span>bImageName);
+</span></span><span style="display:flex;"><span>    pActiveProcessLinks <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>        ((PCHAR)pEprocess <span style="color:#719e07">+</span> WIN10_21H1_EPROCESS_TO_ACTIVEPROCESSLINKS_OFFSET);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> (PLIST_ENTRY64 pBeginNode <span style="color:#719e07">=</span> pActiveProcessLinks, pCurNode <span style="color:#719e07">=</span> pBeginNode;
+</span></span><span style="display:flex;"><span>         pCurNode<span style="color:#719e07">-&gt;</span>Flink <span style="color:#719e07">!=</span> pBeginNode;
+</span></span><span style="display:flex;"><span>         pCurNode <span style="color:#719e07">=</span> pCurNode<span style="color:#719e07">-&gt;</span>Flink) {
+</span></span><span style="display:flex;"><span>        pCurProcess <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>            (PEPROCESS)((PCHAR)pCurNode <span style="color:#719e07">-</span>
+</span></span><span style="display:flex;"><span>                        WIN10_21H1_EPROCESS_TO_ACTIVEPROCESSLINKS_OFFSET);
+</span></span><span style="display:flex;"><span>        uProcessId <span style="color:#719e07">=</span> <span style="color:#268bd2">PsGetProcessId</span>(pCurProcess);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (uProcessId <span style="color:#719e07">==</span> pSetImageName<span style="color:#719e07">-&gt;</span>pid) {
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">// copy new string to cover the old string
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">kprintf</span>(<span style="color:#2aa198">&#34;[+ Hide Process R0] found the process pid</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>, uProcessId);
+</span></span><span style="display:flex;"><span>            pOldImageName <span style="color:#719e07">=</span> <span style="color:#268bd2">PsGetProcessImageFileName</span>(pCurProcess);
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">RtlCopyMemory</span>(pOldImageName, pSetImageName<span style="color:#719e07">-&gt;</span>bImageName, len);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="r0消除进程">R0消除进程</h3>
+<p>这里主要是<strong>R0的断链</strong></p>
+<p>EPROCESS是进程在内核中的结构体，一个进程一个EPROCESS，<code>EPROCESS中-&gt;ActiveProcessLinks</code>值是一个双向链表，指向的是其他进程。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>copy
+</span></span><span style="display:flex;"><span><span style="color:#586e75">//0xa40 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">struct</span> _EPROCESS
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _KPROCESS Pcb;                                                   <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">struct</span> _EX_PUSH_LOCK ProcessLock;                                       <span style="color:#586e75">//0x438
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    VOID<span style="color:#719e07">*</span> UniqueProcessId;                                                  <span style="color:#586e75">//0x440
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">struct</span> _LIST_ENTRY ActiveProcessLinks;                                  <span style="color:#586e75">//0x448
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#719e07">struct</span> _EX_RUNDOWN_REF RundownProtect;                                  <span style="color:#586e75">//0x458
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    ...
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><pre tabindex="0"><code class="language-mer" data-lang="mer">					_eprocess1                   _eprocess2
+					.........                    .........
+					.........                    .........
+					ActiveProcessLinks -&gt; {      ActiveProcessLinks -&gt; {
+------------------&gt;	    Flink ------------------&gt;    Flink ------------------&gt;
+&lt;------------------   	Blink &lt;------------------    Blink &lt;------------------
+					}                            }
+</code></pre><p>然后<code>EPROCESS-&gt;UniqueProcessId</code>表示的是这个进程的pid。</p>
+<p>所有我们可以便利所有进程，然后对比pid是否是我们的目标pid，如果是，则从链表中断开这个<code>ActiveProcessLinks</code>节点，这样就可以做到隐藏进程的效果。</p>
+<p><strong>驱动部分</strong></p>
+<p>获取本进程EPROCESS，从本进程开始遍历。我这里是用<code>PsGetCurrentProcess</code>，这篇[文章](
+<a href="https://bbs.kanxue.com/thread-278717.htm" target="_blank" rel="noopener">https://bbs.kanxue.com/thread-278717.htm</a>还提出一种从<code>fs:[0x124]</code>获取KPCR再，一层一层取得到EPROCESS的思路:<code>_KPCR -&gt; _KPRCB -&gt; KTHREAD -&gt; _KAPC_STATE -&gt; _KPROCESS -&gt; _EPROCESS</code>.大佬分析说这其实就是PsGetCurrentProcess的代码实现原理。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>pEprocess <span style="color:#719e07">=</span> <span style="color:#268bd2">PsGetCurrentProcess</span>();
+</span></span><span style="display:flex;"><span>pActiveProcessLinks <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>        ((PCHAR)pEprocess <span style="color:#719e07">+</span> WIN10_21H1_EPROCESS_TO_ACTIVEPROCESSLINKS_OFFSET);
+</span></span></code></pre></div><p>然后遍历链表，判断每个节点的pid是否是目标pid。如果是目标pid则断开链表节点。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">for</span> (PLIST_ENTRY64 pBeginNode <span style="color:#719e07">=</span> pActiveProcessLinks, pCurNode <span style="color:#719e07">=</span> pBeginNode;
+</span></span><span style="display:flex;"><span>     pCurNode<span style="color:#719e07">-&gt;</span>Flink <span style="color:#719e07">!=</span> pBeginNode;
+</span></span><span style="display:flex;"><span>     pCurNode <span style="color:#719e07">=</span> pCurNode<span style="color:#719e07">-&gt;</span>Flink) {
+</span></span><span style="display:flex;"><span>    pCurProcess <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>        (PEPROCESS)((PCHAR)pCurNode <span style="color:#719e07">-</span>
+</span></span><span style="display:flex;"><span>                    WIN10_21H1_EPROCESS_TO_ACTIVEPROCESSLINKS_OFFSET);
+</span></span><span style="display:flex;"><span>    uProcessId <span style="color:#719e07">=</span> <span style="color:#268bd2">PsGetProcessId</span>(pCurProcess);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">kprintf</span>(<span style="color:#2aa198">&#34;[+] pid =&gt; {%#llx}</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">.&#34;</span>, uProcessId);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> (uProcessId <span style="color:#719e07">==</span> pid) {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">kprintf</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;[+ Hide Process R0] Found the Object Process id: %#llx.</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>            uProcessId);
+</span></span><span style="display:flex;"><span>        ((PLIST_ENTRY64)pCurNode<span style="color:#719e07">-&gt;</span>Blink)<span style="color:#719e07">-&gt;</span>Flink <span style="color:#719e07">=</span> pCurNode<span style="color:#719e07">-&gt;</span>Flink;
+</span></span><span style="display:flex;"><span>        ((PLIST_ENTRY64)pCurNode<span style="color:#719e07">-&gt;</span>Flink)<span style="color:#719e07">-&gt;</span>Blink <span style="color:#719e07">=</span> pCurNode<span style="color:#719e07">-&gt;</span>Blink;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">goto</span> success;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>函数总体代码</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">/// @brief 隐藏指定进程
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">/// @param pid 需要隐藏的进程Pid
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">/// @return 如果隐藏成功则返回STATUS_SUCCESS，失败则返回STATUS_UNSUCCESSFUL
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>NTSTATUS <span style="color:#268bd2">HideProcessByPid</span>(UINT64 pid)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT64        uProcessId;
+</span></span><span style="display:flex;"><span>    PEPROCESS     pEprocess, pCurProcess;
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64 pActiveProcessLinks;
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64 pCurNode;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pEprocess <span style="color:#719e07">=</span> <span style="color:#268bd2">PsGetCurrentProcess</span>();
+</span></span><span style="display:flex;"><span>    pActiveProcessLinks <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>        ((PCHAR)pEprocess <span style="color:#719e07">+</span> WIN10_21H1_EPROCESS_TO_ACTIVEPROCESSLINKS_OFFSET);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> (PLIST_ENTRY64 pBeginNode <span style="color:#719e07">=</span> pActiveProcessLinks, pCurNode <span style="color:#719e07">=</span> pBeginNode;
+</span></span><span style="display:flex;"><span>         pCurNode<span style="color:#719e07">-&gt;</span>Flink <span style="color:#719e07">!=</span> pBeginNode;
+</span></span><span style="display:flex;"><span>         pCurNode <span style="color:#719e07">=</span> pCurNode<span style="color:#719e07">-&gt;</span>Flink) {
+</span></span><span style="display:flex;"><span>        pCurProcess <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>            (PEPROCESS)((PCHAR)pCurNode <span style="color:#719e07">-</span>
+</span></span><span style="display:flex;"><span>                        WIN10_21H1_EPROCESS_TO_ACTIVEPROCESSLINKS_OFFSET);
+</span></span><span style="display:flex;"><span>        uProcessId <span style="color:#719e07">=</span> <span style="color:#268bd2">PsGetProcessId</span>(pCurProcess);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">kprintf</span>(<span style="color:#2aa198">&#34;[+] pid =&gt; {%#llx}</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">.&#34;</span>, uProcessId);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (uProcessId <span style="color:#719e07">==</span> pid) {
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">kprintf</span>(
+</span></span><span style="display:flex;"><span>                <span style="color:#2aa198">&#34;[+ Hide Process R0] Found the Object Process id: %#llx.</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>                uProcessId);
+</span></span><span style="display:flex;"><span>            ((PLIST_ENTRY64)pCurNode<span style="color:#719e07">-&gt;</span>Blink)<span style="color:#719e07">-&gt;</span>Flink <span style="color:#719e07">=</span> pCurNode<span style="color:#719e07">-&gt;</span>Flink;
+</span></span><span style="display:flex;"><span>            ((PLIST_ENTRY64)pCurNode<span style="color:#719e07">-&gt;</span>Flink)<span style="color:#719e07">-&gt;</span>Blink <span style="color:#719e07">=</span> pCurNode<span style="color:#719e07">-&gt;</span>Blink;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">goto</span> success;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>success:
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我是写成wdm类型的驱动，这个函数需要一个进程pid，所以要用户层传入Pid。我将这个函数定义在<code>IRP_MJ_DEVICE_CONTROL</code>下</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">#define IOCTL_HIDE_BY_PID \
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">    CTL_CODE(FILE_DEVICE_UNKNOWN, 0x6666, METHOD_BUFFERED, FILE_ANY_ACCESS)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07"></span>
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#268bd2">CustomControl</span>(PDEVICE_OBJECT pDevice, PIRP pIrp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PIO_STACK_LOCATION pstack;
+</span></span><span style="display:flex;"><span>    UINT64             iocode, in_len, out_len, ioinfo, pid;
+</span></span><span style="display:flex;"><span>    NTSTATUS           status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status  <span style="color:#719e07">=</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>    pstack  <span style="color:#719e07">=</span> <span style="color:#268bd2">IoGetCurrentIrpStackLocation</span>(pIrp);
+</span></span><span style="display:flex;"><span>    iocode  <span style="color:#719e07">=</span> pstack<span style="color:#719e07">-&gt;</span>Parameters.DeviceIoControl.IoControlCode;
+</span></span><span style="display:flex;"><span>    in_len  <span style="color:#719e07">=</span> pstack<span style="color:#719e07">-&gt;</span>Parameters.DeviceIoControl.InputBufferLength;
+</span></span><span style="display:flex;"><span>    out_len <span style="color:#719e07">=</span> pstack<span style="color:#719e07">-&gt;</span>Parameters.DeviceIoControl.OutputBufferLength;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">switch</span> (iocode) {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">case</span> IOCTL_HIDE_BY_PID:
+</span></span><span style="display:flex;"><span>        pid <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>(PUINT32)pIrp<span style="color:#719e07">-&gt;</span>AssociatedIrp.SystemBuffer;
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">kprintf</span>(<span style="color:#2aa198">&#34;[+ Hide Process R0] Recv %#llx from R3.</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>, pid);
+</span></span><span style="display:flex;"><span>        status <span style="color:#719e07">=</span> <span style="color:#268bd2">HideProcessByPid</span>(pid);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (<span style="color:#719e07">!</span><span style="color:#268bd2">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">kprintf</span>(<span style="color:#2aa198">&#34;[! Hide Process R0] Hide Process failed.</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        ioinfo <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">default</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">kprintf</span>(<span style="color:#2aa198">&#34;[! Hide Process]Recv iocode: %#llx&#34;</span>, iocode);
+</span></span><span style="display:flex;"><span>        status <span style="color:#719e07">=</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>        ioinfo <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pIrp<span style="color:#719e07">-&gt;</span>IoStatus.Status      <span style="color:#719e07">=</span> status;
+</span></span><span style="display:flex;"><span>    pIrp<span style="color:#719e07">-&gt;</span>IoStatus.Information <span style="color:#719e07">=</span> ioinfo;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">IoCompleteRequest</span>(pIrp, IO_NO_INCREMENT);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>完整代码在
+<a href="https://github.com/Military-axe/HideProcessR0" target="_blank" rel="noopener">HideProcessR0</a>中。</p>
+<p><strong>用户层部分代码</strong></p>
+<p>用户层部分我直接是用Rust来编写</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">#[derive(Debug)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">pub</span> <span style="color:#719e07">struct</span> <span style="color:#268bd2">BreakChain</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">impl</span> BreakChain {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">pub</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">hide_by_pid</span>(pid: <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#b58900">Result</span><span style="color:#719e07">&lt;</span>()<span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> hdevice <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>            CreateFileA(
+</span></span><span style="display:flex;"><span>                s!(<span style="color:#2aa198">&#34;</span><span style="color:#cb4b16">\\\\</span><span style="color:#2aa198">.</span><span style="color:#cb4b16">\\</span><span style="color:#2aa198">HideProcessR0&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#cb4b16">GENERIC_READ</span> <span style="color:#719e07">|</span> <span style="color:#cb4b16">GENERIC_WRITE</span>).<span style="color:#2aa198">0</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cb4b16">FILE_SHARE_NONE</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#b58900">None</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cb4b16">OPEN_EXISTING</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cb4b16">FILE_ATTRIBUTE_NORMAL</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#b58900">None</span>,
+</span></span><span style="display:flex;"><span>            )<span style="color:#719e07">?</span>
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>        debug!(<span style="color:#2aa198">&#34;Open Device success&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> hdevice.is_invalid() {
+</span></span><span style="display:flex;"><span>            warn!(<span style="color:#2aa198">&#34;Open Device failed {:?}.&#34;</span>, <span style="color:#719e07">unsafe</span> { GetLastError() });
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> <span style="color:#b58900">Err</span>(Error::msg(<span style="color:#2aa198">&#34;Open Device failed.&#34;</span>));
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> input_buffer <span style="color:#719e07">=</span> <span style="color:#719e07">&amp;</span>pid <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#dc322f">u32</span> <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> c_void;
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>            DeviceIoControl(
+</span></span><span style="display:flex;"><span>                hdevice,
+</span></span><span style="display:flex;"><span>                ctl_code(
+</span></span><span style="display:flex;"><span>                    <span style="color:#cb4b16">FILE_DEVICE_UNKNOWN</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#2aa198">0x6666</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#cb4b16">METHOD_BUFFERED</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#cb4b16">FILE_ANY_ACCESS</span>,
+</span></span><span style="display:flex;"><span>                ),
+</span></span><span style="display:flex;"><span>                <span style="color:#b58900">Some</span>(input_buffer),
+</span></span><span style="display:flex;"><span>                size_of::<span style="color:#719e07">&lt;</span><span style="color:#dc322f">u32</span><span style="color:#719e07">&gt;</span>() <span style="color:#719e07">as</span> <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#b58900">None</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#2aa198">0</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#b58900">None</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#b58900">None</span>,
+</span></span><span style="display:flex;"><span>            )<span style="color:#719e07">?</span>
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>        debug!(<span style="color:#2aa198">&#34;Send pid to driver success&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#b58900">Ok</span>(())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">fn</span> <span style="color:#268bd2">ctl_code</span>(device_type: <span style="color:#dc322f">u32</span>, function: <span style="color:#dc322f">u32</span>, method: <span style="color:#dc322f">u32</span>, access: <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#dc322f">u32</span> {
+</span></span><span style="display:flex;"><span>    ((device_type) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">16</span>) <span style="color:#719e07">|</span> ((access) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">14</span>) <span style="color:#719e07">|</span> ((function) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">2</span>) <span style="color:#719e07">|</span> (method)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>运行之后，搜索不到记事本进程了</p>
+<p><img src="https://s2.loli.net/2024/05/27/nEihpY3gI2ukyom.png" alt=""></p>
+<p>需要注意的是，我手动关闭这个断开链表的进程会造成蓝屏，所以目前这个只能用于简单的demo演示，或者某种需要隐蔽且不关闭的程序。具体的蓝屏报错信息如下。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>EXCEPTION_RECORD:  ffffc2857eb137a8 <span style="color:#719e07">--</span> (.exr <span style="color:#2aa198">0xffffc2857eb137a8</span>)
+</span></span><span style="display:flex;"><span>ExceptionAddress: <span style="color:#268bd2">fffff8066aa4dc11</span> (nt<span style="color:#719e07">!</span>PspProcessDelete<span style="color:#719e07">+</span><span style="color:#2aa198">0x000000000012e731</span>)
+</span></span><span style="display:flex;"><span>   ExceptionCode: <span style="color:#268bd2">c0000409</span> (Security check failure or stack buffer overrun)
+</span></span><span style="display:flex;"><span>  ExceptionFlags: <span style="color:#2aa198">00000001</span>
+</span></span><span style="display:flex;"><span>NumberParameters: <span style="color:#2aa198">1</span>
+</span></span><span style="display:flex;"><span>   Parameter[<span style="color:#2aa198">0</span>]<span style="color:#719e07">:</span> <span style="color:#2aa198">0000000000000003</span>
+</span></span><span style="display:flex;"><span>Subcode: <span style="color:#2aa198">0x3</span> FAST_FAIL_CORRUPT_LIST_ENTRY 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PROCESS_NAME:  System
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ERROR_CODE: (NTSTATUS) <span style="color:#2aa198">0xc0000409</span> <span style="color:#719e07">-</span> The system detected an overrun of a stack<span style="color:#719e07">-</span>based buffer in this application. This overrun could potentially allow a malicious user to gain control of this application.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>EXCEPTION_CODE_STR:  c0000409
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>EXCEPTION_PARAMETER1:  <span style="color:#2aa198">0000000000000003</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>EXCEPTION_STR:  <span style="color:#2aa198">0xc0000409</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>STACK_TEXT:  
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb12d78 fffff806`<span style="color:#2aa198">6</span>a718e82     : ffffc285`<span style="color:#2aa198">7</span>eb12ee0 fffff806`<span style="color:#2aa198">6</span>a57f580 <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000100</span> <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>DbgBreakPointWithStatus
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb12d80 fffff806`<span style="color:#2aa198">6</span>a718466     : <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000003</span> ffffc285`<span style="color:#2aa198">7</span>eb12ee0 fffff806`<span style="color:#2aa198">6</span>a6159e0 <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">0000013</span><span style="color:#2aa198">9</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>KiBugCheckDebugBreak<span style="color:#719e07">+</span><span style="color:#2aa198">0x12</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb12de0 fffff806`<span style="color:#2aa198">6</span>a5fdb47     : <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">0000004</span><span style="color:#2aa198">8</span> <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000004</span> ffffc40d`<span style="color:#2aa198">26</span>a08080 <span style="color:#2aa198">33333333</span>`<span style="color:#2aa198">33333333</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>KeBugCheck2<span style="color:#719e07">+</span><span style="color:#2aa198">0x946</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb134f0 fffff806`<span style="color:#2aa198">6</span>a612269     : <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">0000013</span><span style="color:#2aa198">9</span> <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000003</span> ffffc285`<span style="color:#2aa198">7</span>eb13850 ffffc285`<span style="color:#2aa198">7</span>eb137a8 : nt<span style="color:#719e07">!</span>KeBugCheckEx<span style="color:#719e07">+</span><span style="color:#2aa198">0x107</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13530 fffff806`<span style="color:#2aa198">6</span>a612810     : ffffc40d`<span style="color:#2aa198">23602100</span> fffff806`<span style="color:#2aa198">6</span>a433ff2 ffffc40d`<span style="color:#2aa198">26</span>a08080 ffffc40d`<span style="color:#2aa198">26</span>a084c8 : nt<span style="color:#719e07">!</span>KiBugCheckDispatch<span style="color:#719e07">+</span><span style="color:#2aa198">0x69</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13670 fffff806`<span style="color:#2aa198">6</span>a6106ae     : <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> fffff806`<span style="color:#2aa198">6</span>a606036 ffffffff`ffffffff <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000006</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>KiFastFailDispatch<span style="color:#719e07">+</span><span style="color:#2aa198">0xd0</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13850 fffff806`<span style="color:#2aa198">6</span>aa4dc11     : <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>KiRaiseSecurityCheckFailure<span style="color:#719e07">+</span><span style="color:#2aa198">0x32e</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb139e0 fffff806`<span style="color:#2aa198">6</span>a82e9b0     : ffffc40d`<span style="color:#2aa198">26</span>a08050 ffffc40d`<span style="color:#2aa198">26</span>a08050 <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000001</span> ffffc40d`<span style="color:#2aa198">23</span>ce0980 : nt<span style="color:#719e07">!</span>PspProcessDelete<span style="color:#719e07">+</span><span style="color:#2aa198">0x12e731</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13a70 fffff806`<span style="color:#2aa198">6</span>a8d4844     : <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> ffffc40d`<span style="color:#2aa198">26</span>a08050 fffff806`<span style="color:#2aa198">6</span>a8d4640 ffffc40d`<span style="color:#2aa198">23</span>d13af0 : nt<span style="color:#719e07">!</span>ObpRemoveObjectRoutine<span style="color:#719e07">+</span><span style="color:#2aa198">0x80</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13ad0 fffff806`<span style="color:#2aa198">6</span>a4c3ea5     : ffffc40d`<span style="color:#2aa198">292</span>c3040 fffff806`<span style="color:#2aa198">6</span>a8d4640 ffffc40d`<span style="color:#2aa198">23</span>d13af0 ffffc40d`<span style="color:#2aa198">00000000</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>ObpProcessRemoveObjectQueue<span style="color:#719e07">+</span><span style="color:#2aa198">0x204</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13b70 fffff806`<span style="color:#2aa198">6</span>a54ef55     : ffffc40d`<span style="color:#2aa198">292</span>c3040 <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">000000</span><span style="color:#2aa198">80</span> ffffc40d`<span style="color:#2aa198">23</span>c95040 <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>ExpWorkerThread<span style="color:#719e07">+</span><span style="color:#2aa198">0x105</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13c10 fffff806`<span style="color:#2aa198">6</span>a606a48     : ffffae01`<span style="color:#2aa198">1f</span><span style="color:#2aa198">940180</span> ffffc40d`<span style="color:#2aa198">292</span>c3040 fffff806`<span style="color:#2aa198">6</span>a54ef00 ffffffff`ffffffff : nt<span style="color:#719e07">!</span>PspSystemThreadStartup<span style="color:#719e07">+</span><span style="color:#2aa198">0x55</span>
+</span></span><span style="display:flex;"><span>ffffc285`<span style="color:#2aa198">7</span>eb13c60 <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span>     <span style="color:#719e07">:</span> ffffc285`<span style="color:#2aa198">7</span>eb14000 ffffc285`<span style="color:#2aa198">7</span>eb0e000 <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#2aa198">00000000</span>`<span style="color:#2aa198">00000000</span> <span style="color:#719e07">:</span> nt<span style="color:#719e07">!</span>KiStartSystemThread<span style="color:#719e07">+</span><span style="color:#2aa198">0x28</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SYMBOL_NAME:  nt<span style="color:#719e07">!</span>KiFastFailDispatch<span style="color:#719e07">+</span>d0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>MODULE_NAME: nt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>IMAGE_NAME:  ntkrnlmp.exe
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>STACK_COMMAND:  .cxr; .ecxr ; kb
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BUCKET_ID_FUNC_OFFSET:  d0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FAILURE_BUCKET_ID:  <span style="color:#2aa198">0x139</span>_3_CORRUPT_LIST_ENTRY_nt<span style="color:#719e07">!</span>KiFastFailDispatch
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>OS_VERSION:  <span style="color:#2aa198">10.0.19041.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BUILDLAB_STR:  vb_release
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>OSPLATFORM_TYPE:  x64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>OSNAME:  Windows <span style="color:#2aa198">10</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FAILURE_ID_HASH:  {<span style="color:#2aa198">3</span>aede96a<span style="color:#719e07">-</span><span style="color:#2aa198">54</span>dd<span style="color:#719e07">-</span><span style="color:#2aa198">40</span>d6<span style="color:#719e07">-</span>d4cb<span style="color:#719e07">-</span><span style="color:#2aa198">2</span>a161a843851}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Followup:     MachineOwner
+</span></span></code></pre></div><h1 id="总结思考">总结思考</h1>
+<p>R3层面的主要是hook程序的<code>ZwQuerySystemInformation</code>函数，这种需要注入dll，对命令行获取进程信息的程序没办法，比如<code>Tasklist</code>程序就没有办法。哪怕是SetWindowsHook也不行，因为命令程序没有Windows，没有窗口事件。</p>
+<p>Hook explorer的只能监控基于explorer的子进程，对于大部分情况应该可以，但是我这里还没找到太多资料，没有实现出来</p>
+<p>R0层面，如果断开链表，就需要在进程退出的时候还原链表，否则就会导致蓝屏。</p>
+<h1 id="参考">参考</h1>
+<p>
+<a href="https://github.com/Oxygen1a1/HideProcess?tab=readme-ov-file" target="_blank" rel="noopener">HideProcess | Oxygen1a1 · github.com</a></p>
+<p>
+<a href="https://bbs.kanxue.com/thread-269919.htm" target="_blank" rel="noopener">进程隐藏技术 | 1900 · 看雪</a></p>
+<p>
+<a href="https://bbs.kanxue.com/thread-278717.htm" target="_blank" rel="noopener">超详细的3环和0环断链隐藏分析 | ATrueMan · 看雪</a></p>
+<p>
+<a href="https://military-axe.github.io/posts/rustbian-xie-ji-chong-hookde-fang-shi/" target="_blank" rel="noopener">Rust编写几种hook的方式 | mi1itray.axe · github.io</a></p>
+<p>
+<a href="https://xz.aliyun.com/t/10256?time__1311=mq%2BxBDyDRAn4lxGggYG8i2A1DjhnPoD&amp;alichlgref=https%3A%2F%2Fwww.google.com.hk%2F" target="_blank" rel="noopener">Window向之全局Hook实现进程隐藏 | xq17 · 先知</a></p>
+<p>
+<a href="https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-setwindowshookexa" target="_blank" rel="noopener">SetWindowsHookExA 函数 (winuser.h)</a></p>
+<p>
+<a href="https://blog.csdn.net/kingkee/article/details/97390029" target="_blank" rel="noopener">【C++】代码实现：全局钩子注入技术 | kingkee · csdn.net</a></p>
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span>
+    
+    <time>May 30, 2024</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="http://localhost:1313/tags/windows">windows</a>  <a class="category" href="http://localhost:1313/tags/hide">hide</a>  <a class="category" href="http://localhost:1313/tags/driver">driver</a>  <a class="category" href="http://localhost:1313/tags/hook">hook</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="http://localhost:1313/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/" title="通过修改物理内存实现跨进程内存读写">通过修改物理内存实现跨进程内存读写</a>
+    
+
+    
+      <a class="basic-alignment right" href="http://localhost:1313/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/" title="C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <a target="_blank" rel="noopener noreferrer" href="mailto:mi1itray.axe@gmail.com" title="mailto:mi1itray.axe@gmail.com"><i class="fa fa-envelope fa-3x"></i></a>
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">通过修改物理内存实现跨进程内存读写</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/">利用PEB遍历模块链表</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/">Rust污点分析调研</a>
+              </li>
+            
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  
+
+
+  </body>
+</html>
+

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
   
@@ -29,7 +29,7 @@
 
   
   
-    <link href="https://military-axe.github.io/favicon.png" rel="icon">
+    <link href="http://localhost:1313/favicon.png" rel="icon">
   
 
   
@@ -57,7 +57,7 @@
 <header role="banner">
 <hgroup>
   
-  <h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
+  <h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
     <h2>mi1itray.axe@gmail.com</h2>
 </hgroup></header>
 
@@ -68,11 +68,11 @@
   <select onchange="location = this.value;">
     <option value="">Navigate…</option>
       
-        <option value="https://military-axe.github.io/">» Blog</option>
+        <option value="http://localhost:1313/">» Blog</option>
       
-        <option value="https://military-axe.github.io/categories">» Categories</option>
+        <option value="http://localhost:1313/categories">» Categories</option>
       
-        <option value="https://military-axe.github.io/tags">» Tags</option>
+        <option value="http://localhost:1313/tags">» Tags</option>
       
   </select>
 </fieldset>
@@ -82,15 +82,15 @@
   
   
     
-      <li><a href="https://military-axe.github.io/" title="Blog">Blog</a></li>
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
     
   
     
-      <li><a href="https://military-axe.github.io/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
     
   
     
-      <li><a href="https://military-axe.github.io/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
     
   
 </ul>
@@ -98,7 +98,7 @@
 <ul class="subscription">
   
     
-        <a href="https://military-axe.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
     
   
 </ul>
@@ -107,7 +107,7 @@
   <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
     <fieldset role="search">
       <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-      <input type="hidden" name="q" value="site:https://military-axe.github.io/" />
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
     </fieldset>
   </form>
 
@@ -129,7 +129,7 @@
 
     
     
-      - <a class="label" href="https://military-axe.github.io/categories/paper/">Paper </a><a class="label" href="https://military-axe.github.io/categories/reverse/">Reverse </a>
+      - <a class="label" href="http://localhost:1313/categories/reverse/">Reverse </a><a class="label" href="http://localhost:1313/categories/paper/">Paper </a>
     
   </p>
   <h1 class="entry-title">
@@ -177,6 +177,46 @@ code.has-jax {
         <div class="entry-content">
           
           
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#论文主旨">论文主旨</a>
+      <ul>
+        <li><a href="#困难点">困难点</a></li>
+        <li><a href="#作者思路">作者思路</a></li>
+      </ul>
+    </li>
+    <li><a href="#项目细节">项目细节</a>
+      <ul>
+        <li><a href="#去除部分关键字">去除部分关键字</a></li>
+        <li><a href="#转换控制逻辑结构">转换控制逻辑结构</a></li>
+        <li><a href="#添加空操作指令">添加空操作指令</a></li>
+        <li><a href="#pyfet结构">PYFET结构</a>
+          <ul>
+            <li><a href="#定位错误">定位错误</a></li>
+            <li><a href="#处理隐性错误">处理隐性错误</a></li>
+            <li><a href="#迭代转换">迭代转换</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#实验评估">实验评估</a>
+      <ul>
+        <li><a href="#反编译效果验证">反编译效果验证</a></li>
+        <li><a href="#正确性验证">正确性验证</a></li>
+        <li><a href="#转换的影响">转换的影响</a></li>
+      </ul>
+    </li>
+    <li><a href="#对抗pjorion与opcode-remap-python技术">对抗PjOrion与opcode remap python技术</a>
+      <ul>
+        <li><a href="#opcode-remap-python">opcode remap python</a></li>
+        <li><a href="#pjorion">PjOrion</a></li>
+      </ul>
+    </li>
+    <li><a href="#思考">思考</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
           
           <p>2023 S&amp;P论文，讲述的是python反编译的研究工作，总结了大量的反编译特征，针对恶意代码分析领域，提供一种新的解决方案。
 从逆向和工程的角度来说，这项工作有很多值得学习的部分。</p>
@@ -302,7 +342,7 @@ code.has-jax {
       <span class="categories">
         Tags:
         
-          <a class="category" href="https://military-axe.github.io/tags/python">python</a>  <a class="category" href="https://military-axe.github.io/tags/decompile">decompile</a>  <a class="category" href="https://military-axe.github.io/tags/reverse">reverse</a>  
+          <a class="category" href="http://localhost:1313/tags/decompile">decompile</a>  <a class="category" href="http://localhost:1313/tags/python">python</a>  
     
     </span>
   </p>
@@ -311,11 +351,11 @@ code.has-jax {
 
   <p class="meta">
     
-        <a class="basic-alignment left" href="https://military-axe.github.io/blog/2023-06-08-driver-development-and-debug-config/" title="Driver Development and Debug Config">Driver Development and Debug Config</a>
+        <a class="basic-alignment left" href="http://localhost:1313/blog/2023-06-08-driver-development-and-debug-config/" title="Driver Development and Debug Config">Driver Development and Debug Config</a>
     
 
     
-      <a class="basic-alignment right" href="https://military-axe.github.io/blog/2023-06-11-2023-ciscn-ezbytes-write-up/" title="2023 ciscn ezbytes Write Up">2023 ciscn ezbytes Write Up</a>
+      <a class="basic-alignment right" href="http://localhost:1313/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/" title="KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations">KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations</a>
     
   </p>
   
@@ -412,6 +452,18 @@ code.has-jax {
           
           
             
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
           
             
               <li class="post">
@@ -443,18 +495,6 @@ code.has-jax {
               </li>
             
           
-            
-              <li class="post">
-                <a href="/blog/2023-10-16-2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/">2023 香山杯 Reverse</a>
-              </li>
-            
-          
-            
-              <li class="post">
-                <a href="/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/">BiAn: Smart Contract Source Code Obfuscation</a>
-              </li>
-            
-          
         </ul>
       </section>
     
@@ -465,7 +505,7 @@ code.has-jax {
 </div>
 
     <footer role="contentinfo">
-      <p>Copyright &copy; 2024 Mi1itray.axe - <a href="https://military-axe.github.io/license/">License</a> -
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
         <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
       </p>
     </footer>

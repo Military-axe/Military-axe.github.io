@@ -1,0 +1,759 @@
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>Rust编写几种hook的方式</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+
+  
+  
+    <link href="http://localhost:1313/favicon.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe">
+
+  
+  <meta name="generator" content="Hugo 0.125.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="http://localhost:1313/">» Blog</option>
+      
+        <option value="http://localhost:1313/categories">» Categories</option>
+      
+        <option value="http://localhost:1313/tags">» Tags</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+        <header>
+          <h1 class="entry-title">
+            Rust编写几种hook的方式 
+          </h1>
+          <p class="meta">Mar 22, 2024 - 7 minute read - 
+
+          
+
+          
+          
+          <a class="label" href="http://localhost:1313/categories/reverse">Reverse</a>
+          </p>
+        </header>
+        <div class="entry-content">
+          
+          
+          
+          <p>使用Rust编写几种在windows上常用的hook方式:</p>
+<ul>
+<li>IAT hook</li>
+<li>Inline hook</li>
+<li>VMT hook</li>
+</ul>
+<p>为什么要用rust的不用c++？就是想用，想给自己找麻烦😎</p>
+<!-- raw HTML omitted -->
+<h1 id="rust-windows-rs-库使用">Rust windows-rs 库使用</h1>
+<p>早年的教程大多是使用<code>winapi</code>这个库，后来微软官方发布了<code>windows-rs</code>，我就选定用官方的库来做。下面是rust库的一写基础知识</p>
+<h2 id="features">features</h2>
+<p><strong>什么是features？</strong></p>
+<p>在安装库的时候大多是时候我们都是<code>cargo add &lt;库名称&gt;</code>安装一整个库，编译的时候也就整个库参与编译，而<code>features</code>则可以进一步选择库中特定的模块，手动在<code>Cargo.toml</code>添加即可</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[dependencies]
+</span></span><span style="display:flex;"><span>windows-sys = { version = <span style="color:#2aa198">&#34;0.52.0&#34;</span>, features = [
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_UI_WindowsAndMessaging&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_System_LibraryLoader&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_System_Memory&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_Foundation&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_System_SystemServices&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_System_SystemInformation&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_System_Diagnostics_Debug&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_Security&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;Win32_System_Threading&#34;</span>,
+</span></span><span style="display:flex;"><span>] }
+</span></span></code></pre></div><p>比如<code>windows-sys</code>就有很多个features，不同的api处于不同的feature下，需要添加后才可以编译</p>
+<p><strong>查看API/结构体对应的fearture</strong></p>
+<p>这个一般要看文档，我这里搜索对应feature是，windows-rs库文档中专门提供了一个搜索api对应feature的地方</p>
+<p>
+<a href="https://microsoft.github.io/windows-rs/features/#/0.53.0" target="_blank" rel="noopener">https://microsoft.github.io/windows-rs/features/#/0.53.0</a></p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403211356104.png" alt="image-20240321135612069"></p>
+<p><strong>windows &amp; window-sys</strong></p>
+<p>windows -rs库下有两个版本，一个是windows，一个是windows-sys。区别是sys更底层一些，windows封装的更多一些.</p>
+<h2 id="32位--64位--dll">32位 &amp; 64位 &amp; DLL</h2>
+<p>在windows上编译32位的需要rustup添加一个交叉编译平台。</p>
+<p>查看所有交叉编译平台</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>rustup target list
+</span></span></code></pre></div><p>我是64位 win11，安装一个32的交叉编译</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>rustup target add i686-pc-windows-msvc
+</span></span></code></pre></div><p>编译32位程序</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>cargo build --target<span style="color:#719e07">=</span>i686-pc-windows-msvc
+</span></span></code></pre></div><p>如果报错找不到linker，需要在cargo.toml中配置一下linker，根据自己的路径来配置</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[target.i686-pc-windows-msvc]
+</span></span><span style="display:flex;"><span>linker = <span style="color:#2aa198">&#34;C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.24.28314\\bin\\Hostx64\\x86\\link.exe&#34;</span>
+</span></span></code></pre></div><p>然后编译成<strong>dll</strong>则需要在cargo.toml中添加如下内容</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[lib]
+</span></span><span style="display:flex;"><span>crate-type = [<span style="color:#2aa198">&#34;cdylib&#34;</span>]
+</span></span></code></pre></div><h1 id="iat-hook">IAT hook</h1>
+<p>导入表hook，什么是导入表？当PE程序调用dll中的函数时，就要去自己的导入表中查找dll中函数地址，这个IAT表在程序初始化中就初始化好了。</p>
+<p>可以通过CFF exploer来查找你想hook的函数在那个dll中</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403211549619.png" alt="CFF exploer"></p>
+<p>hook的思路也很简单，就是替换掉表中的函数指针值，修改成我们的函数地址</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403211551812.png" alt=""></p>
+<p>现在假设我们的目标就是hook一个程序中的<code>MessageBoxA</code>函数</p>
+<p><strong>IAT hook 先决条件</strong></p>
+<ol>
+<li>首先目标程序需要调用了<code>MessageBoxA</code>函数</li>
+<li>这个程序需要调用IAT表中的<code>MessageBoxA</code></li>
+</ol>
+<p>C++版本的代码有很多，可以参考
+<a href="https://www.ired.team/offensive-security/code-injection-process-injection/import-adress-table-iat-hooking" target="_blank" rel="noopener">Red Team Note</a>的版本</p>
+<p>关键部分是定位到IAT表然后遍历表项，定位IAT表需要做一个PE头的解析，或者说偏移，具体如下</p>
+<p>首先通过DOS头的<code>e_lfanew</code>（最后4个字节）定位到NT头</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#268bd2">let</span> image_base <span style="color:#719e07">=</span> GetModuleHandleA(null()) <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>;
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">let</span> p_dos_header <span style="color:#719e07">=</span> image_base <span style="color:#719e07">as</span> PimageDosHeader;
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">let</span> p_nt_headers <span style="color:#719e07">=</span> (image_base <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>p_dos_header).e_lfanew <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>) <span style="color:#719e07">as</span> PimageNtHeaders64;
+</span></span></code></pre></div><p>然后NT头的<code>OptionalHeader--&gt;DataDirArray</code>中第2项就是导入表的偏移，同理可以得到其他表，具体有哪些表可以查文档，下面是010editor截图</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403211731982.png" alt=""></p>
+<p>然后遍历对比导入表中的模块名是否和目标模块相同，相同则继续遍历模块中的函数名，直到匹配到目标函数。</p>
+<p>匹配到目标函数也就是<code>MessageBoxA</code>后，修改权限，再修改函数指针，再修改回原来的权限(养成好习惯，不留下烂摊子)</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#586e75">/* 修改IAT表属性为可读可写可执行, 然后修改对应IAT表项值为hook函数 */</span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">/* 由于只是修改IAT表中的一个指针，所以大小直接0x1000，不会有大小的限制 */</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> old_protection <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span><span style="color:#719e07">u32</span>;
+</span></span><span style="display:flex;"><span>VirtualProtect(p_func <span style="color:#719e07">as</span> _, <span style="color:#2aa198">0x1000</span>, <span style="color:#cb4b16">PAGE_EXECUTE_READWRITE</span>, <span style="color:#719e07">&amp;</span><span style="color:#719e07">mut</span> old_protection <span style="color:#719e07">as</span> _);
+</span></span><span style="display:flex;"><span><span style="color:#719e07">*</span>p_func <span style="color:#719e07">=</span> new_func_address;
+</span></span><span style="display:flex;"><span>VirtualProtect(p_func <span style="color:#719e07">as</span> _, <span style="color:#2aa198">0x1000</span>, old_protection, <span style="color:#719e07">&amp;</span><span style="color:#719e07">mut</span> old_protection <span style="color:#719e07">as</span> _);
+</span></span></code></pre></div><p>这样就可以了，需要记得再实现一个自定义的<code>new_func_address</code>也就是我们自己hook的函数</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">hook_message_box_a</span>(h_wnd: <span style="color:#268bd2">HWND</span>, _: <span style="color:#268bd2">PCSTR</span>, _: <span style="color:#268bd2">PCSTR</span>, u_type: <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#dc322f">i32</span> {
+</span></span><span style="display:flex;"><span>    (<span style="color:#719e07">*</span>(<span style="color:#719e07">&amp;</span><span style="color:#cb4b16">MESSAGE_BOX_A_HOOK_ADDRESS</span> <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> _ <span style="color:#719e07">as</span> MessageBoxWHook))(
+</span></span><span style="display:flex;"><span>        h_wnd,
+</span></span><span style="display:flex;"><span>        s!(<span style="color:#2aa198">&#34;Ops hooked by mi1itray.axe!&#34;</span>),
+</span></span><span style="display:flex;"><span>        s!(<span style="color:#2aa198">&#34;Ops hooked by mi1itray.axe!&#34;</span>),
+</span></span><span style="display:flex;"><span>        u_type,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Rust版本64位代码如下:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">use</span> core::ptr::null;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::os::raw::c_void;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows_sys::{
+</span></span><span style="display:flex;"><span>    core::<span style="color:#719e07">*</span>, Win32::Foundation::<span style="color:#719e07">*</span>, Win32::System::Diagnostics::Debug::<span style="color:#cb4b16">IMAGE_NT_HEADERS64</span>,
+</span></span><span style="display:flex;"><span>    Win32::System::LibraryLoader::<span style="color:#719e07">*</span>, Win32::System::Memory::<span style="color:#719e07">*</span>, Win32::System::SystemServices::<span style="color:#719e07">*</span>,
+</span></span><span style="display:flex;"><span>    Win32::<span style="color:#cb4b16">UI</span>::WindowsAndMessaging::<span style="color:#719e07">*</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 定义一个别名
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">type</span> <span style="color:#268bd2">MessageBoxWHook</span> <span style="color:#719e07">=</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span>(<span style="color:#cb4b16">HWND</span>, <span style="color:#cb4b16">PCSTR</span>, <span style="color:#cb4b16">PCSTR</span>, <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#dc322f">i32</span>;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">type</span> <span style="color:#268bd2">LPVOID</span> <span style="color:#719e07">=</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">type</span> <span style="color:#268bd2">PimageNtHeaders64</span> <span style="color:#719e07">=</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">IMAGE_NT_HEADERS64</span>;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">type</span> <span style="color:#268bd2">PimageImportDescriptor</span> <span style="color:#719e07">=</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">IMAGE_IMPORT_DESCRIPTOR</span>;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">type</span> <span style="color:#268bd2">PimageDosHeader</span> <span style="color:#719e07">=</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#cb4b16">IMAGE_DOS_HEADER</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 保存原函数地址，当然这里可以用指针具体写法后面单独介绍
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">static</span> <span style="color:#719e07">mut</span> <span style="color:#cb4b16">MESSAGE_BOX_A_HOOK_ADDRESS</span>: <span style="color:#dc322f">u64</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// 两个调试的时候使用的函数，用于输入Error信息
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">#[allow(dead_code)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">clear_last_error</span>() {
+</span></span><span style="display:flex;"><span>    SetLastError(<span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[allow(dead_code)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">show_last_error</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> e <span style="color:#719e07">=</span> format!(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">{:?}</span><span style="color:#cb4b16">\0</span><span style="color:#2aa198">&#34;</span>, GetLastError()).as_ptr();
+</span></span><span style="display:flex;"><span>    MessageBoxA(<span style="color:#2aa198">0</span>, e, s!(<span style="color:#2aa198">&#34;Warn&#34;</span>), <span style="color:#cb4b16">MB_OK</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// `hook_message_box_a`是我们自定义的messagebox函数，用于替换掉原来的`MessageBoxA`函数
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// 效果是弹出一个消息框，主体内容和标题栏内容都是**Ops hooked by mi1itray.axe!**
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// # 参数
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// 参数与原本的`MessageBoxA`函数声明相同
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">hook_message_box_a</span>(h_wnd: <span style="color:#268bd2">HWND</span>, _: <span style="color:#268bd2">PCSTR</span>, _: <span style="color:#268bd2">PCSTR</span>, u_type: <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#dc322f">i32</span> {
+</span></span><span style="display:flex;"><span>    (<span style="color:#719e07">*</span>(<span style="color:#719e07">&amp;</span><span style="color:#cb4b16">MESSAGE_BOX_A_HOOK_ADDRESS</span> <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> _ <span style="color:#719e07">as</span> MessageBoxWHook))(
+</span></span><span style="display:flex;"><span>        h_wnd,
+</span></span><span style="display:flex;"><span>        s!(<span style="color:#2aa198">&#34;Ops hooked by mi1itray.axe!&#34;</span>),
+</span></span><span style="display:flex;"><span>        s!(<span style="color:#2aa198">&#34;Ops hooked by mi1itray.axe!&#34;</span>),
+</span></span><span style="display:flex;"><span>        u_type,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// `detour`执行hook逻辑的函数，将指定模块中指定偏移值的函数指针替换成指定的新函数地址值。
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// 首先遍历模块列表，直到对比出相同的模块名称。然后
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// # 参数
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// - `module_name`: 指向模块名称内存的指针，类型是`*const u8`
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// - `old_func_offset`: 原本函数指针在模块上IAT表中的偏移
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// - `new_func_address`: 替换的函数指针地址值
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// # 返回值
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// 如果hook成功则返回原始函数的地址，如果失败则返回0
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// # 例子
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">///
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// ```rust
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// detour(&#34;USER32.dll\0&#34;.as_ptr() as _, 0x72AD0, hook_message_box_w as _);
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// ```
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">detour</span>(module_name: <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#dc322f">u8</span>, old_func_offset: <span style="color:#dc322f">u64</span>, new_func_address: <span style="color:#dc322f">u64</span>) -&gt; <span style="color:#dc322f">u64</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> module_address <span style="color:#719e07">=</span> GetModuleHandleA(module_name) <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> old_func_address <span style="color:#719e07">=</span> module_address <span style="color:#719e07">+</span> old_func_offset;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> image_base <span style="color:#719e07">=</span> GetModuleHandleA(null()) <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> p_dos_header <span style="color:#719e07">=</span> image_base <span style="color:#719e07">as</span> PimageDosHeader;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> p_nt_headers <span style="color:#719e07">=</span> (image_base <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>p_dos_header).e_lfanew <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>) <span style="color:#719e07">as</span> PimageNtHeaders64;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> p_import_descriptor <span style="color:#719e07">=</span> (image_base
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>p_nt_headers).OptionalHeader.DataDirectory[<span style="color:#2aa198">1</span>].VirtualAddress <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">as</span> PimageImportDescriptor;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> (<span style="color:#719e07">*</span>p_import_descriptor).FirstThunk <span style="color:#719e07">!=</span> <span style="color:#2aa198">0</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 对比导入表项名称与目标是否符合，不符合则直接偏移导入表下一项 */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> module_name.eq(<span style="color:#719e07">&amp;</span>((image_base <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>p_import_descriptor).Name <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>) <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#dc322f">u8</span>)) {
+</span></span><span style="display:flex;"><span>            p_import_descriptor <span style="color:#719e07">=</span> p_import_descriptor.offset(<span style="color:#2aa198">1</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">continue</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 匹配到目标模块, 弹出一个消息框 */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> module_name <span style="color:#719e07">=</span> (image_base <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>p_import_descriptor).Name <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>) <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#dc322f">u8</span>;
+</span></span><span style="display:flex;"><span>        MessageBoxA(<span style="color:#2aa198">0</span>, module_name, s!(<span style="color:#2aa198">&#34;Module name&#34;</span>), <span style="color:#cb4b16">MB_OK</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 遍历导入表 */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> p_func <span style="color:#719e07">=</span> (image_base <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>p_import_descriptor).FirstThunk <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>) <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#dc322f">u64</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#2aa198">0</span><span style="color:#719e07">..</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> p_func.is_null() {
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">/* 匹配到导入表函数，弹出一个消息框 */</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#268bd2">let</span> func_name <span style="color:#719e07">=</span> <span style="color:#cb4b16">PCSTR</span>::from(
+</span></span><span style="display:flex;"><span>                (image_base
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>((image_base <span style="color:#719e07">+</span> (<span style="color:#719e07">*</span>p_import_descriptor).Anonymous.OriginalFirstThunk <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span>)
+</span></span><span style="display:flex;"><span>                        <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#dc322f">u64</span>)
+</span></span><span style="display:flex;"><span>                        .offset(i))
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">+</span> <span style="color:#2aa198">2</span>) <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#dc322f">u8</span>,
+</span></span><span style="display:flex;"><span>            );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> old_func_address <span style="color:#719e07">==</span> <span style="color:#719e07">*</span>p_func {
+</span></span><span style="display:flex;"><span>                MessageBoxA(<span style="color:#2aa198">0</span>, func_name, s!(<span style="color:#2aa198">&#34;Find Func&#34;</span>), <span style="color:#cb4b16">MB_OK</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">/* 修改IAT表属性为可读可写可执行, 然后修改对应IAT表项值为hook函数 */</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">/* 由于只是修改IAT表中的一个指针，所以大小直接0x1000，不会有大小的限制 */</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> old_protection <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span><span style="color:#719e07">u32</span>;
+</span></span><span style="display:flex;"><span>                VirtualProtect(
+</span></span><span style="display:flex;"><span>                    p_func <span style="color:#719e07">as</span> _,
+</span></span><span style="display:flex;"><span>                    <span style="color:#2aa198">0x1000</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#cb4b16">PAGE_EXECUTE_READWRITE</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">&amp;</span><span style="color:#719e07">mut</span> old_protection <span style="color:#719e07">as</span> _,
+</span></span><span style="display:flex;"><span>                );
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">*</span>p_func <span style="color:#719e07">=</span> new_func_address;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#586e75">/* 修改回原来的属性 */</span>
+</span></span><span style="display:flex;"><span>                VirtualProtect(
+</span></span><span style="display:flex;"><span>                    p_func <span style="color:#719e07">as</span> _,
+</span></span><span style="display:flex;"><span>                    <span style="color:#2aa198">0x1000</span>,
+</span></span><span style="display:flex;"><span>                    old_protection,
+</span></span><span style="display:flex;"><span>                    <span style="color:#719e07">&amp;</span><span style="color:#719e07">mut</span> old_protection <span style="color:#719e07">as</span> _,
+</span></span><span style="display:flex;"><span>                );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#719e07">return</span> old_func_address;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            p_func <span style="color:#719e07">=</span> p_func.offset(<span style="color:#2aa198">1</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// `init_hook` 例程执行函数，调用`detour`函数，IAThook函数
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">/// 其中的`0x79730`是我本机上user32.dll中基地址到MessageBoxA的偏移值
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">init_hook</span>() -&gt; <span style="color:#dc322f">u32</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">MESSAGE_BOX_A_HOOK_ADDRESS</span> <span style="color:#719e07">=</span> detour(s!(<span style="color:#2aa198">&#34;USER32.dll&#34;</span>), <span style="color:#2aa198">0x79730</span>, hook_message_box_a <span style="color:#719e07">as</span> _);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[no_mangle]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[allow(non_snake_case)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">pub</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">DllMain</span>(_: <span style="color:#dc322f">isize</span>, reason: <span style="color:#dc322f">u32</span>, _: <span style="color:#268bd2">LPVOID</span>) -&gt; <span style="color:#dc322f">i32</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">match</span> reason {
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_ATTACH</span> <span style="color:#719e07">=&gt;</span> <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>            MessageBoxA(<span style="color:#2aa198">0</span>, s!(<span style="color:#2aa198">&#34;Inject dll success&#34;</span>), s!(<span style="color:#2aa198">&#34;Step 1&#34;</span>), <span style="color:#cb4b16">MB_OK</span>);
+</span></span><span style="display:flex;"><span>            init_hook();
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_DETACH</span> <span style="color:#719e07">=&gt;</span> (),
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_ATTACH</span> <span style="color:#719e07">=&gt;</span> (),
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_DETACH</span> <span style="color:#719e07">=&gt;</span> (),
+</span></span><span style="display:flex;"><span>        _ <span style="color:#719e07">=&gt;</span> (),
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">1</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h1 id="inline-hook">Inline hook</h1>
+<p>inline hook是hook完这个函数后</p>
+<ul>
+<li>
+<p>首先要将原始函数的参数值都存入栈中</p>
+</li>
+<li>
+<p>然后再跳转自定义hook函数</p>
+</li>
+<li>
+<p>执行完我们的函数后回到原始函数</p>
+</li>
+<li>
+<p>再恢复原始函数的参数，让原始函数继续正常运行。</p>
+</li>
+</ul>
+<p>目的就是减小影响。这种方法效果最好，应用场景广，没有限制；但是需要写汇编语句来将参数存入栈中，同时需要根据hook函数离hook位置来决定是要<strong>长跳转还是短跳转</strong>。</p>
+<p>好在可以使用一些hook框架来降低难度，windows下c语言很多框架，detour，minihook等，rust选择就比较少，之前比较有名的是detour，但是以及停止维护了。所以我这里使用的是
+<a href="https://github.com/Hpmason/retour-rs" target="_blank" rel="noopener">retour</a>，一个detour的fork维护版本</p>
+<p>下面是一个官方的代码，是hook <code>MessageBoxW</code>的</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#2aa198">//! A `MessageBoxW` detour example.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">//!
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198">//! Ensure the crate is compiled as a &#39;cdylib&#39; library to allow C interop.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">use</span> retour::static_detour;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::error::Error;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::ffi::c_int;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::os::raw::c_void;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::{ffi::CString, iter, mem};
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows::core::{<span style="color:#cb4b16">PCSTR</span>, <span style="color:#cb4b16">PCWSTR</span>};
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows::w;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows::Win32::Foundation::{<span style="color:#cb4b16">BOOL</span>, <span style="color:#cb4b16">HANDLE</span>, <span style="color:#cb4b16">HWND</span>};
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows::Win32::System::LibraryLoader::{GetModuleHandleW, GetProcAddress};
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows::Win32::System::SystemServices::{
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">DLL_PROCESS_ATTACH</span>, <span style="color:#cb4b16">DLL_PROCESS_DETACH</span>, <span style="color:#cb4b16">DLL_THREAD_ATTACH</span>, <span style="color:#cb4b16">DLL_THREAD_DETACH</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>static_detour! {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">static</span> MessageBoxWHook: <span style="color:#268bd2">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span>(<span style="color:#cb4b16">HWND</span>, <span style="color:#cb4b16">PCWSTR</span>, <span style="color:#cb4b16">PCWSTR</span>, <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#268bd2">c_int</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// A type alias for `MessageBoxW` (makes the transmute easy on the eyes)
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span><span style="color:#719e07">type</span> <span style="color:#268bd2">FnMessageBoxW</span> <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span>(<span style="color:#cb4b16">HWND</span>, <span style="color:#cb4b16">PCWSTR</span>, <span style="color:#cb4b16">PCWSTR</span>, <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#268bd2">c_int</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// Called when the DLL is attached to the process.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">main</span>() -&gt; <span style="color:#b58900">Result</span><span style="color:#719e07">&lt;</span>(), <span style="color:#b58900">Box</span><span style="color:#719e07">&lt;</span><span style="color:#719e07">dyn</span> Error<span style="color:#719e07">&gt;&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// Retrieve an absolute address of `MessageBoxW`. This is required for
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#586e75">// libraries due to the import address table. If `MessageBoxW` would be
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#586e75">// provided directly as the target, it would only hook this DLL&#39;s
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#586e75">// `MessageBoxW`. Using the method below an absolute address is retrieved
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#586e75">// instead, detouring all invocations of `MessageBoxW` in the active process.
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#268bd2">let</span> address <span style="color:#719e07">=</span> get_module_symbol_address(<span style="color:#2aa198">&#34;user32.dll&#34;</span>, <span style="color:#2aa198">&#34;MessageBoxW&#34;</span>)
+</span></span><span style="display:flex;"><span>        .expect(<span style="color:#2aa198">&#34;could not find &#39;MessageBoxW&#39; address&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> target: <span style="color:#268bd2">FnMessageBoxW</span> <span style="color:#719e07">=</span> mem::transmute(address);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// Initialize AND enable the detour (the 2nd parameter can also be a closure)
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    MessageBoxWHook
+</span></span><span style="display:flex;"><span>        .initialize(target, messageboxw_detour)<span style="color:#719e07">?</span>
+</span></span><span style="display:flex;"><span>        .enable()<span style="color:#719e07">?</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#b58900">Ok</span>(())
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// Called whenever `MessageBoxW` is invoked in the process.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">fn</span> <span style="color:#268bd2">messageboxw_detour</span>(hwnd: <span style="color:#268bd2">HWND</span>, text: <span style="color:#268bd2">PCWSTR</span>, _caption: <span style="color:#268bd2">PCWSTR</span>, msgbox_style: <span style="color:#dc322f">u32</span>) -&gt; <span style="color:#268bd2">c_int</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// Call the original `MessageBoxW`, but replace the caption
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75"></span>    <span style="color:#268bd2">let</span> replaced_caption <span style="color:#719e07">=</span> w!(<span style="color:#2aa198">&#34;Detoured!&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">unsafe</span> { MessageBoxWHook.call(hwnd, text, replaced_caption, msgbox_style) }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#2aa198">/// Returns a module symbol&#39;s absolute address.
+</span></span></span><span style="display:flex;"><span><span style="color:#2aa198"></span><span style="color:#719e07">fn</span> <span style="color:#268bd2">get_module_symbol_address</span>(module: <span style="color:#719e07">&amp;</span><span style="color:#dc322f">str</span>, symbol: <span style="color:#719e07">&amp;</span><span style="color:#dc322f">str</span>) -&gt; <span style="color:#b58900">Option</span><span style="color:#719e07">&lt;</span><span style="color:#dc322f">usize</span><span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> module <span style="color:#719e07">=</span> module
+</span></span><span style="display:flex;"><span>        .encode_utf16()
+</span></span><span style="display:flex;"><span>        .chain(iter::once(<span style="color:#2aa198">0</span>))
+</span></span><span style="display:flex;"><span>        .collect::<span style="color:#719e07">&lt;</span><span style="color:#b58900">Vec</span><span style="color:#719e07">&lt;</span><span style="color:#dc322f">u16</span><span style="color:#719e07">&gt;&gt;</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> symbol <span style="color:#719e07">=</span> CString::new(symbol).unwrap();
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> handle <span style="color:#719e07">=</span> GetModuleHandleW(<span style="color:#cb4b16">PCWSTR</span>(module.as_ptr() <span style="color:#719e07">as</span> _)).unwrap();
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">match</span> GetProcAddress(handle, <span style="color:#cb4b16">PCSTR</span>(symbol.as_ptr() <span style="color:#719e07">as</span> _)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#b58900">Some</span>(func) <span style="color:#719e07">=&gt;</span> <span style="color:#b58900">Some</span>(func <span style="color:#719e07">as</span> <span style="color:#dc322f">usize</span>),
+</span></span><span style="display:flex;"><span>            <span style="color:#b58900">None</span> <span style="color:#719e07">=&gt;</span> <span style="color:#b58900">None</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[no_mangle]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">DllMain</span>(_hinst: <span style="color:#268bd2">HANDLE</span>, reason: <span style="color:#dc322f">u32</span>, _reserved: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void) -&gt; <span style="color:#268bd2">BOOL</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">match</span> reason {
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_ATTACH</span> <span style="color:#719e07">=&gt;</span> {
+</span></span><span style="display:flex;"><span>            println!(<span style="color:#2aa198">&#34;attaching&#34;</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">unsafe</span> { main().unwrap() }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_DETACH</span> <span style="color:#719e07">=&gt;</span> {
+</span></span><span style="display:flex;"><span>            println!(<span style="color:#2aa198">&#34;detaching&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_ATTACH</span> <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_DETACH</span> <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>        _ <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#cb4b16">BOOL</span>::from(<span style="color:#cb4b16">true</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>看完我只能说，优雅，太优雅了！宛如汉尼拔做人一样的优雅。</p>
+<h1 id="vmt-hook">VMT hook</h1>
+<p>虚表hook，在c++中，一个类如果使用到了虚函数，就会有虚表。这个虚表只属于这个类，这个类的对象都有指向这个虚表的指针</p>
+<pre tabindex="0"><code class="language-mermaid" data-lang="mermaid">graph LR
+
+	A(类A的对象1) --&gt; B(类A虚表)
+	C(类A的对象2) --&gt; B
+	B --&gt; D(类A的虚函数)
+</code></pre><p>先写一个简单的例子</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;iostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07"></span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">using</span> <span style="color:#719e07">namespace</span> std;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Base</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">virtual</span> <span style="color:#dc322f">void</span> func1() { cout <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">&#34;func1()&#34;</span> <span style="color:#719e07">&lt;&lt;</span> endl; }
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">virtual</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">func2</span>() { cout <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">&#34;func2()&#34;</span> <span style="color:#719e07">&lt;&lt;</span> endl; }
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">virtual</span> <span style="color:#dc322f">void</span> <span style="color:#268bd2">func3</span>() { cout <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">&#34;func3()&#34;</span> <span style="color:#719e07">&lt;&lt;</span> endl; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Base t;
+</span></span><span style="display:flex;"><span>    (((<span style="color:#dc322f">void</span> (<span style="color:#719e07">*</span>)()) <span style="color:#719e07">*</span> ((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)(<span style="color:#719e07">*</span>((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>t)) <span style="color:#719e07">+</span> <span style="color:#2aa198">0</span>)))();
+</span></span><span style="display:flex;"><span>    (((<span style="color:#dc322f">void</span> (<span style="color:#719e07">*</span>)()) <span style="color:#719e07">*</span> ((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)(<span style="color:#719e07">*</span>((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>t)) <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>)))();
+</span></span><span style="display:flex;"><span>    (((<span style="color:#dc322f">void</span> (<span style="color:#719e07">*</span>)()) <span style="color:#719e07">*</span> ((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)(<span style="color:#719e07">*</span>((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>t)) <span style="color:#719e07">+</span> <span style="color:#2aa198">2</span>)))();
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>运行后可以看到</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span> ❯❯ mi1it ❯❯ .<span style="color:#cb4b16">\v</span>mt.exe
+</span></span><span style="display:flex;"><span>func1<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>func2<span style="color:#719e07">()</span>
+</span></span><span style="display:flex;"><span>func3<span style="color:#719e07">()</span>
+</span></span></code></pre></div><p>g++编译成x86架构的，使用ida打开分析一下</p>
+<pre tabindex="0"><code class="language-assembly" data-lang="assembly">.rdata:004052A8 ; public Base
+.rdata:004052A8                 public __ZTI4Base
+.rdata:004052A8 ; `typeinfo for&#39;Base
+.rdata:004052A8 __ZTI4Base      dd offset __imp___ZTVN10__cxxabiv117__class_type_infoE+8
+.rdata:004052A8                                         ; DATA XREF: .rdata:004052BC↓o
+.rdata:004052A8                                         ; reference to RTTI&#39;s type class
+.rdata:004052AC                 dd offset __ZTS4Base    ; reference to type&#39;s name
+.rdata:004052B0                 public __ZTS4Base
+.rdata:004052B0 ; `typeinfo name for&#39;Base
+.rdata:004052B0 __ZTS4Base      db &#39;4Base&#39;,0            ; DATA XREF: .rdata:004052AC↑o
+.rdata:004052B0                                         ; type descriptor name
+.rdata:004052B6                 align 4
+.rdata:004052B8                 public __ZTV4Base
+.rdata:004052B8 ; `vtable for&#39;Base
+.rdata:004052B8 __ZTV4Base      dd 0                    ; offset to this
+.rdata:004052BC                 dd offset __ZTI4Base    ; `typeinfo for&#39;Base
+.rdata:004052C0 virtual         dd offset __ZN4Base5func1Ev
+.rdata:004052C0                                         ; DATA XREF: _main+E↑o
+.rdata:004052C0                                         ; Base::func1(void)
+.rdata:004052C4                 dd offset __ZN4Base5func2Ev ; Base::func2(void)
+.rdata:004052C8                 dd offset __ZN4Base5func3Ev ; Base::func3(void)
+</code></pre><p>可以看到一个Base类的结构，在this指针偏移2的位置就是虚表，分别指向3个虚函数。但是这是类的结构，不是对象的结构。一个实例对象的地址指向的就是虚表，所以代码中实例t直接通过偏移可以得到函数地址。</p>
+<p>如果我修改VMT中的一个函数指针，当这个这个函数被调用的时候就达到了hook的效果。基于这种虚表，可以修改表的内容，就像IAT hook，或者直接hook虚函数本身，就类似inline hook的。</p>
+<p>基于retour写一个类似inlinr hook的就可以</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">use</span> std::ptr::null;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::error::Error;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::mem;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows_sys::Win32::System::LibraryLoader::<span style="color:#719e07">*</span>;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows_sys::Win32::Foundation::{<span style="color:#cb4b16">BOOL</span>, <span style="color:#cb4b16">HANDLE</span>};
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::os::raw::c_void;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> retour::static_detour;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> windows_sys::Win32::System::SystemServices::{
+</span></span><span style="display:flex;"><span>    <span style="color:#cb4b16">DLL_PROCESS_ATTACH</span>, <span style="color:#cb4b16">DLL_PROCESS_DETACH</span>, <span style="color:#cb4b16">DLL_THREAD_ATTACH</span>, <span style="color:#cb4b16">DLL_THREAD_DETACH</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>static_detour! {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">static</span> HookIt: <span style="color:#268bd2">fn</span>(); 
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">type</span> <span style="color:#268bd2">BaseF1</span> <span style="color:#719e07">=</span> <span style="color:#719e07">fn</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">fn</span> <span style="color:#268bd2">get_func_address</span>(offset: <span style="color:#dc322f">usize</span>) -&gt; <span style="color:#268bd2">BaseF1</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> handle <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { GetModuleHandleA(null()) <span style="color:#719e07">as</span> <span style="color:#dc322f">usize</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">unsafe</span> { mem::transmute::<span style="color:#719e07">&lt;</span><span style="color:#dc322f">usize</span>, BaseF1<span style="color:#719e07">&gt;</span>( offset <span style="color:#719e07">+</span> handle) }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">fn</span> <span style="color:#268bd2">detour</span>() {
+</span></span><span style="display:flex;"><span>    println!(<span style="color:#2aa198">&#34;Ops hook it by mi1itray.axe&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">main</span>() -&gt; <span style="color:#b58900">Result</span><span style="color:#719e07">&lt;</span>(), <span style="color:#b58900">Box</span><span style="color:#719e07">&lt;</span><span style="color:#719e07">dyn</span> Error<span style="color:#719e07">&gt;&gt;</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> func_1 <span style="color:#719e07">=</span> get_func_address(<span style="color:#2aa198">0x52c4</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">unsafe</span> { HookIt.initialize(func_1, detour)<span style="color:#719e07">?</span>.enable() }<span style="color:#719e07">?</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#b58900">Ok</span>(())
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[no_mangle]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">unsafe</span> <span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;system&#34;</span> <span style="color:#719e07">fn</span> <span style="color:#268bd2">DllMain</span>(_hinst: <span style="color:#268bd2">HANDLE</span>, reason: <span style="color:#dc322f">u32</span>, _reserved: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void) -&gt; <span style="color:#268bd2">BOOL</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">match</span> reason {
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_ATTACH</span> <span style="color:#719e07">=&gt;</span> {
+</span></span><span style="display:flex;"><span>            println!(<span style="color:#2aa198">&#34;attaching&#34;</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">unsafe</span> { main().unwrap() }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_PROCESS_DETACH</span> <span style="color:#719e07">=&gt;</span> {
+</span></span><span style="display:flex;"><span>            println!(<span style="color:#2aa198">&#34;detaching&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_ATTACH</span> <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>        <span style="color:#cb4b16">DLL_THREAD_DETACH</span> <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>        _ <span style="color:#719e07">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#cb4b16">BOOL</span>::from(<span style="color:#cb4b16">true</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h1 id="参考">参考</h1>
+<p>
+<a href="https://blog.csdn.net/kunyus/article/details/108884016" target="_blank" rel="noopener">使用Rust编写 Windows dll 并注入进第三方进程后对 Windows API MessageBoxW 进行 Hook | CSDN</a></p>
+<p>
+<a href="https://microsoft.github.io/windows-docs-rs/doc/windows/index.html" target="_blank" rel="noopener">windows-rs crate doc | microsoft.github.io</a></p>
+<p>
+<a href="https://blog.csdn.net/weixin_43695321/article/details/132241468" target="_blank" rel="noopener">rust x84 windows编译报错 | CSDN</a></p>
+<p>
+<a href="https://www.ired.team/offensive-security/code-injection-process-injection/import-adress-table-iat-hooking" target="_blank" rel="noopener">Red Team note | ired.team</a></p>
+<p>
+<a href="https://github.com/Hpmason/retour-rs" target="_blank" rel="noopener">retour-rs | github.com</a></p>
+<p>
+<a href="https://www.cnblogs.com/Mered1th/p/10924545.html" target="_blank" rel="noopener">深入理解C++虚函数表 | cnblogs.com</a></p>
+<p>
+<a href="https://zhuanlan.zhihu.com/p/75172640" target="_blank" rel="noopener">C++ 虚函数表剖析 | 知乎</a></p>
+
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span>
+    
+    <time>Mar 22, 2024</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="http://localhost:1313/tags/retour">retour</a>  <a class="category" href="http://localhost:1313/tags/inline-hook">inline hook</a>  <a class="category" href="http://localhost:1313/tags/vmt-hook">vmt hook</a>  <a class="category" href="http://localhost:1313/tags/iat-hook">iat hook</a>  <a class="category" href="http://localhost:1313/tags/rust">rust</a>  <a class="category" href="http://localhost:1313/tags/hook">hook</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="http://localhost:1313/%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/" title="利用PEB遍历模块链表">利用PEB遍历模块链表</a>
+    
+
+    
+      <a class="basic-alignment right" href="http://localhost:1313/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/" title="句柄降权绕过CallBacks检查">句柄降权绕过CallBacks检查</a>
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <a target="_blank" rel="noopener noreferrer" href="mailto:mi1itray.axe@gmail.com" title="mailto:mi1itray.axe@gmail.com"><i class="fa fa-envelope fa-3x"></i></a>
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  
+
+
+  </body>
+</html>
+

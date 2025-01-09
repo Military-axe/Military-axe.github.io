@@ -2,346 +2,353 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Mi1itray.axe</title>
-    <link>https://military-axe.github.io/tags/</link>
+    <link>http://localhost:1313/tags/</link>
     <description>Recent content in Tags on Mi1itray.axe</description>
     <generator>Hugo 0.125.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 06 May 2024 11:17:50 +0800</lastBuildDate>
-    <atom:link href="https://military-axe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 10 Jan 2025 00:40:23 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>C&#43;&#43;</title>
+      <link>http://localhost:1313/tags/c&#43;&#43;/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CRTP</title>
+      <link>http://localhost:1313/tags/crtp/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/crtp/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Polymorphism</title>
+      <link>http://localhost:1313/tags/polymorphism/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/polymorphism/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Driver</title>
-      <link>https://military-axe.github.io/tags/driver/</link>
+      <link>http://localhost:1313/tags/driver/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/driver/</guid>
+      <guid>http://localhost:1313/tags/driver/</guid>
       <description></description>
     </item>
     <item>
-      <title>Reverse</title>
-      <link>https://military-axe.github.io/tags/reverse/</link>
+      <title>Hide</title>
+      <link>http://localhost:1313/tags/hide/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/reverse/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Windows</title>
-      <link>https://military-axe.github.io/tags/windows/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/windows/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>句柄降权</title>
-      <link>https://military-axe.github.io/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/</guid>
+      <guid>http://localhost:1313/tags/hide/</guid>
       <description></description>
     </item>
     <item>
       <title>Hook</title>
-      <link>https://military-axe.github.io/tags/hook/</link>
+      <link>http://localhost:1313/tags/hook/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/hook/</guid>
+      <guid>http://localhost:1313/tags/hook/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Windows</title>
+      <link>http://localhost:1313/tags/windows/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/windows/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Reverse</title>
+      <link>http://localhost:1313/tags/reverse/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/reverse/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>X64</title>
+      <link>http://localhost:1313/tags/x64/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/x64/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>句柄降权</title>
+      <link>http://localhost:1313/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/</guid>
       <description></description>
     </item>
     <item>
       <title>Iat Hook</title>
-      <link>https://military-axe.github.io/tags/iat-hook/</link>
+      <link>http://localhost:1313/tags/iat-hook/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/iat-hook/</guid>
+      <guid>http://localhost:1313/tags/iat-hook/</guid>
       <description></description>
     </item>
     <item>
       <title>Inline Hook</title>
-      <link>https://military-axe.github.io/tags/inline-hook/</link>
+      <link>http://localhost:1313/tags/inline-hook/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/inline-hook/</guid>
+      <guid>http://localhost:1313/tags/inline-hook/</guid>
       <description></description>
     </item>
     <item>
       <title>Retour</title>
-      <link>https://military-axe.github.io/tags/retour/</link>
+      <link>http://localhost:1313/tags/retour/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/retour/</guid>
+      <guid>http://localhost:1313/tags/retour/</guid>
       <description></description>
     </item>
     <item>
       <title>Rust</title>
-      <link>https://military-axe.github.io/tags/rust/</link>
+      <link>http://localhost:1313/tags/rust/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/rust/</guid>
+      <guid>http://localhost:1313/tags/rust/</guid>
       <description></description>
     </item>
     <item>
       <title>Vmt Hook</title>
-      <link>https://military-axe.github.io/tags/vmt-hook/</link>
+      <link>http://localhost:1313/tags/vmt-hook/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/vmt-hook/</guid>
+      <guid>http://localhost:1313/tags/vmt-hook/</guid>
       <description></description>
     </item>
     <item>
-      <title>C&#43;&#43;</title>
-      <link>https://military-axe.github.io/tags/c&#43;&#43;/</link>
+      <title>C&#43;&#43;&#34;</title>
+      <link>http://localhost:1313/tags/c&#43;&#43;/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/c&#43;&#43;/</guid>
+      <guid>http://localhost:1313/tags/c&#43;&#43;/</guid>
       <description></description>
     </item>
     <item>
       <title>Peb</title>
-      <link>https://military-axe.github.io/tags/peb/</link>
+      <link>http://localhost:1313/tags/peb/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/peb/</guid>
+      <guid>http://localhost:1313/tags/peb/</guid>
       <description></description>
     </item>
     <item>
       <title>Obfuscation</title>
-      <link>https://military-axe.github.io/tags/obfuscation/</link>
+      <link>http://localhost:1313/tags/obfuscation/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/obfuscation/</guid>
+      <guid>http://localhost:1313/tags/obfuscation/</guid>
       <description></description>
     </item>
     <item>
       <title>Taint Analysis</title>
-      <link>https://military-axe.github.io/tags/taint-analysis/</link>
+      <link>http://localhost:1313/tags/taint-analysis/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/taint-analysis/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>2023</title>
-      <link>https://military-axe.github.io/tags/2023/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/2023/</guid>
+      <guid>http://localhost:1313/tags/taint-analysis/</guid>
       <description></description>
     </item>
     <item>
       <title>Android</title>
-      <link>https://military-axe.github.io/tags/android/</link>
+      <link>http://localhost:1313/tags/android/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/android/</guid>
+      <guid>http://localhost:1313/tags/android/</guid>
       <description></description>
     </item>
     <item>
       <title>Base64</title>
-      <link>https://military-axe.github.io/tags/base64/</link>
+      <link>http://localhost:1313/tags/base64/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/base64/</guid>
+      <guid>http://localhost:1313/tags/base64/</guid>
       <description></description>
     </item>
     <item>
       <title>Vm</title>
-      <link>https://military-axe.github.io/tags/vm/</link>
+      <link>http://localhost:1313/tags/vm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/vm/</guid>
+      <guid>http://localhost:1313/tags/vm/</guid>
       <description></description>
     </item>
     <item>
       <title>Xor</title>
-      <link>https://military-axe.github.io/tags/xor/</link>
+      <link>http://localhost:1313/tags/xor/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/xor/</guid>
+      <guid>http://localhost:1313/tags/xor/</guid>
       <description></description>
     </item>
     <item>
       <title>香山杯</title>
-      <link>https://military-axe.github.io/tags/%E9%A6%99%E5%B1%B1%E6%9D%AF/</link>
+      <link>http://localhost:1313/tags/%E9%A6%99%E5%B1%B1%E6%9D%AF/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/%E9%A6%99%E5%B1%B1%E6%9D%AF/</guid>
+      <guid>http://localhost:1313/tags/%E9%A6%99%E5%B1%B1%E6%9D%AF/</guid>
       <description></description>
     </item>
     <item>
       <title>Smart Contract</title>
-      <link>https://military-axe.github.io/tags/smart-contract/</link>
+      <link>http://localhost:1313/tags/smart-contract/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/smart-contract/</guid>
+      <guid>http://localhost:1313/tags/smart-contract/</guid>
       <description></description>
     </item>
     <item>
       <title>Rc4</title>
-      <link>https://military-axe.github.io/tags/rc4/</link>
+      <link>http://localhost:1313/tags/rc4/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/rc4/</guid>
+      <guid>http://localhost:1313/tags/rc4/</guid>
       <description></description>
     </item>
     <item>
       <title>反调试</title>
-      <link>https://military-axe.github.io/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/</link>
+      <link>http://localhost:1313/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>研究生国赛</title>
-      <link>https://military-axe.github.io/tags/%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Base64换表</title>
-      <link>https://military-axe.github.io/tags/base64%E6%8D%A2%E8%A1%A8/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/base64%E6%8D%A2%E8%A1%A8/</guid>
+      <guid>http://localhost:1313/tags/%E5%8F%8D%E8%B0%83%E8%AF%95/</guid>
       <description></description>
     </item>
     <item>
       <title>DES</title>
-      <link>https://military-axe.github.io/tags/des/</link>
+      <link>http://localhost:1313/tags/des/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/des/</guid>
+      <guid>http://localhost:1313/tags/des/</guid>
       <description></description>
     </item>
     <item>
       <title>Golang</title>
-      <link>https://military-axe.github.io/tags/golang/</link>
+      <link>http://localhost:1313/tags/golang/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/golang/</guid>
+      <guid>http://localhost:1313/tags/golang/</guid>
       <description></description>
     </item>
     <item>
       <title>羊城杯</title>
-      <link>https://military-axe.github.io/tags/%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
+      <link>http://localhost:1313/tags/%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
+      <guid>http://localhost:1313/tags/%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
       <description></description>
     </item>
     <item>
       <title>Mongodb</title>
-      <link>https://military-axe.github.io/tags/mongodb/</link>
+      <link>http://localhost:1313/tags/mongodb/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/mongodb/</guid>
+      <guid>http://localhost:1313/tags/mongodb/</guid>
       <description></description>
     </item>
     <item>
       <title>Tag</title>
-      <link>https://military-axe.github.io/tags/tag/</link>
+      <link>http://localhost:1313/tags/tag/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/tag/</guid>
+      <guid>http://localhost:1313/tags/tag/</guid>
       <description></description>
     </item>
     <item>
       <title>Binary Diffing</title>
-      <link>https://military-axe.github.io/tags/binary-diffing/</link>
+      <link>http://localhost:1313/tags/binary-diffing/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/binary-diffing/</guid>
+      <guid>http://localhost:1313/tags/binary-diffing/</guid>
       <description></description>
     </item>
     <item>
       <title>Machine Learning</title>
-      <link>https://military-axe.github.io/tags/machine-learning/</link>
+      <link>http://localhost:1313/tags/machine-learning/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/machine-learning/</guid>
+      <guid>http://localhost:1313/tags/machine-learning/</guid>
       <description></description>
     </item>
     <item>
       <title>Llvm</title>
-      <link>https://military-axe.github.io/tags/llvm/</link>
+      <link>http://localhost:1313/tags/llvm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/llvm/</guid>
+      <guid>http://localhost:1313/tags/llvm/</guid>
       <description></description>
     </item>
     <item>
       <title>Obfuscate</title>
-      <link>https://military-axe.github.io/tags/obfuscate/</link>
+      <link>http://localhost:1313/tags/obfuscate/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/obfuscate/</guid>
+      <guid>http://localhost:1313/tags/obfuscate/</guid>
       <description></description>
     </item>
     <item>
       <title>Rsa</title>
-      <link>https://military-axe.github.io/tags/rsa/</link>
+      <link>http://localhost:1313/tags/rsa/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/rsa/</guid>
+      <guid>http://localhost:1313/tags/rsa/</guid>
       <description></description>
     </item>
     <item>
       <title>Frida</title>
-      <link>https://military-axe.github.io/tags/frida/</link>
+      <link>http://localhost:1313/tags/frida/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/frida/</guid>
+      <guid>http://localhost:1313/tags/frida/</guid>
       <description></description>
     </item>
     <item>
       <title>Ida</title>
-      <link>https://military-axe.github.io/tags/ida/</link>
+      <link>http://localhost:1313/tags/ida/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/ida/</guid>
+      <guid>http://localhost:1313/tags/ida/</guid>
       <description></description>
     </item>
     <item>
       <title>Sig</title>
-      <link>https://military-axe.github.io/tags/sig/</link>
+      <link>http://localhost:1313/tags/sig/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/sig/</guid>
+      <guid>http://localhost:1313/tags/sig/</guid>
       <description></description>
     </item>
     <item>
       <title>Sctf</title>
-      <link>https://military-axe.github.io/tags/sctf/</link>
+      <link>http://localhost:1313/tags/sctf/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/sctf/</guid>
+      <guid>http://localhost:1313/tags/sctf/</guid>
       <description></description>
     </item>
     <item>
       <title>Junk</title>
-      <link>https://military-axe.github.io/tags/junk/</link>
+      <link>http://localhost:1313/tags/junk/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/junk/</guid>
+      <guid>http://localhost:1313/tags/junk/</guid>
       <description></description>
     </item>
     <item>
       <title>Movfuscator</title>
-      <link>https://military-axe.github.io/tags/movfuscator/</link>
+      <link>http://localhost:1313/tags/movfuscator/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/movfuscator/</guid>
+      <guid>http://localhost:1313/tags/movfuscator/</guid>
       <description></description>
     </item>
     <item>
       <title>Fuzz</title>
-      <link>https://military-axe.github.io/tags/fuzz/</link>
+      <link>http://localhost:1313/tags/fuzz/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/fuzz/</guid>
+      <guid>http://localhost:1313/tags/fuzz/</guid>
       <description></description>
     </item>
     <item>
       <title>MacOS</title>
-      <link>https://military-axe.github.io/tags/macos/</link>
+      <link>http://localhost:1313/tags/macos/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/macos/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Dwarf</title>
-      <link>https://military-axe.github.io/tags/dwarf/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/dwarf/</guid>
+      <guid>http://localhost:1313/tags/macos/</guid>
       <description></description>
     </item>
     <item>
       <title>Decompile</title>
-      <link>https://military-axe.github.io/tags/decompile/</link>
+      <link>http://localhost:1313/tags/decompile/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/decompile/</guid>
+      <guid>http://localhost:1313/tags/decompile/</guid>
       <description></description>
     </item>
     <item>
       <title>Python</title>
-      <link>https://military-axe.github.io/tags/python/</link>
+      <link>http://localhost:1313/tags/python/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/python/</guid>
+      <guid>http://localhost:1313/tags/python/</guid>
       <description></description>
     </item>
     <item>
       <title>Debug</title>
-      <link>https://military-axe.github.io/tags/debug/</link>
+      <link>http://localhost:1313/tags/debug/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/debug/</guid>
+      <guid>http://localhost:1313/tags/debug/</guid>
       <description></description>
     </item>
     <item>
-      <title>Driver_Development</title>
-      <link>https://military-axe.github.io/tags/driver_development/</link>
+      <title>Driver Development</title>
+      <link>http://localhost:1313/tags/driver-development/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/tags/driver_development/</guid>
+      <guid>http://localhost:1313/tags/driver-development/</guid>
       <description></description>
     </item>
   </channel>

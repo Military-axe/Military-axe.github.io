@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Dwarf on Mi1itray.axe</title>
-    <link>https://military-axe.github.io/tags/dwarf/</link>
+    <link>http://localhost:1313/tags/dwarf/</link>
     <description>Recent content in Dwarf on Mi1itray.axe</description>
     <generator>Hugo 0.125.1</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 11 Jun 2023 15:40:13 +0800</lastBuildDate>
-    <atom:link href="https://military-axe.github.io/tags/dwarf/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/dwarf/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>2023 ciscn ezbytes Write Up</title>
-      <link>https://military-axe.github.io/blog/2023-06-11-2023-ciscn-ezbytes-write-up/</link>
+      <link>http://localhost:1313/2023_ciscn_ezbytes/</link>
       <pubDate>Sun, 11 Jun 2023 15:40:13 +0800</pubDate>
-      <guid>https://military-axe.github.io/blog/2023-06-11-2023-ciscn-ezbytes-write-up/</guid>
-      <description>&lt;p&gt;这题使用了DWARF字节码，需要了解DWARF相关知识，实际上是c++异常处理中的相关知识。这题利用异常处理的栈回溯，执行了一段设计好的DWARF字节码，单纯的跟踪是跟踪不到的&lt;/p&gt;&#xA;&lt;p&gt;这题怪我没有心去做这题，不然早就出了，最近想改变一下心态，既然不能摆脱，那就走到底。&lt;/p&gt;</description>
+      <guid>http://localhost:1313/2023_ciscn_ezbytes/</guid>
+      <description>这题使用了DWARF字节码，需要了解DWARF相关知识，实际上是c++异常处理中的相关知识。这题利用异常处理的栈回溯，执行了一段设计好的DWARF字节码，单纯的跟踪是跟踪不到的&#xA;这题怪我没有心去做这题，不然早就出了，最近想改变一下心态，既然不能摆脱，那就走到底。&#xA;c++异常处理 根据 c++ 的标准，异常抛出后如果在当前函数内没有被捕捉(catch)，它就要沿着函数的调用链继续往上抛，直到走完整个调用链，或者在某个函数中找到相应的 catch。 程序中的 catch 那部分代码有一个专门的名字叫作：Landing pad（不十分准确），从抛异常开始到执行 landing pad 里的代码这中间的整个过程叫作 stack unwind（栈展开），这个过程包含了两个阶段：&#xA;从抛异常的函数开始，对调用链上的函数逐个往前查找 landing pad。 如果没有找到 landing pad 则把程序 abort，如果找到则记下 landing pad 的位置，再重新回到抛异常的函数那里开始，一帧一帧地清理调用链上各个函数内部的局部变量，直到 landing pad 所在的函数为止。 简而言之，正常情况下，stack unwind 所要做的事情就是从抛出异常的函数开始，沿着调用链向上找 catch 所在的函数，然后从抛异常的地方开始，清理调用链上各栈帧内已经创建了的局部变量。&#xA;void func1() { cs a; // stack unwind时被析构。 throw 3; } void func2() { cs b; func1(); } void func3() { cs c; try { func2(); } catch (int) { //进入这里之前， func1, func2已经被unwind. } } 这里可以看到unwind的调用过程是函数调用的逆过程，实际实现的过程由专门的 stack unwind 库来进行。</description>
     </item>
   </channel>
 </rss>

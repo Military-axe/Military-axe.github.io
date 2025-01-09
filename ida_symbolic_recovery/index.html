@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+    
+    
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  
+
+  
+  <title>Ida Symbolic Recovery</title>
+
+  
+  
+  <link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+
+  
+  
+    <link href="http://localhost:1313/favicon.png" rel="icon">
+  
+
+  
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe">
+
+  
+  <meta name="generator" content="Hugo 0.125.1">
+
+  
+  
+
+  
+  
+
+
+
+</head>
+<body>
+
+
+<header role="banner">
+<hgroup>
+  
+  <h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header>
+
+
+<nav role="navigation">
+<fieldset class="mobile-nav">
+  
+  <select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="http://localhost:1313/">» Blog</option>
+      
+        <option value="http://localhost:1313/categories">» Categories</option>
+      
+        <option value="http://localhost:1313/tags">» Tags</option>
+      
+  </select>
+</fieldset>
+
+
+<ul class="main-navigation">
+  
+  
+    
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+        <header>
+          <h1 class="entry-title">
+            Ida Symbolic Recovery 
+          </h1>
+          <p class="meta">Jul 3, 2023 - 1 minute read - 
+
+          
+
+          
+          
+          <a class="label" href="http://localhost:1313/categories/reverse">Reverse</a>
+          </p>
+        </header>
+        <div class="entry-content">
+          
+          
+          
+          <p>最近发现二进制文件中符号恢复的手段有不少，这里想记录一下几种符号恢复的工具使用与效果对比。</p>
+<p>Finger，lscan，flair，bindiff</p>
+<!-- raw HTML omitted -->
+<h1 id="编译工具与其他环境">编译工具与其他环境</h1>
+<p>主要是win下的MinGw，VC++，的C和C++和Linux下的GUN/LLVM。主要是针对库函数去符号的一个恢复。</p>
+<h1 id="finger">Finger</h1>
+<p>阿里出品，很好用，方便。</p>
+<p>github 地址：
+<a href="https://github.com/aliyunav/Finger" target="_blank" rel="noopener">aliyunav/Finger: A tool for recognizing function symbol (github.com)</a></p>
+<p>实际上是要联网访问阿里的库来识别函数，所以遇到大程序，识别所有函数会慢一点。安装可以看github链接，使用也很简单，ida的导航栏会多一个Finger，两个选项，恢复所有函数或者恢复当前函数。</p>
+<!-- raw HTML omitted -->
+<p>绿色的部分是还原的函数名</p>
+<!-- raw HTML omitted -->
+<p>这个使用简单，效果好，但是要联网。只是不知道对arm，mips这些其他架构的识别如何。虽然识别可能会有假阳性，但是很低，从易用性来说，这个首选。</p>
+<h1 id="lscan">lscan</h1>
+<p>github地址：
+<a href="https://github.com/maroueneboubakri/lscan" target="_blank" rel="noopener">maroueneboubakri/lscan: lscan is a library identification tool on statically linked/stripped binaries (github.com)</a></p>
+<p>lscan是一个python项目，使用FLIRT（快速库识别和识别技术）签名来进行库识别。也就是通过扫描sig文件，找到与二进制文件最相似的库</p>
+<blockquote>
+<p>FLIRT 最初是由辛普森 (Peter Silberman) 开发的，后来被 IDA Pro (一种逆向工程工具) 所采用。FLIRT 通过使用一种称为“特征”的字符串来识别库和函数。这些特征是函数中的指令序列，或者是库中使用的函数的调用序列。FLIRT 使用这些特征来生成一个签名数据库，然后可以使用这个数据库来识别二进制文件中使用的库和函数。</p>
+</blockquote>
+<p><strong>使用</strong></p>
+<p><code>python ./lscan.py -S .sig的目录 -f 要扫描的二进制文件</code>，例子如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python lscan.py -S i386/sig -f i386/bin/bin-libc-2.23
+</span></span><span style="display:flex;"><span>python lscan.py -s i386/sig/libpthread-2.23.sig -f i386/bin/bin-libpthread-2.23 -v
+</span></span><span style="display:flex;"><span>python lscan.py -f i386/win32/bin/bin-libcmt.exe -s i386/win32/sig/msvcmrt.sig
+</span></span></code></pre></div><p>项目自带了一些sig文件，github上也有专门收集的sig文件
+<a href="https://github.com/push0ebp/sig-database" target="_blank" rel="noopener">push0ebp/sig-database: IDA FLIRT Signature Database (github.com)</a></p>
+<p>使用这个是来批量识别你目标程序中和那个sig文件最吻合，选择到对应的后，可以再ida中加载对饮的sig文件</p>
+<!-- raw HTML omitted -->
+<p>加载sig文件的功能直接在ida中。首先如果ida中没有这个对应的sig文件，需要将sig文件放到<code>&lt;IDA_INSTALL_PATH&gt;/sig/&lt;arch&gt;</code>。</p>
+<!-- raw HTML omitted -->
+<ul>
+<li>view-&ldquo;Open subview&rdquo;-Signatures(快捷键shift+F5)打开已应用的签名窗口</li>
+<li>右键Apply new signatures，选择一个添加</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>但是这种方法要求你有sig文件，并且能确定是那个sig文件。对于c++的可以通过字符串来判断。如果是一些开源库这种不存在sig的情况，可以制作sig文件，并导入文件中。[IDA使用技巧&ndash;导入头文件和导入函数签名 | Hexo (tomqunchao.github.io)](
+<a href="https://tomqunchao.github.io/2020/10/10/note/rev/rev-1/#:~:text=" target="_blank" rel="noopener">https://tomqunchao.github.io/2020/10/10/note/rev/rev-1/#:~:text=</a>导入函数签名 1 使用pelf制作pat 1 .%2Fpelf libgmp.a gmp.pat 如果出现,collisions. &hellip; 3 如果一切顺利，则会生成sig文件 4 把sig文件复制到IDA_INSTALL_PATH%2Fsig%2Fpc目录下，打开IDA 5 Shift%2BF5，打开函数签名页面，右键，选择你刚刚添加的签名)</p>
+<h1 id="bindiff">bindiff</h1>
+<p>bindiff是针对idb文件，可以bindiff两个idb文件，对比两个idb的函数与相似程度。具体可以参考
+<a href="https://blog.csdn.net/qq_54894802/article/details/130211890" target="_blank" rel="noopener">2023-GUDOCTF-L!S!(bindiff的使用)_二木先生啊的博客-CSDN博客</a></p>
+<p>除了对比相进版本文件，也可以对比开源库在文件中的函数</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307032147866.png" alt="在这里插入图片描述"></p>
+<p>第一列是相似度，1是最高。</p>
+<h1 id="参考">参考</h1>
+<p>
+<a href="https://github.com/aliyunav/Finger" target="_blank" rel="noopener">aliyunav/Finger: A tool for recognizing function symbol (github.com)</a></p>
+<p>
+<a href="https://github.com/maroueneboubakri/lscan" target="_blank" rel="noopener">maroueneboubakri/lscan: lscan is a library identification tool on statically linked/stripped binaries (github.com)</a></p>
+<p>
+<a href="https://github.com/push0ebp/sig-database" target="_blank" rel="noopener">push0ebp/sig-database: IDA FLIRT Signature Database (github.com)</a></p>
+<p>
+<a href="https://blog.csdn.net/lixiangminghate/article/details/81352205" target="_blank" rel="noopener">IDA中应用SIG文件_ida sig_Yuri800的博客-CSDN博客</a></p>
+<p>[IDA使用技巧&ndash;导入头文件和导入函数签名 | Hexo (tomqunchao.github.io)](
+<a href="https://tomqunchao.github.io/2020/10/10/note/rev/rev-1/#:~:text=" target="_blank" rel="noopener">https://tomqunchao.github.io/2020/10/10/note/rev/rev-1/#:~:text=</a>导入函数签名 1 使用pelf制作pat 1 .%2Fpelf libgmp.a gmp.pat 如果出现,collisions. &hellip; 3 如果一切顺利，则会生成sig文件 4 把sig文件复制到IDA_INSTALL_PATH%2Fsig%2Fpc目录下，打开IDA 5 Shift%2BF5，打开函数签名页面，右键，选择你刚刚添加的签名)</p>
+<p>
+<a href="https://blog.csdn.net/qq_54894802/article/details/130211890" target="_blank" rel="noopener">2023-GUDOCTF-L!S!(bindiff的使用)_二木先生啊的博客-CSDN博客</a></p>
+
+        </div>
+        
+
+<footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span>
+    
+    <time>Jul 3, 2023</time>
+    
+      <span class="categories">
+        Tags:
+        
+          <a class="category" href="http://localhost:1313/tags/sig">sig</a>  <a class="category" href="http://localhost:1313/tags/ida">ida</a>  <a class="category" href="http://localhost:1313/tags/reverse">reverse</a>  
+    
+    </span>
+  </p>
+
+  
+
+  <p class="meta">
+    
+        <a class="basic-alignment left" href="http://localhost:1313/frida_learn_and_2023_sctf_check_flow/" title="Frida learn &amp;&amp; sctf 2023 checkFlow">Frida learn &amp;&amp; sctf 2023 checkFlow</a>
+    
+
+    
+      <a class="basic-alignment right" href="http://localhost:1313/frida_call_method_to_explode/" title="Frida call java class/method to explode">Frida call java class/method to explode</a>
+    
+  </p>
+  
+</footer>
+
+      </article>
+    </div>
+    
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section>
+
+  
+  
+
+
+
+<ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <a target="_blank" rel="noopener noreferrer" href="mailto:mi1itray.axe@gmail.com" title="mailto:mi1itray.axe@gmail.com"><i class="fa fa-envelope fa-3x"></i></a>
+
+  
+  
+  </li>
+</ul>
+
+  
+
+  
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+
+  
+  
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+
+    
+    
+
+
+
+    
+    
+    
+
+    
+  
+
+
+  </body>
+</html>
+

@@ -2,66 +2,52 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Mi1itray.axe</title>
-    <link>https://military-axe.github.io/categories/</link>
+    <link>http://localhost:1313/categories/</link>
     <description>Recent content in Categories on Mi1itray.axe</description>
     <generator>Hugo 0.125.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 06 May 2024 11:17:50 +0800</lastBuildDate>
-    <atom:link href="https://military-axe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 10 Jan 2025 00:40:23 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Windows</title>
-      <link>https://military-axe.github.io/categories/windows/</link>
+      <title>C&#43;&#43;</title>
+      <link>http://localhost:1313/categories/c&#43;&#43;/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/windows/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Reverse</title>
-      <link>https://military-axe.github.io/categories/reverse/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/reverse/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Paper</title>
-      <link>https://military-axe.github.io/categories/paper/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/paper/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Develop</title>
-      <link>https://military-axe.github.io/categories/develop/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/develop/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Mobile</title>
-      <link>https://military-axe.github.io/categories/mobile/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/mobile/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Cheatsheets</title>
-      <link>https://military-axe.github.io/categories/cheatsheets/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/cheatsheets/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Fuzz</title>
-      <link>https://military-axe.github.io/categories/fuzz/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/fuzz/</guid>
+      <guid>http://localhost:1313/categories/c&#43;&#43;/</guid>
       <description></description>
     </item>
     <item>
       <title>Driver</title>
-      <link>https://military-axe.github.io/categories/driver/</link>
+      <link>http://localhost:1313/categories/driver/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://military-axe.github.io/categories/driver/</guid>
+      <guid>http://localhost:1313/categories/driver/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Reverse</title>
+      <link>http://localhost:1313/categories/reverse/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/reverse/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Paper</title>
+      <link>http://localhost:1313/categories/paper/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/paper/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Develop</title>
+      <link>http://localhost:1313/categories/develop/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/develop/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Mobile</title>
+      <link>http://localhost:1313/categories/mobile/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/categories/mobile/</guid>
       <description></description>
     </item>
   </channel>
