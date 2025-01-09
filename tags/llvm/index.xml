@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Llvm on Mi1itray.axe</title>
-    <link>http://localhost:1313/tags/llvm/</link>
+    <link>https://military-axe.github.io/tags/llvm/</link>
     <description>Recent content in Llvm on Mi1itray.axe</description>
     <generator>Hugo 0.125.1</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 23 Jul 2023 21:36:57 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/llvm/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://military-axe.github.io/tags/llvm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques</title>
-      <link>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
+      <link>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
       <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
-      <guid>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
+      <guid>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
       <description>&lt;p&gt;这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。&lt;/p&gt;&#xA;&lt;p&gt;从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。&lt;/p&gt;</description>
     </item>
   </channel>
