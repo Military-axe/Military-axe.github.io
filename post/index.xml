@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Mi1itray.axe</description>
     <generator>Hugo 0.125.1</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 10 Jan 2025 00:40:23 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 25 Jan 2025 15:28:53 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>llvm base development environment configuration</title>
+      <link>https://military-axe.github.io/blog/2025-01-25-llvm-base-development-environment-configuration/</link>
+      <pubDate>Sat, 25 Jan 2025 15:28:53 +0800</pubDate>
+      <guid>https://military-axe.github.io/blog/2025-01-25-llvm-base-development-environment-configuration/</guid>
+      <description>&lt;p&gt;之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录&lt;/p&gt;</description>
+    </item>
     <item>
       <title>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</title>
       <link>https://military-axe.github.io/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</link>
