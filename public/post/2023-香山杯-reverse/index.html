@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>2023 香山杯 Reverse</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="2023 香山杯 Reverse">
+  <meta property="og:description" content="香山杯初赛的3到逆向的WP，不是很难的题，但是有一些新的东西，chaquopy框架，这个框架完成了一套sdk，可以安卓调用python代码也可以python调用java代码。可惜的是python是源码存储，还有研究的空间">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-10-16T14:05:44+08:00">
+    <meta property="article:modified_time" content="2023-10-16T14:05:44+08:00">
+    <meta property="article:tag" content="Vm">
+    <meta property="article:tag" content="香山杯">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="Base64">
+    <meta property="article:tag" content="Xor">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2023 香山杯 Reverse">
+  <meta name="twitter:description" content="香山杯初赛的3到逆向的WP，不是很难的题，但是有一些新的东西，chaquopy框架，这个框架完成了一套sdk，可以安卓调用python代码也可以python调用java代码。可惜的是python是源码存储，还有研究的空间">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#url%e4%bb%8e%e5%93%aa%e5%84%bf%e6%9d%a5" class="nav-url从哪儿来">
+									URL从哪儿来
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#hello_py" class="nav-hello_py">
+									hello_py
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#nesting" class="nav-nesting">
+									nesting
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    2023 香山杯 Reverse
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-10-16 14:05
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/reverse">Reverse</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/vm">vm</a>
+                                &nbsp;
+                            
+                                <a href="/tags/%E9%A6%99%E5%B1%B1%E6%9D%AF">香山杯</a>
+                                &nbsp;
+                            
+                                <a href="/tags/android">android</a>
+                                &nbsp;
+                            
+                                <a href="/tags/base64">base64</a>
+                                &nbsp;
+                            
+                                <a href="/tags/xor">xor</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>香山杯初赛的3到逆向的WP，不是很难的题，但是有一些新的东西，chaquopy框架，这个框架完成了一套sdk，可以安卓调用python代码也可以python调用java代码。可惜的是python是源码存储，还有研究的空间</p>
+<h2 id="url从哪儿来">URL从哪儿来</h2>
+<p>题目说明：小A收到一个样本，很轻松就完成了任务：找到样本外联C2。但小A非常好奇的是，他并不能直接在样本中搜到C2，C2是如何被解密的呢？</p>
+<p>题目链接：https://github.com/Military-axe/ctf/tree/master/2023/2023%E9%A6%99%E5%B1%B1%E6%9D%AF%E5%88%9D%E8%B5%9B</p>
+<p>分析，发现有一个程序会导出一个临时文件，临时文件<code>ou.exe</code>才是真正的逻辑所在</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#8b008b;font-weight:bold">__cdecl</span> <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">int</span> argc, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **argv, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  HMODULE ModuleHandleW; <span style="color:#228b22">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  HMODULE v4; <span style="color:#228b22">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  HMODULE v5; <span style="color:#228b22">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  _BYTE *v7; <span style="color:#228b22">// [esp+4h] [ebp-28Ch]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  HGLOBAL hResData; <span style="color:#228b22">// [esp+8h] [ebp-288h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  HRSRC hResInfo; <span style="color:#228b22">// [esp+Ch] [ebp-284h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  _BYTE *lpAddress; <span style="color:#228b22">// [esp+10h] [ebp-280h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  FILE *Stream; <span style="color:#228b22">// [esp+1Ch] [ebp-274h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  DWORD dwSize; <span style="color:#228b22">// [esp+20h] [ebp-270h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  DWORD i; <span style="color:#228b22">// [esp+28h] [ebp-268h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">struct</span> _PROCESS_INFORMATION ProcessInformation; <span style="color:#228b22">// [esp+30h] [ebp-260h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">struct</span> _STARTUPINFOA StartupInfo; <span style="color:#228b22">// [esp+40h] [ebp-250h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  CHAR Buffer[<span style="color:#b452cd">260</span>]; <span style="color:#228b22">// [esp+84h] [ebp-20Ch] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  CHAR TempFileName[<span style="color:#b452cd">260</span>]; <span style="color:#228b22">// [esp+188h] [ebp-108h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  ModuleHandleW = <span style="color:#008b45">GetModuleHandleW</span>(<span style="color:#b452cd">0</span>);
+</span></span><span style="display:flex;"><span>  hResInfo = <span style="color:#008b45">FindResourceW</span>(ModuleHandleW, (LPCWSTR)<span style="color:#b452cd">0x65</span>, <span style="color:#cd5555">L</span><span style="color:#cd5555">&#34;e_ou&#34;</span>);
+</span></span><span style="display:flex;"><span>  v4 = <span style="color:#008b45">GetModuleHandleW</span>(<span style="color:#b452cd">0</span>);
+</span></span><span style="display:flex;"><span>  hResData = <span style="color:#008b45">LoadResource</span>(v4, hResInfo);
+</span></span><span style="display:flex;"><span>  v7 = <span style="color:#008b45">LockResource</span>(hResData);
+</span></span><span style="display:flex;"><span>  v5 = <span style="color:#008b45">GetModuleHandleW</span>(<span style="color:#b452cd">0</span>);
+</span></span><span style="display:flex;"><span>  dwSize = <span style="color:#008b45">SizeofResource</span>(v5, hResInfo);
+</span></span><span style="display:flex;"><span>  lpAddress = <span style="color:#008b45">VirtualAlloc</span>(<span style="color:#b452cd">0</span>, dwSize, <span style="color:#b452cd">0x1000u</span>, <span style="color:#b452cd">4u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( !lpAddress )
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">for</span> ( i = <span style="color:#b452cd">0</span>; i &lt; dwSize; ++i )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( v7[i] &amp;&amp; v7[i] != <span style="color:#cd5555">&#39;x&#39;</span> )
+</span></span><span style="display:flex;"><span>      lpAddress[i] = v7[i] ^ <span style="color:#cd5555">&#39;x&#39;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>      lpAddress[i] = v7[i];
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( !<span style="color:#008b45">GetTempPathA</span>(<span style="color:#b452cd">0x104u</span>, Buffer) )
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( !<span style="color:#008b45">GetTempFileNameA</span>(Buffer, <span style="color:#cd5555">&#34;ou.exe&#34;</span>, <span style="color:#b452cd">0</span>, TempFileName) )
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  Stream = <span style="color:#008b45">fopen</span>(TempFileName, <span style="color:#cd5555">&#34;wb&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( !Stream )
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( <span style="color:#008b45">fwrite</span>(lpAddress, <span style="color:#b452cd">1u</span>, dwSize, Stream) == dwSize )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">fclose</span>(Stream);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">VirtualFree</span>(lpAddress, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0x8000u</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">memset</span>(&amp;StartupInfo, <span style="color:#b452cd">0</span>, <span style="color:#8b008b;font-weight:bold">sizeof</span>(StartupInfo));
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">memset</span>(&amp;ProcessInformation, <span style="color:#b452cd">0</span>, <span style="color:#8b008b;font-weight:bold">sizeof</span>(ProcessInformation));
+</span></span><span style="display:flex;"><span>    StartupInfo.cb = <span style="color:#b452cd">68</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">GetStartupInfoA</span>(&amp;StartupInfo);
+</span></span><span style="display:flex;"><span>    StartupInfo.wShowWindow = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">CreateProcessA</span>(TempFileName, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, &amp;StartupInfo, &amp;ProcessInformation);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">CloseHandle</span>(ProcessInformation.hProcess);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">CloseHandle</span>(ProcessInformation.hThread);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">DeleteFileA</span>(TempFileName);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">fclose</span>(Stream);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>idapython</code>提取存储在里面的ou.exe</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">idc</span> 
+</span></span><span style="display:flex;"><span>s = idc.get_bytes(<span style="color:#b452cd">0x1550000</span>,<span style="color:#b452cd">0x1a800</span>) 
+</span></span><span style="display:flex;"><span>f=<span style="color:#658b00">open</span>(<span style="color:#cd5555">&#39;D:/Desktop/1.exe&#39;</span>, <span style="color:#cd5555">&#39;wb&#39;</span>) 
+</span></span><span style="display:flex;"><span>f.write(s) 
+</span></span><span style="display:flex;"><span>f.close()
+</span></span></code></pre></div><p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310161345760.png" alt="img">、</p>
+<p>分析ou.exe中代码，main函数中这部分代码，得到block的值是一个base64</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310161346427.png" alt="img">flag{6469616e-6369-626f-7169-746170617761}</p>
+<h2 id="hello_py">hello_py</h2>
+<p>题目地址：https://github.com/Military-axe/ctf/tree/master/2023/2023%E9%A6%99%E5%B1%B1%E6%9D%AF%E5%88%9D%E8%B5%9B</p>
+<p>这是一个叫chaquopy框架的题目，框架可以在安卓中调用python和python中调用安卓代码两种方式</p>
+<p>一开始以为这个框架会把python文件编译成so文件，实际上没有，还是把python文件存在APK文件中</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310161346581.png" alt="img">只是改了一下后缀名，改成app.zip，解开来就是hello.py发现只是一个<code>xxtea</code>加密，改都没改，秒了</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">ctypes</span> <span style="color:#8b008b;font-weight:bold">import</span> *
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto.Util.number</span> <span style="color:#8b008b;font-weight:bold">import</span> *
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">MX</span>(z, y, total, key, p, e):
+</span></span><span style="display:flex;"><span>    temp1 = (z.value&gt;&gt;<span style="color:#b452cd">5</span> ^ y.value&lt;&lt;<span style="color:#b452cd">2</span>) + (y.value&gt;&gt;<span style="color:#b452cd">3</span> ^ z.value&lt;&lt;<span style="color:#b452cd">4</span>)
+</span></span><span style="display:flex;"><span>    temp2 = (total.value ^ y.value) + (key[(p&amp;<span style="color:#b452cd">3</span>) ^ e.value] ^ z.value)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> c_uint32(temp1 ^ temp2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">decrypt</span>(n, v, key):
+</span></span><span style="display:flex;"><span>    delta = <span style="color:#b452cd">0x9e3779b9</span>
+</span></span><span style="display:flex;"><span>    rounds = <span style="color:#b452cd">6</span> + <span style="color:#b452cd">52</span>//n 
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    total = c_uint32(rounds * delta)
+</span></span><span style="display:flex;"><span>    y = c_uint32(v[<span style="color:#b452cd">0</span>])
+</span></span><span style="display:flex;"><span>    e = c_uint32(<span style="color:#b452cd">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">while</span> rounds &gt; <span style="color:#b452cd">0</span>:
+</span></span><span style="display:flex;"><span>        e.value = (total.value &gt;&gt; <span style="color:#b452cd">2</span>) &amp; <span style="color:#b452cd">3</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">for</span> p <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(n-<span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, -<span style="color:#b452cd">1</span>):
+</span></span><span style="display:flex;"><span>            z = c_uint32(v[p-<span style="color:#b452cd">1</span>])
+</span></span><span style="display:flex;"><span>            v[p] = c_uint32((v[p] - MX(z,y,total,key,p,e).value)).value
+</span></span><span style="display:flex;"><span>            y.value = v[p]
+</span></span><span style="display:flex;"><span>        z = c_uint32(v[n-<span style="color:#b452cd">1</span>])  
+</span></span><span style="display:flex;"><span>        v[<span style="color:#b452cd">0</span>] = c_uint32(v[<span style="color:#b452cd">0</span>] - MX(z,y,total,key,<span style="color:#b452cd">0</span>,e).value).value
+</span></span><span style="display:flex;"><span>        y.value = v[<span style="color:#b452cd">0</span>]  
+</span></span><span style="display:flex;"><span>        total.value -= delta
+</span></span><span style="display:flex;"><span>        rounds -= <span style="color:#b452cd">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> v 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cipher =[<span style="color:#b452cd">689085350</span> ,<span style="color:#b452cd">626885696</span> ,<span style="color:#b452cd">1894439255</span> ,<span style="color:#b452cd">1204672445</span> ,<span style="color:#b452cd">1869189675</span> ,<span style="color:#b452cd">475967424</span> ,<span style="color:#b452cd">1932042439</span> ,<span style="color:#b452cd">1280104741</span> ,<span style="color:#b452cd">2808893494</span> ]
+</span></span><span style="display:flex;"><span>key = [<span style="color:#b452cd">12345678</span> ,<span style="color:#b452cd">12398712</span> ,<span style="color:#b452cd">91283904</span> ,<span style="color:#b452cd">12378192</span> ]
+</span></span><span style="display:flex;"><span>n = <span style="color:#b452cd">9</span>
+</span></span><span style="display:flex;"><span>res = decrypt(n, cipher, key)
+</span></span><span style="display:flex;"><span>flag = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> res:
+</span></span><span style="display:flex;"><span>    flag+=long_to_bytes(i)[::-<span style="color:#b452cd">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#658b00">print</span>(flag)
+</span></span></code></pre></div><p>flag{c1f8ace6-4b46-4931-b25b-a1010a89c592}</p>
+<h2 id="nesting">nesting</h2>
+<p>题目提示：<code>flag{uuid}</code></p>
+<p>题目地址：https://github.com/Military-axe/ctf/tree/master/2023/2023%E9%A6%99%E5%B1%B1%E6%9D%AF%E5%88%9D%E8%B5%9B</p>
+<p>这是一个vm题，vm写的很复杂，实际上用污点分析的思路，下几个内存断点，跟踪一下输入的变化，就会发现只是输入和一组值相异或</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>xor = [<span style="color:#b452cd">0x54</span>, <span style="color:#b452cd">0xf6</span>, <span style="color:#b452cd">0xf2</span>, <span style="color:#b452cd">7</span>, <span style="color:#b452cd">0xfb</span>, <span style="color:#b452cd">4</span>, <span style="color:#b452cd">5</span>, <span style="color:#b452cd">0xe</span>, <span style="color:#b452cd">0x5d</span>, <span style="color:#b452cd">0x53</span>, <span style="color:#b452cd">0xc9</span>, <span style="color:#b452cd">0x4e</span>, <span style="color:#b452cd">0x46</span>, <span style="color:#b452cd">0xa</span>, <span style="color:#b452cd">0x13</span>, <span style="color:#b452cd">0x1</span>, <span style="color:#b452cd">0x3</span>, <span style="color:#b452cd">0x38</span>, <span style="color:#b452cd">0xa0</span>, <span style="color:#b452cd">0xbb</span>, <span style="color:#b452cd">0xc7</span>, <span style="color:#b452cd">0x44</span>, <span style="color:#b452cd">0xfa</span>, <span style="color:#b452cd">0xbc</span>, <span style="color:#b452cd">0x3</span>, <span style="color:#b452cd">0x44</span>, <span style="color:#b452cd">0x2c</span>, <span style="color:#b452cd">0x9a</span>, <span style="color:#b452cd">0x6d</span>, <span style="color:#b452cd">0x98</span>, <span style="color:#b452cd">0x35</span>, <span style="color:#b452cd">0x4f</span>, <span style="color:#b452cd">0x4a</span>, <span style="color:#b452cd">0x10</span>, <span style="color:#b452cd">0xc4</span>, <span style="color:#b452cd">0x17</span>, <span style="color:#b452cd">0x9</span>, <span style="color:#b452cd">0x61</span>, <span style="color:#b452cd">0x6</span>, <span style="color:#b452cd">0xe1</span>, <span style="color:#b452cd">0x8d</span>, <span style="color:#b452cd">0x75</span>]
+</span></span><span style="display:flex;"><span>c = [<span style="color:#b452cd">50</span>, <span style="color:#b452cd">154</span>, <span style="color:#b452cd">147</span>, <span style="color:#b452cd">96</span>, <span style="color:#b452cd">128</span>, <span style="color:#b452cd">54</span>, <span style="color:#b452cd">102</span>, <span style="color:#b452cd">57</span>, <span style="color:#b452cd">62</span>, <span style="color:#b452cd">99</span>, <span style="color:#b452cd">240</span>, <span style="color:#b452cd">125</span>, <span style="color:#b452cd">36</span>, <span style="color:#b452cd">39</span>, <span style="color:#b452cd">117</span>, <span style="color:#b452cd">55</span>, <span style="color:#b452cd">55</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">141</span>, <span style="color:#b452cd">138</span>, <span style="color:#b452cd">246</span>, <span style="color:#b452cd">33</span>, <span style="color:#b452cd">158</span>, <span style="color:#b452cd">145</span>, <span style="color:#b452cd">98</span>, <span style="color:#b452cd">115</span>, <span style="color:#b452cd">29</span>, <span style="color:#b452cd">172</span>, <span style="color:#b452cd">64</span>, <span style="color:#b452cd">175</span>, <span style="color:#b452cd">5</span>, <span style="color:#b452cd">126</span>, <span style="color:#b452cd">43</span>, <span style="color:#b452cd">114</span>, <span style="color:#b452cd">252</span>, <span style="color:#b452cd">116</span>, <span style="color:#b452cd">104</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">103</span>, <span style="color:#b452cd">135</span>, <span style="color:#b452cd">232</span>, <span style="color:#b452cd">8</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#658b00">len</span>(xor)):
+</span></span><span style="display:flex;"><span>    c[i] ^= xor[i]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#658b00">print</span>(<span style="color:#658b00">bytes</span>(c))
+</span></span><span style="display:flex;"><span><span style="color:#658b00">print</span>(xor)
+</span></span></code></pre></div>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-10-16</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/">
+			Next<br>Rust污点分析调研
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/bian-smart-contract-source-code-obfuscation/">
+			Previous<br>BiAn: Smart Contract Source Code Obfuscation
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#url%e4%bb%8e%e5%93%aa%e5%84%bf%e6%9d%a5" class="nav-url从哪儿来">
+									URL从哪儿来
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#hello_py" class="nav-hello_py">
+									hello_py
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#nesting" class="nav-nesting">
+									nesting
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

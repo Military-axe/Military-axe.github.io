@@ -1,0 +1,513 @@
+<?xml-stylesheet href="/rss.xsl" type="text/xsl"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Mi1itray.axe</title>
+    <link>https://military-axe.github.io/</link>
+    <description>Recent content on Mi1itray.axe</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>mi1itray.axe copyright.</copyright>
+    <lastBuildDate>Sat, 25 Jan 2025 15:28:53 +0800</lastBuildDate>
+    
+        <atom:link href="https://military-axe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+        <item>
+        <title>KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations</title>
+        <link>https://military-axe.github.io/post/kextfuzz/</link>
+        <pubDate>Wed, 14 Jun 2023 15:53:46 +0800</pubDate>
+        
+        <guid>https://military-axe.github.io/post/kextfuzz/</guid>
+        <description>Mi1itray.axe https://military-axe.github.io/post/kextfuzz/ -&lt;p&gt;来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章&lt;/p&gt;
+&lt;p&gt;讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决&lt;/p&gt;
+&lt;p&gt;通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz&lt;/p&gt;
+&lt;h1 id=&#34;背景与困难&#34;&gt;背景与困难&lt;/h1&gt;
+&lt;p&gt;macOS的内核中有很大一部分是KEXT(Kernel Extension)，可以直接当作Linux中的驱动。但是在mac中是闭源的。由于闭源，分析难度高，所以漏洞挖掘与测试不充分，这也使得kext成为主要的攻击面。
+但是对kext fuzz有3方面的问题&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;怎么采集代码覆盖率：Coverage 反馈是提升 fuzz 效率的基本手段。其采集方法通常有代码插桩（kcov）、硬件监听（Intel-PT）与虚拟层监听（AFL-qemu）几种方式。但是三种方法都不使用kext. 源码插桩无法适用闭源组件，binary rewriting的闭源插桩具有一定可行，但是内核中使用这种插桩很容易系统崩溃，不使用与内核；apple silicon不提供Intel-PT 相似的硬件监听功能；Apple Silicon macOS 系统虚拟化技术仍不成熟，虚拟化环境能够支持的 kext 十分有限。&lt;/li&gt;
+&lt;li&gt;如何识别接口格式：能准确得到接口格式，对fuzz数据的生成有更好的帮助，但是闭源程序信息少，macOS驱动接口又复杂，大量不同种类与格式的输入。&lt;/li&gt;
+&lt;li&gt;如何绕过权限检查：macOS 驱动广泛使用 Entitlement 检查限制能够调用驱动的用户态程序，而大部分 Entitlement 仅分配给苹果公司或部分特殊开发者（如大型公司），包括 Fuzzer 在内的普通第三方程序难以获取，这限制了 Fuzzer 能够触发的代码范围。然而，在实战中，攻击者仍然可以通过构造攻击链，利用受保护代码中的漏洞，使得受 Entitlement 保护的特权代码成为了一个缺少测试的独特攻击面。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;统计代码覆盖率&#34;&gt;统计代码覆盖率&lt;/h1&gt;
+&lt;p&gt;kext在统计代码覆盖率上使用的还是binary rewriting实现代码覆盖率插桩。直接加入指令会造成原有指令便宜，很容易破坏原有程序（静态分析修复可以修复一部分，但是也难以全面），在内核环境下不适用。
+kext中使用了ARM的一个PA（Pointer Authentication）机制，这个机制是插入一些指令来保证控制流完整，这些指令会提高漏洞利用的难度，但是对于fuzz来说这些指令是没有实际作用的，同时不对正常功能有影响。所以作者直接去除这些PA指令，用这些指令的位置来添加插桩的代码。&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h1 id=&#34;接口识别&#34;&gt;接口识别&lt;/h1&gt;
+&lt;p&gt;kext用户态的调用很规范，所以可以通过静态污点分析来分析用户态调用kext接口片段代码，从而分析出接口参数格式。KextFuzz设计了一个多标签静态五点方法来分析kext用户空间包装器代码。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;macOS为内核服务提供了抽象层，其中的组件将复杂的kext调用封装成良好的服务，并以标准的方式与kext互动。但是这些包装器也是闭源的，所以还是得二进制文件静态污点分析来还原出来。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;KextFuzz建立了调用kext接口(\(I\))的函数(\(F\))的控制流程图(CFG)。然后，KextFuzz提取了从\(F\)的函数入口开始到\(I\)结束的路径(\(\lambda\))作为分析目标，也就是上图
+污点分析定义污点源&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kext接口的输出(\(s1\))：一些kext接口使用其他接口的输出作为输入，这些值要求很精确，很难通过突变产生，所以通过这个标签来识别&lt;/li&gt;
+&lt;li&gt;全局变量(\(s2\))&lt;/li&gt;
+&lt;li&gt;对象创建函数返回值(\(s3\)) ：有一些参数是一些特别的对象，这些对象很复杂，由特殊的API创建，所以识别这些函数，在函数的返回值上打上标记。&lt;/li&gt;
+&lt;li&gt;栈和堆的指针(\(s4\))：在堆栈寄存器（SP，arm64的x29）和内存分配函数的返回值上添加污点标签&lt;/li&gt;
+&lt;li&gt;调用者函数参数(\(s5\))：c++开发的二进制文件在导入外部函数时，函数名是经过命令粉碎（name mangling）机制的，此时外部函数的参数信息也会在命名上得到显示，如果\(I\)接口调用函数\(F\)的参数，那也可以用于识别，所以在\(F\)的参数上识别&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;权限过滤器&#34;&gt;权限过滤器&lt;/h1&gt;
+&lt;p&gt;权限保护敏感功能不被普通用户调用，只有授权的公司和产品才能调用，这也增加了测试的难度，使得这些代码缺乏测试。KextFuzz自动像攻击者一样绕过这部分检查。
+kexts调用检查函数来检查权限（这部分函数由 macOS XNU和AMFI kext实现）。需要被检查kexts（也就是外部驱动）需要调用外部的kexts检查函数。
+KextFuzz通过二进制重写来hook检查器函数来劫持权限检查。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在57个有权限检查的kexts中，有8个与安全有关，9个与系统管理有关，使用权限过滤器成功绕郭权限检查，并使用kextFuzz发现了18个特权代码漏洞。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h1 id=&#34;kextfuzz-结构&#34;&gt;KextFuzz 结构&lt;/h1&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;binary-rewriting&#34;&gt;binary rewriting&lt;/h2&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;模拟执行的污点&#34;&gt;模拟执行的污点&lt;/h2&gt;
+&lt;p&gt;使用Triton作为污点分析引擎。由于只分析代码片段，所有有两个问题&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如何初始化寄存器和内存&lt;/li&gt;
+&lt;li&gt;对于其他调用函数怎么分析？尤其是创建CoreFoundation对象的函数，这些函数提供了参数类型信息？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;KextFuzz使用特殊的值来初始化程序状态。同时必须在分析开始前对函数参数和堆栈指针初始化，对应就是\(s4,s5\)&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h3 id=&#34;初始化寄存器与内存&#34;&gt;初始化寄存器与内存&lt;/h3&gt;
+&lt;p&gt;在初始化中使用的特殊值被编码，如图6所示。KextFuzz将寄存器和内存分为32位单元。在每个单元中，KextFuzz使用高位来记录污点来源和详细信息（例如，函数和参数索引）。
+它还记录了嵌套级别以识别指针。嵌套级别指的是访问该值所需的解除引用次数。指针使用零级。它们所指向的内存块使用第一级，进一步说，第二级和第三级。
+在执行之前，KextFuzz初始化了寄存器和内存，如图6所示。参数以及它们所指向的内存都是用\(s5\)标签初始化的。因此，污点标签不会在指针解除引用时丢失。
+macOS中的封装二进制文件主要是用C++开发的，所以KextFuzz认为存储在X0中的F的第一个参数是一个THIS变量指针，它可以被看作是一个全局变量，需要使用标签\(s2\)。&lt;/p&gt;
+&lt;h3 id=&#34;分析创建corefoundation对象的函数&#34;&gt;分析创建CoreFoundation对象的函数&lt;/h3&gt;
+&lt;p&gt;KextFuzz为这些函数创建了一个通用抽象函数\(M\)，共同模式是输入为值和大小，输出为指向一段内存的指针，在返回的指针和内存块上会被我们添加\(s3\)的标签&lt;/p&gt;
+&lt;h1 id=&#34;实验数据&#34;&gt;实验数据&lt;/h1&gt;
+&lt;p&gt;实验数据来解答以下几个问题：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;覆盖率采集器可以采集多少基本块？开销如何，能帮助KextFuzz找到更多bug吗?&lt;/li&gt;
+&lt;li&gt;kexts生成的接口规范与SyzGen生成的接口规范相比如何？&lt;/li&gt;
+&lt;li&gt;KextFuzz能在kexts中发现多少个bug？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;实验一&#34;&gt;实验一&lt;/h2&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;实验二&#34;&gt;实验二&lt;/h2&gt;
+&lt;p&gt;分析接口识别模块的效果与作用，与SyzGen对比，SyzGen是目前最先进的macOS接口识别工具。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;SyzGen是intel芯片下的，kextFuzz是arm芯片下的。所以选取了一个有两种版本的mac系统macOS 11.5.2，然后去除两个不同服务的部分。只保留在两个系统中都存在的服务，接口等。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;结果显示KextFuzz发现70个有效的服务和97个客户端。SyzGen发现了43个服务和43个客户端&lt;/p&gt;
+&lt;h2 id=&#34;实验三&#34;&gt;实验三&lt;/h2&gt;
+&lt;p&gt;对KextFuzz使用不同的配置来测试&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;KF-K: 只用kext二进制文件中提取的接口信息来Fuzz。（接口信息包括服务名称，客户端类型，函数名，参数）&lt;/li&gt;
+&lt;li&gt;KF-En-K: 二进制文件提取信息+权限过滤，与KF-K相比，可以多测试有权限检查器保护的特权代码&lt;/li&gt;
+&lt;li&gt;KF-En-K&amp;amp;U：在KF-En-K上加上使用接口分析器&lt;/li&gt;
+&lt;li&gt;KF-En-SyzGen: 使用SyzGen分析接口信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h1 id=&#34;参考&#34;&gt;参考&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://mp.weixin.qq.com/s?__biz=Mzg5ODUxMzg0Ng==&amp;amp;mid=2247495000&amp;amp;idx=1&amp;amp;sn=c52f5395e5fcec0196733e83e7d3c212&amp;amp;chksm=c063c381f7144a979d712e9467e82f8e2a22f87417f17af1960d13591f3f07dc2ddb65d0e444&amp;amp;scene=178&amp;amp;cur_album_id=2324026554710114306#rd&#34;&gt;G.O.S.S.I.P 阅读推荐 2023-04-26 KextFuzz&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/JonathanSalwan/Triton&#34;&gt;Triton 污点分析引擎 github&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.usenix.org/conference/usenixsecurity23/presentation/yin#:~:text=KextFuzz%20exploits%20these%20mitigation%20schemes%20to%20instrument%20the,48%20unique%20kernel%20bugs%20in%20the%20macOS%20kexts&#34;&gt;usenix security&lt;/a&gt;&lt;/p&gt;- https://military-axe.github.io/post/kextfuzz/ - mi1itray.axe copyright.</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation</title>
+        <link>https://military-axe.github.io/post/pyfet/</link>
+        <pubDate>Sat, 10 Jun 2023 21:12:15 +0800</pubDate>
+        
+        <guid>https://military-axe.github.io/post/pyfet/</guid>
+        <description>Mi1itray.axe https://military-axe.github.io/post/pyfet/ -&lt;p&gt;2023 S&amp;amp;P论文，讲述的是python反编译的研究工作，总结了大量的反编译特征，针对恶意代码分析领域，提供一种新的解决方案。
+从逆向和工程的角度来说，这项工作有很多值得学习的部分。&lt;/p&gt;
+&lt;h1 id=&#34;论文主旨&#34;&gt;论文主旨&lt;/h1&gt;
+&lt;h2 id=&#34;困难点&#34;&gt;困难点&lt;/h2&gt;
+&lt;p&gt;python代码编译成pyc或者可执行文件后，对于反编译会出现困难，尤其是刻意加了混淆指令的python程序。以往遇到反编译失败，只能通过人工分析的方法，成本非常高昂，因为python的反编译只有几个，没有其他折中的选择。&lt;/p&gt;
+&lt;h2 id=&#34;作者思路&#34;&gt;作者思路&lt;/h2&gt;
+&lt;p&gt;从分析恶意脚本出发，以往的角度都是完全还原源代码，往精准的反编译上靠拢，本文提出&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对于分析中很多不重要的部分，可以去除，或者替换指令，来降低反编译难度&lt;/li&gt;
+&lt;li&gt;反编译过程中遇到报错，通过FET模式匹配修复后继续反编译，使得能够自动反编译完成。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;无论是分析python编译后结构中可替换部分结构，还是反编译报错解决都需要大量的特征收集，从工程上本文的关键是数据收集，从研究角度上本文最大的贡献是提出无需精确还原，采用替换部分结构，为恶意代码分析之类对代码恢复的精确性不是那么敏感的工作（其实就是背后有大量人工投入嘛~）添砖加瓦。&lt;/p&gt;
+&lt;h1 id=&#34;项目细节&#34;&gt;项目细节&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;在逆向分析的时候并不一定追求精确还原代码（即保证反编译结果的语义正确性）&lt;/strong&gt;，所以我们完全可以&lt;strong&gt;做一些妥协，把一些不好处理的地方简化掉或者修改掉&lt;/strong&gt;，使得decompiler能够工作下去。&lt;/p&gt;
+&lt;h2 id=&#34;去除部分关键字&#34;&gt;去除部分关键字&lt;/h2&gt;
+&lt;p&gt;在逆向时，如果没有这些关键字，我们还是理解语义&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;转换控制逻辑结构&#34;&gt;转换控制逻辑结构&lt;/h2&gt;
+&lt;p&gt;去掉部分结构或者替换成一些简单的结构是可行的&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;添加空操作指令&#34;&gt;添加空操作指令&lt;/h2&gt;
+&lt;p&gt;python本身具有一个NOP操作指令，但是现有的反编译器无法识别和翻译这个指令。次项目实现了类似的空操作指令，是得反编译器能翻译和识别。
+空操作指令的用处是&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;替换一些不重要的指令&lt;/li&gt;
+&lt;li&gt;对齐已经替换的指令&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;pyfet结构&#34;&gt;PYFET结构&lt;/h2&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;主要有两个组成部分，错误识别，迭代转换自动解决检测到的错误&lt;/p&gt;
+&lt;h3 id=&#34;定位错误&#34;&gt;定位错误&lt;/h3&gt;
+&lt;p&gt;通过来自反编译器的错误信息来定位错误位置，如果没有错误信息但是又反编译失败了则不认为是显性错误，可以查看下面的隐性错误。报错信息的模式如下&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h3 id=&#34;处理隐性错误&#34;&gt;处理隐性错误&lt;/h3&gt;
+&lt;p&gt;处理隐性错误的流程。
+如果识别出一个与隐形错误匹配的代码片段，则对照隐性错误，得到两个值，一个是原本的可能为隐形错\(S_{error}\)一个是对照后可能的正确模式\(S_{correct}\).将这两个源码重新编译一遍（同一个编译器），得到\(I_{error}, I_{correct}\)。然后回到原二进制文件中对应的位置，看匹配\(I_{error}, I_{correct}\)中哪一个，从而发现隐性错误，继续反编译。&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;常见的隐形错误模式的修复前后对比，这里只显示6组。&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h3 id=&#34;迭代转换&#34;&gt;迭代转换&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;首先获取cfg，并选择包含错误位置的目标块&lt;/li&gt;
+&lt;li&gt;对目标块中的指令进行转换&lt;/li&gt;
+&lt;li&gt;对转换后的结果，运行错误识别来检查转换后的是否解决最初的目标错误，如果没有成功会找当前块的邻近块来反复执行这个过程。&lt;/li&gt;
+&lt;li&gt;当没有目标块可以处理，也没有找到成功的转换的时候，就失败&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;上图的例子就是0块发生错误，但是无法通过转换来解决，这时候首先找到与0块直接相连的几个1块，通过尝试转换，1块任然不行再拓展到2块。已经解决过的块是不会再加入这个流程，直接解决问题或者没有其他块了。下面是基本块选择算法。&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;从工程角度看一下细节，其中对于指令的匹配和替换是使用正则表达式和定义了一些转换规则。
+正则表达式是匹配指令链&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;上图表示匹配一个&lt;code&gt;POP_JUMP_IF_FALSE&lt;/code&gt;,&lt;code&gt;POP_JUMP_IF_TRUE&lt;/code&gt;指令链加一个跳转块，再RE-1这种情况下会直接第三列的结果，RE-2没有匹配成功就不改变，RE-3对应的情况和RE-1不同，考虑下面这种情况&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;这种if语句超过三个参数，不再只有两个块，所以使用RE-1是不行的，需要多个块都跳转。也就是通过正则匹配指令链和参数后，根据不同情况，每种指令链都有多个可能情况需要对应。&lt;/p&gt;
+&lt;h1 id=&#34;实验评估&#34;&gt;实验评估&lt;/h1&gt;
+&lt;h2 id=&#34;反编译效果验证&#34;&gt;反编译效果验证&lt;/h2&gt;
+&lt;p&gt;收集了38351个不同的python恶意样本，选取了现有的5中反编译器Uncompyle6, Decompyle3, Uncompyle2, Unpyc37, and Decompyle++，确定17117个样本（45.6%）反编译失败&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;使用这17117个样本去验证本项目的有效性，PYFET成功解决了所有的反编译错误
+下表显示了样本中隐性和显性错误的数量。&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;正确性验证&#34;&gt;正确性验证&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;选择了100个流行python程序的源码，和二进制文件，总计14949个python文件。然后对30个FET规则选择40个对应报错，总共1200个反编译错误的样本。&lt;/li&gt;
+&lt;li&gt;对每个错误样本，将FET的结果手动应用在源码上，然后编译为样本，得到1200个源码转换后的样本。&lt;/li&gt;
+&lt;li&gt;然后对1中1200二进制文件，直接用PYFET转化，得到1200个转化后的二进制文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;对比2中的二进制样本和3中的二进制样本，结果显示没有字节码上的差异，意味着pyfet所有的转换都是正确的。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;采用这种验证方法是因为，直接FET反编译过来中间优化或者去除了部分逻辑，不能执行的，无法对比一个正确性，所以作者正对每一个转化规则，选取了40个不同的报错，每个报错根据FET规则，在源码上手动修改，再编译。和直接用PYFET修改后的二进制对比，说明PYFET直接转发二进制程序反编译后和源码上直接应用FET规则是一样的效果。
+但是由于其中有人工的部分，这一部分实验数据存疑。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;转换的影响&#34;&gt;转换的影响&lt;/h2&gt;
+&lt;p&gt;100%的反编译率+100%的正确性，给作者他也不敢开这个口，于是他加了一个实验。
+将3中的结果反编译成源码，对比项目原本的源码，结果显示，在源码层面，pyfet影响平均不到3行源码。（这看起来稍微靠谱了一点&lt;/p&gt;
+&lt;h1 id=&#34;对抗pjorion与opcode-remap-python技术&#34;&gt;对抗PjOrion与opcode remap python技术&lt;/h1&gt;
+&lt;h2 id=&#34;opcode-remap-python&#34;&gt;opcode remap python&lt;/h2&gt;
+&lt;p&gt;这是通过修改python源码，改变指令对应的opcode值，这样正常的反编译器是无法反编译成功的。文中以Dropbox的反编译为例子讲述如何使用PYFET反编译.
+首先Dropbox是基于python3.8.12版本的python，所以作者先编译python 3.8.12标准库，和Dropbox的二进制文件对比，发现除了opcode，其他部分都是吻合的。
+图b正常编译后其中字节码的样子，图a则是Dropbox反编译看到的字节码，可以看到是不正常的。
+这里可以通过对比和统计找到所有对应的形式，如图e。&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;pjorion&#34;&gt;PjOrion&lt;/h2&gt;
+&lt;p&gt;这种混淆技术有四种方法&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;添加无效结构&lt;/li&gt;
+&lt;li&gt;添加异常块&lt;/li&gt;
+&lt;li&gt;在参数字节中隐藏原始操作码&lt;/li&gt;
+&lt;li&gt;添加随机跳转指令，重构整个文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这种混淆其实主要就是隐藏真实的控制流，首先要提取控制流，用下面这条正则来提取控制流&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;得到的控制流程图大概如下&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;然后应用FET规则来还原整个程序&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;blockquote&gt;
+&lt;p&gt;首先删除那些不可到达的跳转
+然后用上图e的指令重新找到入口点
+然后使用f指令删除跳转来达到去混淆的效果&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;完成整个流程后就对PjOrion实现了成功的去混淆。&lt;/p&gt;
+&lt;h1 id=&#34;思考&#34;&gt;思考&lt;/h1&gt;
+&lt;p&gt;本文总结了很多python反编译的数据与经验，在针对恶意代码领域，不完全的或者不精准的转换部分代码达到成功反编译效果是可以接受的。本文实际上是利用大量的人工分析来总结各种特征与转化方法，在思路上并没有很多的突破，但是是非常大的一个工作量，同时在反编译python二进制文件这个领域中也是做出了很多贡献。从工程角度上这是一份可以很快应用于恶意代码分析领域的工作。&lt;/p&gt;
+&lt;h1 id=&#34;参考&#34;&gt;参考&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://mp.weixin.qq.com/s/ziy9mOFUV8_pyHWZ1-cJ2Q&#34;&gt;G.O.S.S.I.P 阅读推荐 2023-05-15 PyFET&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/pyfet-pyc/src/&#34;&gt;pyfet-pyc/src (github.com)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.computer.org/csdl/proceedings-article/sp/2023/933600a800/1Js0DmsXjQQ&#34;&gt;2023 IEEE Symposium on Security and Privacy (SP)&lt;/a&gt;&lt;/p&gt;- https://military-axe.github.io/post/pyfet/ - mi1itray.axe copyright.</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Driver Development and Debug Config</title>
+        <link>https://military-axe.github.io/post/driver_development_and_debug_config/</link>
+        <pubDate>Thu, 08 Jun 2023 13:58:36 +0800</pubDate>
+        
+        <guid>https://military-axe.github.io/post/driver_development_and_debug_config/</guid>
+        <description>Mi1itray.axe https://military-axe.github.io/post/driver_development_and_debug_config/ -&lt;p&gt;配置windows驱动开发环境与windbg preview调试技巧，还会记录一下遇到的问题&lt;/p&gt;
+&lt;h2 id=&#34;驱动开发&#34;&gt;驱动开发&lt;/h2&gt;
+&lt;p&gt;我选择的模式是物理机编译开发驱动，虚拟机调试&lt;/p&gt;
+&lt;h3 id=&#34;开发环境&#34;&gt;开发环境&lt;/h3&gt;
+&lt;p&gt;开发环境：vs2019 + vscode&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;选择vs2019的原因是我用vs2022，配置wdk和sdk后，模板中没有minifilter，刚好又是我要用的，只能选择vs2019.
+如果有师傅解决了这个问题麻烦mail我，感激不尽.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;sdk version: &lt;code&gt;10.0.19041&lt;/code&gt;
+wdk version: &lt;code&gt;10.0.19041&lt;/code&gt;, &lt;a href=&#34;https://learn.microsoft.com/zh-cn/windows-hardware/drivers/other-wdk-downloads&#34;&gt;WDK 版本和其他下载&lt;/a&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;wdk和sdk版本务必一样，查看wdk是下载下来后，点击安装在安装界面的上边可以看到，我这里是已经安装了所以报错&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081420890.png&#34; alt=&#34;image-20230608142033119&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;项目设置&#34;&gt;项目设置&lt;/h3&gt;
+&lt;p&gt;根据vs2019的配置与需求配置项目，配置都是在&lt;code&gt;project-&amp;gt;properties&lt;/code&gt;中设置，不一定按照这个配置，这个配置是为了开发时候方便调试，一切从简。从上线项目的角度来看，不建议开启下面的，但是我测试项目，上线再说。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;c++-&amp;gt;General-&amp;gt;Treat Warnings As Err&lt;/code&gt;设置为 No&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;c++-&amp;gt;Code Generation-&amp;gt;Spectre Mitigation&lt;/code&gt;设置Disable&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Linker-&amp;gt;General-&amp;gt;Treat Warnings As Err&lt;/code&gt;设置为No&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Driver-&amp;gt;Settings-&amp;gt;Target OS version&lt;/code&gt;设置为&lt;code&gt;Windows 10 or higher&lt;/code&gt;，因为我的虚拟机是win10&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Configuartion&lt;/code&gt;选择Debug，没有证书别选release，否则安装不上&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这些都是vs2019中用于编译的，我开发代码是用vscode，写完了再去vs2019点一下编译，直接用vscode打开项目会很多头文件缺失，补全也很简单，在项目目录下配置一下。&lt;/p&gt;
+&lt;p&gt;vscode control+shift+p打开控制面板，选择&lt;code&gt;C/C++ Edit Configuration(JSON)&lt;/code&gt;，然后在vs2019右键引用在vscode中缺失的头文件，copy一下路径，配置在vscode的项目json中。实际上只用添加一个路径，我这是&lt;code&gt;&amp;quot;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/km&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;configurations&amp;#34;&lt;/span&gt;: [
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;Win32&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;includePath&amp;#34;&lt;/span&gt;: [
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;${workspaceFolder}/**&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/km&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            ],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;defines&amp;#34;&lt;/span&gt;: [
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;_DEBUG&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;UNICODE&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;_UNICODE&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            ],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;windowsSdkVersion&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;10.0.22000.0&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;compilerPath&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;cl.exe&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;cStandard&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;c17&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;cppStandard&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;c++17&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;intelliSenseMode&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;windows-msvc-x64&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    ],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;&amp;#34;version&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#b452cd&#34;&gt;4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后vscode就可以愉快的打代码了&lt;/p&gt;
+&lt;h3 id=&#34;虚拟机设置&#34;&gt;虚拟机设置&lt;/h3&gt;
+&lt;p&gt;这个很多文章都有很详细的配置，这里只记录简单的几个我用到的命令，详细的请找别的文章&lt;/p&gt;
+&lt;p&gt;虚拟机需要开启测试模式，一般的驱动无法直接安装上在win10 x64下，需要签名，开启测试模式则无需签名&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;如果安装驱动服务，启动时报签名损毁，577错误时，需要打开windows启动中的高级设置，强制关闭驱动签名验证。&lt;/p&gt;
+&lt;p&gt;shift+单机重启 -&amp;gt; 高级选项-&amp;gt;启动设置-&amp;gt;重启，然后选择强制禁用驱动签名&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;管理员 powershell&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bcdedit /&lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;set&lt;/span&gt; testsigning on
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bcdedit /Debug on
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bcdedit /dbgsettings serial baudrate:&lt;span style=&#34;color:#b452cd&#34;&gt;115200&lt;/span&gt; debugport:&lt;span style=&#34;color:#b452cd&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;最后一个开启后，还要再虚拟机上设置，开启一个端口才能在物理机上用windbg连上虚拟机&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081444764.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;以下命令都是在管理员权限下执行&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;启动服务&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;net start &amp;lt;service_name&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;关闭服务&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;net stop &amp;lt;service_anem&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;删除服务&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sc delete &amp;lt;service_name&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;驱动调试&#34;&gt;驱动调试&lt;/h2&gt;
+&lt;p&gt;在物理机上调试虚拟机中的驱动&lt;/p&gt;
+&lt;p&gt;调试软件: &lt;code&gt;windbg preview&lt;/code&gt;，设置截图&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081458667.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;然后再setting中设置源码与符号目录&lt;/p&gt;
+&lt;p&gt;连接之后开始调试。&lt;/p&gt;
+&lt;p&gt;系统运行中间不能再键入命令，需要再设置什么值则可以点击左上角的Break，然后再键入命令&lt;/p&gt;
+&lt;h3 id=&#34;日志调试等级&#34;&gt;日志调试等级&lt;/h3&gt;
+&lt;p&gt;开发中在源码中写入&lt;code&gt;KdPrintEx&lt;/code&gt;，并在参数中设置调试等级。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#008b45&#34;&gt;KdPrintEx&lt;/span&gt;(( DPFLTR_IHVDRIVER_ID,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            DPFLTR_WARNING_LEVEL,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;[+] HoneyFile: FileNameInfo-&amp;gt;Name.MaximumLength: %d &amp;gt;= 260&lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;\r\n&lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            FileNameInfo-&amp;gt;Name.MaximumLength));
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;DPFLTR_WARNING_LEVEL&lt;/code&gt;就是等级，对应的值是1&lt;/p&gt;
+&lt;p&gt;在windbg中运行起来后设置&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kd&amp;gt; ed Kd_IHVDRIVER_Mask &lt;span style=&#34;color:#b452cd&#34;&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这样，打印的时候进行的运算是&lt;code&gt;(1 &amp;lt;&amp;lt; DPFLTR_WARNING_LEVEL) &amp;amp; Kd_IHVDRIVER_Mask = 2&lt;/code&gt;只要值不是0就可以打印出来&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Kd_IHVDRIVER_Mask&lt;/code&gt;的设置是根据源码中第一个参数设置成&lt;code&gt;Kd_XXXX_Mask&lt;/code&gt;的，要是怕变量名重复可以改成&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;nt!Kd_IHVDRIVER_Mask
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;下面是调试日志等级对应的值&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#define DPFLTR_ERROR_LEVEL 0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#define DPFLTR_WARNING_LEVEL 1
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#define DPFLTR_TRACE_LEVEL 2
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#define DPFLTR_INFO_LEVEL 3
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#define DPFLTR_MASK 0x80000000
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;- https://military-axe.github.io/post/driver_development_and_debug_config/ - mi1itray.axe copyright.</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>2023 XCTF GotYouKey Write Up</title>
+        <link>https://military-axe.github.io/post/gotyoukey/</link>
+        <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
+        
+        <guid>https://military-axe.github.io/post/gotyoukey/</guid>
+        <description>Mi1itray.axe https://military-axe.github.io/post/gotyoukey/ -&lt;p&gt;前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。&lt;/p&gt;
+&lt;h2 id=&#34;分析过程&#34;&gt;分析过程&lt;/h2&gt;
+&lt;p&gt;jadx反编译后看源码，前面都是开线程，开端口，都不关键，直接到&lt;code&gt;com.hack.gotyourkey.Oooo000&lt;/code&gt;中看到关键函数
+&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519119.png&#34; alt=&#34;image.png&#34;&gt;
+只有这个&lt;code&gt;check&lt;/code&gt;函数关键其他的都是加的，传入&lt;code&gt;check&lt;/code&gt;函数中的就是输入的值。
+进入之后是AES加密和base64换表
+&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519871.png&#34; alt=&#34;image.png&#34;&gt;
+接出来得到flag: &lt;code&gt;flag{345ghyuj!$}&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;from Crypto.Cipher import AES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;import base64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b&#34;&gt;str1&lt;/span&gt; = &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;UGCA3QBFjPnlAZ6-NbV2Ca^^&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b&#34;&gt;string1&lt;/span&gt; = &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-+^&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b&#34;&gt;string2&lt;/span&gt; = &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b&#34;&gt;key&lt;/span&gt; = b&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#39;1234567890abcdef&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b&#34;&gt;c&lt;/span&gt; = base64.b64decode(str1.translate(str.maketrans(string1,string2)))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b&#34;&gt;e&lt;/span&gt; = AES.new(key, AES.MODE_ECB)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b&#34;&gt;m&lt;/span&gt; = e.decrypt(c)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;print(m)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;但是这个flag是假的，继续分析后发现，存在一个&lt;code&gt;libgotyoukey.so&lt;/code&gt;
+打开后在&lt;code&gt;JNI_OnLoad&lt;/code&gt;函数存在很多逻辑
+&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519549.png&#34; alt=&#34;image.png&#34;&gt;
+进入&lt;code&gt;core&lt;/code&gt;函数后，设置第一个参数为&lt;code&gt;JNIEnv *&lt;/code&gt;
+可以发现core中的函数是调用各种java中的函数，还原函数类型后，重命名后逻辑如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-basic&#34; data-lang=&#34;basic&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v54&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;android/app/ActivityThread&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v53&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetStaticFieldID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v54,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;sCurrentActivityThread&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;Landroid/app/ActivityThread;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v52&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetFieldID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v54,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;mInitialApplication&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;Landroid/app/Application;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v51&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetStaticObjectField(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v54,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v53);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v50&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetObjectField(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v51,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v52);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v49&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;android/app/Application&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v48&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v49,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;getAssets&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;()Landroid/content/res/AssetManager;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v47&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v50,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v48);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v46&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;android/content/res/AssetManager&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v45&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v46,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;openFd&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;(Ljava/lang/String;)Landroid/content/res/AssetFileDescriptor;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v44&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;NewStringUTF(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;asset.bin&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v43&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v47,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v45,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v44);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v42&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;android/content/res/AssetFileDescriptor&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v41&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v42,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;getLength&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;()J&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;length&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallLongMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v43,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v41);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v39&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v46,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;open&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;(Ljava/lang/String;)Ljava/io/InputStream;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v38&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v47,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v39,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v44);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;new_array&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;NewByteArray(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;length);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v36&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;java/io/InputStream&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v35&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v36,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;read&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;([BII)I&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;my_input&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallIntMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v38,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v35,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;new_array,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;LL,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;length);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;v33&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;malloc(length);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;if&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;(&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;my_input&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&amp;gt;&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;  &lt;/span&gt;GetByteArrayRegion(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;new_array,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;length,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v33);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;  &lt;/span&gt;v32&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;malloc(length);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;  &lt;/span&gt;rc4(&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;goodluck&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v33,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;length,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v32);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;  &lt;/span&gt;SetByteArrayRegion(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;new_array,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;length,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v32);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;  &lt;/span&gt;if&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;(&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v32&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;    &lt;/span&gt;free(v32);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;    &lt;/span&gt;if&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;(&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v33&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;free(v33);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v31&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;java/nio/ByteBuffer&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v30&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetStaticMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v31,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;allocate&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;(I)Ljava/nio/ByteBuffer;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v29&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallStaticObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v31,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v30,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;length);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v28&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v31,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;put&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;([B)Ljava/nio/ByteBuffer;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v27&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v31,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;position&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;(I)Ljava/nio/Buffer;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;CallObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v29,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v28,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;new_array);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;CallObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v29,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v27,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;LL);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v26&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;com/hack/gotyourkey/MainActivity&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v25&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;java/lang/Class&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v24&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v25,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;getClassLoader&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;()Ljava/lang/ClassLoader;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v23&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v26,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v24);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v22&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;dalvik/system/PathClassLoader&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v21&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetFieldID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v22,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;pathList&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;Ldalvik/system/DexPathList;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v20&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;dalvik/system/DexPathList&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v19&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetFieldID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v20,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;dexElements&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;[Ldalvik/system/DexPathList$Element;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v18&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;dalvik/system/InMemoryDexClassLoader&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v17&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v18,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;&amp;lt;init&amp;gt;&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;(Ljava/nio/ByteBuffer;Ljava/lang/ClassLoader;)V&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v16&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;NewObjectV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v18,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v17,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v29,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v23);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v15&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetObjectField(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v16,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v21);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v14&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetObjectField(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v15,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v19);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v13&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetObjectField(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v23,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v21);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v12&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetObjectField(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v13,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v19);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v11&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;FindClass(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;java/util/ArrayList&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v10&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v11,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;add&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;(Ljava/lang/Object;)Z&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v9&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v11,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;toArray&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;()[Ljava/lang/Object;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v8&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetMethodID(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v11,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;&amp;lt;init&amp;gt;&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;()V&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;v7&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;NewObjectV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v11,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v8);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;      &lt;/span&gt;for&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;(&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;i&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;;&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;i&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&amp;lt;&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetArrayLength(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v14);&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;++i&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;        &lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;        &lt;/span&gt;v5&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetObjectArrayElement(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v14,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;i);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;        &lt;/span&gt;CallBooleanMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v7,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v10,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v5);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;        &lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;        &lt;/span&gt;for&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;(&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;j&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;;&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;j&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;&amp;lt;&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetArrayLength(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v12);&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;++j&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;          &lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;          &lt;/span&gt;v3&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;GetObjectArrayElement(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v12,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;j);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;          &lt;/span&gt;CallBooleanMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v7,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v10,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v3);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;          &lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;          &lt;/span&gt;v1&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;=&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;CallObjectMethodV(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v7,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v9);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#bbb&#34;&gt;          &lt;/span&gt;return&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;SetObjectField(env,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v13,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v19,&lt;span style=&#34;color:#bbb&#34;&gt; &lt;/span&gt;v1);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;中间调用了一个rc4，key是&lt;code&gt;goodluck&lt;/code&gt;
+直接给chatgpt解释后知道，这里用rc4解密了asset.bin这个文件，然后加载进入apk，中间都是使用java的函数。所以还原了之后很好做
+解密asset.bin代码&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#1e889b&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#1e889b&#34;&gt;&amp;lt;stdlib.h&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#1e889b&#34;&gt;&amp;lt;string.h&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1e889b&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#008b45&#34;&gt;rc4_init&lt;/span&gt;(&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;* s, &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;* key,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;              &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;long&lt;/span&gt; len)   &lt;span style=&#34;color:#228b22&#34;&gt;// s最开始是传入的长度为256的char型空数组，用来存放初始化后的s
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#228b22&#34;&gt;// key是密钥，内容可定义  //最后一个len是密钥的长度
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;int&lt;/span&gt;           i      = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;int&lt;/span&gt;           j      = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt; k[&lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;] = {&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;};
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt; temp   = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;for&lt;/span&gt; (i = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;; i &amp;lt; &lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;; i++) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        s[i] = i;              &lt;span style=&#34;color:#228b22&#34;&gt;// 0-255赋给s
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;        k[i] = key[i % len];   &lt;span style=&#34;color:#228b22&#34;&gt;// 将k重新计算
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;for&lt;/span&gt; (i = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;; i &amp;lt; &lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;; i++) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        j    = (j + s[i] + k[i]) % &lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;;   &lt;span style=&#34;color:#228b22&#34;&gt;// 给j赋
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;        temp = s[i];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        s[i] = s[j];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        s[j] = temp;   &lt;span style=&#34;color:#228b22&#34;&gt;// s[i]和s[j]交换
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#008b45&#34;&gt;rc4_crypt&lt;/span&gt;(&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;* s, &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;* data,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;               &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;long&lt;/span&gt; len)   &lt;span style=&#34;color:#228b22&#34;&gt;// s是上面初始化之后的，data是我们要加密的数据，len是data的长度
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;int&lt;/span&gt;           i = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;, j = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;, t = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;long&lt;/span&gt; k = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt; temp;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;for&lt;/span&gt; (k = &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;; k &amp;lt; len; k++) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        i    = (i + &lt;span style=&#34;color:#b452cd&#34;&gt;1&lt;/span&gt;) % &lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;;      &lt;span style=&#34;color:#228b22&#34;&gt;// 固定方式生成的i
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;        j    = (j + s[i]) % &lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;;   &lt;span style=&#34;color:#228b22&#34;&gt;// 固定方式生成的j
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;        temp = s[i];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        s[i] = s[j];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        s[j] = temp;                  &lt;span style=&#34;color:#228b22&#34;&gt;// 交换
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;        t    = (s[i] + s[j]) % &lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;;   &lt;span style=&#34;color:#228b22&#34;&gt;// 固定方式生成的t
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;        data[k] ^= s[t];              &lt;span style=&#34;color:#228b22&#34;&gt;// 异或运算
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#228b22&#34;&gt;&lt;/span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#008b45&#34;&gt;main&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;  s[&lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;]   = {&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;};
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;  s2[&lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;]  = {&lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;};
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;  key[&lt;span style=&#34;color:#b452cd&#34;&gt;256&lt;/span&gt;] = {&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;goodluck&amp;#34;&lt;/span&gt;};
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;* data;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;long&lt;/span&gt;  len;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    FILE*          file1;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    FILE*          file2;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    file1 = &lt;span style=&#34;color:#008b45&#34;&gt;fopen&lt;/span&gt;(&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;./asset.bin&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;rb&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;fseek&lt;/span&gt;(file1, &lt;span style=&#34;color:#b452cd&#34;&gt;0&lt;/span&gt;, SEEK_END);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    len = &lt;span style=&#34;color:#008b45&#34;&gt;ftell&lt;/span&gt;(file1);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;printf&lt;/span&gt;(&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;file len: %ld &lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;\r\n&lt;/span&gt;&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;&lt;/span&gt;, len);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    data = &lt;span style=&#34;color:#008b45&#34;&gt;calloc&lt;/span&gt;(len + &lt;span style=&#34;color:#b452cd&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;sizeof&lt;/span&gt;(&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;));
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;rewind&lt;/span&gt;(file1);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;fread&lt;/span&gt;(data, &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;sizeof&lt;/span&gt;(&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;), len, file1);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;fclose&lt;/span&gt;(file1);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;rc4_init&lt;/span&gt;(s, (&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;*)key, &lt;span style=&#34;color:#008b45&#34;&gt;strlen&lt;/span&gt;((&lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;*)key));
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;rc4_crypt&lt;/span&gt;(s, (&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;*)data, len);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    file2 = &lt;span style=&#34;color:#008b45&#34;&gt;fopen&lt;/span&gt;(&lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;./dec&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#cd5555&#34;&gt;&amp;#34;wb&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;fwrite&lt;/span&gt;(data, &lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;sizeof&lt;/span&gt;(&lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;unsigned&lt;/span&gt; &lt;span style=&#34;color:#00688b;font-weight:bold&#34;&gt;char&lt;/span&gt;), len, file2);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#008b45&#34;&gt;fclose&lt;/span&gt;(file2);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;解密之后发现和原来的逻辑几乎一样，但是在最关节的check函数不同&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519480.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;这里是base64换表和rc4加密，不是原来的base+aes
+所以，直接base64换表后rc4解密&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519880.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;但是得到这个flag: &lt;code&gt;flag{ikjnmkjh±$}&lt;/code&gt;还是过不了原apk的check
+通过调试发现，密文变了不是&lt;code&gt;SSro3CogRALMhCnQRBDyWa^^&lt;/code&gt;变成了&lt;code&gt;SSro3CogRALMhCnQRG9yWa^^&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519811.png&#34; alt=&#34;fa686bcd2089778e03832656e34b71c.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;所以再用&lt;code&gt;SSro3CogRALMhCnQRG9yWa^^&lt;/code&gt;解密一次，得到flag: &lt;code&gt;flag{ikjnmkjh@$}&lt;/code&gt;，这就可以过check了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519143.jpeg&#34; alt=&#34;7c41a84fd36fb8cf5da333553b0480e.jpg&#34;&gt;&lt;/p&gt;- https://military-axe.github.io/post/gotyoukey/ - mi1itray.axe copyright.</description>
+        </item>
+    
+    
+  </channel>
+</rss> 

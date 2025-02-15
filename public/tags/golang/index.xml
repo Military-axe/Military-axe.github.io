@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Golang on Mi1itray.axe</title>
+    <link>https://military-axe.github.io/tags/golang/</link>
+    <description>Recent content in Golang on Mi1itray.axe</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>mi1itray.axe copyright.</copyright>
+    <lastBuildDate>Wed, 06 Sep 2023 17:50:41 +0800</lastBuildDate>
+    <atom:link href="https://military-axe.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2023 羊城杯 Reverse</title>
+      <link>https://military-axe.github.io/post/2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      <guid>https://military-axe.github.io/post/2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/</guid>
+      <description>&lt;p&gt;没打，王哥发了我三题，我就看了一下，稍微多花了时间。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

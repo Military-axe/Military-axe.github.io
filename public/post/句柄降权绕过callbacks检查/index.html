@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>句柄降权绕过CallBacks检查</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="句柄降权绕过CallBacks检查">
+  <meta property="og:description" content="ObRegistyCallBacks保护指定进程，可以让攻击程序OpenProcess打开指定进程后获取的句柄权限是我们指定的权限范围, 比如不能读取进程内存, 不能终止进程。
+如何绕过这种保护，可以使用句柄降权/提权的方法，就可以对提高已经获取到的句柄权限。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2024-04-29T22:01:29+08:00">
+    <meta property="article:modified_time" content="2024-04-29T22:01:29+08:00">
+    <meta property="article:tag" content="Windows">
+    <meta property="article:tag" content="句柄降权">
+    <meta property="article:tag" content="X64">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="句柄降权绕过CallBacks检查">
+  <meta name="twitter:description" content="ObRegistyCallBacks保护指定进程，可以让攻击程序OpenProcess打开指定进程后获取的句柄权限是我们指定的权限范围, 比如不能读取进程内存, 不能终止进程。
+如何绕过这种保护，可以使用句柄降权/提权的方法，就可以对提高已经获取到的句柄权限。">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%a5%e6%9f%84%e9%99%8d%e6%9d%83" class="nav-句柄降权">
+									句柄降权
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e4%bb%80%e4%b9%88%e6%98%af%e5%8f%a5%e6%9f%84" class="nav-什么是句柄">
+									什么是句柄
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%a7%81%e6%9c%89%e5%8f%a5%e6%9f%84%e8%a1%a8" class="nav-私有句柄表">
+									私有句柄表
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#tablecode%e5%8f%a5%e6%9f%84%e8%a1%a8" class="nav-tablecode句柄表">
+									TableCode句柄表
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#windbg-%e8%b0%83%e8%af%95" class="nav-windbg-调试">
+									Windbg 调试
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%88%a4%e6%96%ad%e5%8f%a5%e6%9f%84%e7%b1%bb%e5%9e%8b" class="nav-判断句柄类型">
+									判断句柄类型
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#win7881" class="nav-win7881">
+									win7/8/8.1
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#win10" class="nav-win10">
+									win10
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%a5%e6%9f%84%e9%99%8d%e6%9d%83%e6%8f%90%e6%9d%83" class="nav-句柄降权提权">
+									句柄降权/提权
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%bb%a3%e7%a0%81%e5%ae%9e%e7%8e%b0%e9%98%b2%e6%ad%a2ce%e8%af%bb%e5%8f%96%e8%bf%9b%e7%a8%8b%e5%86%85%e5%ad%98" class="nav-代码实现防止ce读取进程内存">
+									代码实现防止CE读取进程内存
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#mainc" class="nav-mainc">
+									main.c
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#headerc" class="nav-headerc">
+									header.c
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%93%e6%9e%9c" class="nav-结果">
+									结果
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%af%b9%e6%8a%97%e5%8f%a5%e6%9f%84%e9%99%8d%e6%9d%83%e6%80%9d%e8%b7%af" class="nav-对抗句柄降权思路">
+									对抗句柄降权思路
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%8f%8d%e5%a4%8d%e4%bf%ae%e6%94%b9%e6%9d%83%e9%99%90" class="nav-反复修改权限">
+									反复修改权限
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%96%ad%e9%93%be" class="nav-断链">
+									断链
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#obregistercallbacks-%e4%bf%9d%e6%8a%a4" class="nav-obregistercallbacks-保护">
+									ObRegisterCallbacks 保护
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    句柄降权绕过CallBacks检查
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2024-04-29 22:01
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/reverse">Reverse</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/windows">windows</a>
+                                &nbsp;
+                            
+                                <a href="/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83">句柄降权</a>
+                                &nbsp;
+                            
+                                <a href="/tags/x64">x64</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>ObRegistyCallBacks保护指定进程，可以让攻击程序OpenProcess打开指定进程后获取的句柄权限是我们指定的权限范围, 比如不能读取进程内存, 不能终止进程。</p>
+<p>如何绕过这种保护，可以使用句柄降权/提权的方法，就可以对提高已经获取到的句柄权限。</p>
+<h1 id="句柄降权">句柄降权</h1>
+<h2 id="什么是句柄">什么是句柄</h2>
+<p>当一个进程利用名称来创建或打开一个对象时，将获得一个句柄，该句柄指向所创建或打开的对象。以后，该进程无须使用名称来引用该对象，使用此句柄即可访问。这样做可以显著地提高引用对象的效率。句柄是一个在软件设计中被广泛使用的概念。例如，在C运行库中，文件操作使用句柄来表示，每当应用程序创建或打开一个文件时，只要此创建或打开操作成功，则C运行库返回一个句柄。以后应用程序对文件的读写操作都使用此句柄来标识该文件。而且，如果两个应用程序以共享方式打开了同一个文件，那么，它们将分别得到各自的句柄，且都可以通过句柄操作该文件。尽管两个应用程序得到的句柄的值并不相同，但是这两个句柄所指的文件却是同一个。因此，句柄只是一个对象引用，同一个对象在不同的环境下可能有不同的引用（句柄）值。</p>
+<p>上文中的&quot;对象&quot;指的是内核对象，我们在R3中所使用的文件、进程、线程在内核中都有对应内核对象。应用层每次创建或打开进程、文件都会对相应的内核对象创建一个句柄。当多个进程同时打开一个文件时，该文件在内核中只会存在一个文件内核对象，但每个进程都有一个各自的文件句柄，每个句柄会增加内核对象的引用计数，只有当内核对象的引用计数为0时，内核对象才会释放。</p>
+<h2 id="私有句柄表">私有句柄表</h2>
+<p><img src="https://s2.loli.net/2024/04/29/XAuz3r5m7bEqVPv.png" alt="image-20240427100234291"></p>
+<p><code>eprocess</code>指向一个<code>ObjectTable</code>，<code>ObjectTbale</code>中存在<code>TableCode</code>，这个指向的是这个进程的私有句柄表。同时<code>ObjectTable</code>中还有一个<code>HandleTableList</code>，这个是一个链表，通过<code>HandleTableList</code> 成员遍历得到所有进程的<code>ObjectTable</code>地址</p>
+<p>我们的目标是获取到<code>_object_header</code>结构体，这个结构体才是句柄的真正内容。但是不同版本系统下的取法不太一样，win7是直接指向句柄，win10则需要做一些偏移，这些偏移google没有资料，大多都是通过IDA静态分析函数才能得到。</p>
+<p>win中有一些根据_handle_table_entry获取进程句柄的函数，我这里没有做过多分析，直接使用前辈分析后的经验。分析目标<code>ntoskrnl.exe</code>下的<code>ObpEnumFindHandleProcedure</code>函数，可以看到如下</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">__int64</span> <span style="color:#8b008b;font-weight:bold">__fastcall</span> <span style="color:#008b45">ObpEnumFindHandleProcedure</span>(
+</span></span><span style="display:flex;"><span>        _HANDLE_TABLE *handle_table,
+</span></span><span style="display:flex;"><span>        _HANDLE_TABLE_ENTRY *handle_table_entry,
+</span></span><span style="display:flex;"><span>        HANDLE a3,
+</span></span><span style="display:flex;"><span>        HANDLE *object_header)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int8</span> v5; <span style="color:#228b22">// bl
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  HANDLE v7; <span style="color:#228b22">// rbx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  _DWORD *v8; <span style="color:#228b22">// rcx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v9; <span style="color:#228b22">// r11
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> v10[<span style="color:#b452cd">10</span>]; <span style="color:#228b22">// [rsp+0h] [rbp-28h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( !*object_header || *object_header == (HANDLE)((handle_table_entry-&gt;LowValue &gt;&gt; <span style="color:#b452cd">16</span>) &amp; <span style="color:#b452cd">0xFFFFFFFFFFFFFFF0u</span>i64) )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    v7 = object_header[<span style="color:#b452cd">1</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( !v7
+</span></span><span style="display:flex;"><span>      || v7 == (HANDLE)ObTypeIndexTable[(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int8</span>)ObHeaderCookie ^ *(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int8</span> *)(((handle_table_entry-&gt;LowValue &gt;&gt; <span style="color:#b452cd">16</span>) &amp; <span style="color:#b452cd">0xFFFFFFFFFFFFFFF0u</span>i64)
+</span></span><span style="display:flex;"><span>                                                                                             + <span style="color:#b452cd">0x18</span>) ^ (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span>)(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int8</span>)((<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int16</span>)(<span style="color:#008b45">WORD1</span>(handle_table_entry-&gt;LowValue) &amp; <span style="color:#b452cd">0xFFF0</span>) &gt;&gt; <span style="color:#b452cd">8</span>)] )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      v8 = object_header[<span style="color:#b452cd">2</span>];
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( !v8 )
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">goto</span> LABEL_11;
+</span></span><span style="display:flex;"><span>      v9 = (handle_table_entry-&gt;LowValue &gt;&gt; <span style="color:#b452cd">17</span>) &amp; <span style="color:#b452cd">7</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( (*(_DWORD *)(&amp;handle_table_entry-&gt;<span style="color:#b452cd">4</span> + <span style="color:#b452cd">1</span>) &amp; <span style="color:#b452cd">0x2000000</span>) != <span style="color:#b452cd">0</span> )
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">LOBYTE</span>(v9) = v9 | <span style="color:#b452cd">8</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( *v8 == (v9 &amp; <span style="color:#b452cd">7</span>) &amp;&amp; v8[<span style="color:#b452cd">1</span>] == (*(_DWORD *)(&amp;handle_table_entry-&gt;<span style="color:#b452cd">4</span> + <span style="color:#b452cd">1</span>) &amp; <span style="color:#b452cd">0x1FFFFFF</span>) )
+</span></span><span style="display:flex;"><span>LABEL_11:
+</span></span><span style="display:flex;"><span>        v5 = <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>        v5 = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      v5 = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    v5 = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">_InterlockedExchangeAdd64</span>(&amp;handle_table_entry-&gt;VolatileLowValue, <span style="color:#b452cd">1u</span>i64);
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">_InterlockedOr</span>(v10, <span style="color:#b452cd">0</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( handle_table-&gt;HandleContentionEvent.Value )
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">ExfUnblockPushLock</span>(&amp;handle_table-&gt;HandleContentionEvent, <span style="color:#b452cd">0</span>i64);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> v5;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>可以在开头部分看到<code>(handle_table_entry-&gt;LowValue &gt;&gt; 16) &amp; 0xFFFFFFFFFFFFFFF0ui64)</code>，这样才能获取到句柄内容，获取到<code>_object_header</code>.</p>
+<p>但是我自己尝试的时候没有获取到，直到我注意到帖子里面最后得到的值开头都是<code>0xffff</code>，这说明右移前面不是补充0，而是补充1</p>
+<p>所以地址计算实际是：<code>(handle_table_entry-&gt;LowValue &gt;&gt; 16) &amp; 0xFFFFFFFFFFFFFFF0ui64) + 0xffff000000000000</code></p>
+<p>得到的就是<code>_OBJECT_HEADER</code>，这表示一个句柄头，句柄体在body的位置，我系统版本的偏移是0x30，进程句柄的话就是_<code>eprocess</code>结构体</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">//0x38 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">struct</span> _OBJECT_HEADER
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    LONGLONG PointerCount;                                                  <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        LONGLONG HandleCount;                                               <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        VOID* NextToFree;                                                   <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">struct</span> _EX_PUSH_LOCK Lock;                                              <span style="color:#228b22">//0x10
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    UCHAR TypeIndex;                                                        <span style="color:#228b22">//0x18
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        UCHAR TraceFlags;                                                   <span style="color:#228b22">//0x19
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            UCHAR DbgRefTrace:<span style="color:#b452cd">1</span>;                                            <span style="color:#228b22">//0x19
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR DbgTracePermanent:<span style="color:#b452cd">1</span>;                                      <span style="color:#228b22">//0x19
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    UCHAR InfoMask;                                                         <span style="color:#228b22">//0x1a
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        UCHAR Flags;                                                        <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            UCHAR NewObject:<span style="color:#b452cd">1</span>;                                              <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR KernelObject:<span style="color:#b452cd">1</span>;                                           <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR KernelOnlyAccess:<span style="color:#b452cd">1</span>;                                       <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR ExclusiveObject:<span style="color:#b452cd">1</span>;                                        <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR PermanentObject:<span style="color:#b452cd">1</span>;                                        <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR DefaultSecurityQuota:<span style="color:#b452cd">1</span>;                                   <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR SingleHandleEntry:<span style="color:#b452cd">1</span>;                                      <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            UCHAR DeletedInline:<span style="color:#b452cd">1</span>;                                          <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    ULONG Reserved;                                                         <span style="color:#228b22">//0x1c
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">struct</span> _OBJECT_CREATE_INFORMATION* ObjectCreateInfo;                <span style="color:#228b22">//0x20
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        VOID* QuotaBlockCharged;                                            <span style="color:#228b22">//0x20
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    };
+</span></span><span style="display:flex;"><span>    VOID* SecurityDescriptor;                                               <span style="color:#228b22">//0x28
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">struct</span> _QUAD Body;                                                      <span style="color:#228b22">//0x30
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>}; 
+</span></span></code></pre></div><p>0x18位置的TypeIndex表示这个句柄对应的对象是一个什么类型的对象，比如文件、进程、线程等，0x30的Body就是便指向了该句柄对应的对象结构。若句柄对应的对象是一个进程对象那么0x30的位置存的就是对应进程对象的<code>_EPROCESS</code>的结构，可以从这个结构便获得进程名、进程ID等等信息。</p>
+<p>所以在内核中有一个链表存放了每一个进程的私有句柄表。</p>
+<h2 id="tablecode句柄表">TableCode句柄表</h2>
+<p>句柄表是以页为单位，两层句柄表则是第一层存放第二层的指针，一般只有系统进程才会打开那么多的句柄，恶意进程通常只有一层。win10的机器上tablecode是存放了一页的handle_table_entry，每一个16字节，一页大小是4k，所以一页最多256个句柄。（32位系统的是一页512个句柄）</p>
+<p><strong>怎么判断句柄表有几层？</strong></p>
+<p>TableCode的最后2个bit表示层数（有的文章说是3个bit，我也不确定）,但是目前我看最多的也只有两层，下面分别是0层和1层的情况。</p>
+<p><img src="https://s2.loli.net/2024/04/29/dEIlA19MrjFNV5L.png" alt="image-20240427100430264"></p>
+<p>可以看到tablecode句柄表的内容不是句柄，而是<code>_handle_table_entry</code>，这不是一个结构体，是一个union</p>
+<p><img src="https://s2.loli.net/2024/04/29/bIXg3JmWzkBpilU.png" alt="image-20240427100507003"></p>
+<p>从handle_table_entry到句柄还需要一些额外的计算变化，同时一个进程句柄的权限就标注在每个句柄对应的这个结构体当中</p>
+<h2 id="windbg-调试">Windbg 调试</h2>
+<p>以手动的方式从一个eprocess内存看到他下面的句柄表</p>
+<p>windbg以内核附加模式连接上虚拟机/真机后，首先我们需要一个EPROCESS结构体地址，使用<code>!process 0 0</code>查看所有进程的基本信息</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; !process <span style="color:#b452cd">0</span> <span style="color:#b452cd">0</span>
+</span></span><span style="display:flex;"><span>**** NT ACTIVE PROCESS DUMP ****
+</span></span><span style="display:flex;"><span>PROCESS ffffbf8eaa092040
+</span></span><span style="display:flex;"><span>    SessionId: none  Cid: <span style="color:#b452cd">0004</span>    Peb: <span style="color:#b452cd">00000000</span>  ParentCid: <span style="color:#b452cd">0000</span>
+</span></span><span style="display:flex;"><span>    DirBase: <span style="color:#b452cd">001</span>ad000  ObjectTable: ffffd00b12a10840  HandleCount: <span style="color:#b452cd">1715.</span>
+</span></span><span style="display:flex;"><span>    Image: System
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PROCESS ffffbf8eab1ea080
+</span></span><span style="display:flex;"><span>    SessionId: <span style="color:#b452cd">0</span>  Cid: <span style="color:#b452cd">01</span>d8    Peb: bbe935c000  ParentCid: <span style="color:#b452cd">01</span>cc
+</span></span><span style="display:flex;"><span>    DirBase: <span style="color:#b452cd">2364</span>c9000  ObjectTable: ffffd00b145784c0  HandleCount: <span style="color:#b452cd">462.</span>
+</span></span><span style="display:flex;"><span>    Image: csrss.exe
+</span></span></code></pre></div><p>PROCESS的值就是EPROCESS的地址值, 我这里选用csrss.exe的PROCESS值<code>ffffbf8eab1ea080</code></p>
+<p>定位<code>ObjectTable</code>的值</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; dt ffffbf8eab1ea080 nt!_EPROCESS -y object
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x570</span> ObjectTable : <span style="color:#b452cd">0xffffd00b</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">145784</span>c0 _HANDLE_TABLE
+</span></span></code></pre></div><p>再进一步查看_HANDLE_TABLE结构体，定位TableCode的值</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; dt <span style="color:#b452cd">0xffffd00b</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">145784</span>c0 _HANDLE_TABLE
+</span></span><span style="display:flex;"><span>ntdll!_HANDLE_TABLE
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> NextHandleNeedingPool : <span style="color:#b452cd">0x800</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x004</span> ExtraInfoPages   : <span style="color:#b452cd">0</span>n0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> TableCode        : <span style="color:#b452cd">0xffffd00b</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58001
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x010</span> QuotaProcess     : <span style="color:#b452cd">0xffffbf8e</span><span style="color:#a61717;background-color:#e3d2d2">`</span>ab1ea080 _EPROCESS
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x018</span> HandleTableList  : _LIST_ENTRY [ <span style="color:#b452cd">0xffffd00b</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">167057</span>d8 - <span style="color:#b452cd">0xffffd00b</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">140f</span>de18 ]
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x028</span> UniqueProcessId  : <span style="color:#b452cd">0x1d8</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x02c</span> Flags            : <span style="color:#b452cd">0x12</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x02c</span> StrictFIFO       : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x02c</span> EnableHandleExceptions : <span style="color:#b452cd">0</span>y1
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x02c</span> Rundown          : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x02c</span> Duplicated       : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x02c</span> RaiseUMExceptionOnInvalidHandleClose : <span style="color:#b452cd">0</span>y1
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x030</span> HandleContentionEvent : _EX_PUSH_LOCK
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x038</span> HandleTableLock  : _EX_PUSH_LOCK
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x040</span> FreeLists        : [<span style="color:#b452cd">1</span>] _HANDLE_TABLE_FREE_LIST
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x040</span> ActualEntry      : [<span style="color:#b452cd">32</span>]  <span style="color:#cd5555">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x060</span> DebugInfo        : (null) 
+</span></span></code></pre></div><p>得到TableCode的值是0xffffd00b`16d58001，注意TableCode最后的一位是1，这表示有两层页表，第一层的值是指向的第二层的指针，所以先查看第一层句柄指针表</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">2</span>: kd&gt; dq <span style="color:#b452cd">0xffffd00b</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58000 
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58000  ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667000</span> ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d59000
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58010  ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">19</span>a4c000 <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58020  <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span> <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58030  <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span> <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58040  <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span> <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58050  <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span> <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58060  <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span> <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16</span>d58070  <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span> <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span></code></pre></div><p>看到有3个二层句柄表，我们选用第一张表</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">2</span>: kd&gt; dq ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667000</span>  <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span> <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000000</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667010</span>  bf8eaaee<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">9430ff</span>ff <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">001f</span><span style="color:#b452cd">0003</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667020</span>  bf8eaaee<span style="color:#a61717;background-color:#e3d2d2">`</span>ae30fffb <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">001f</span><span style="color:#b452cd">0003</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667030</span>  bf8eab18<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">25</span>b0fffd <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000001</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667040</span>  bf8eaaec<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">6890ff</span>c3 <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">001f</span><span style="color:#b452cd">0003</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667050</span>  bf8eab1e<span style="color:#a61717;background-color:#e3d2d2">`</span>ba40ffc3 <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">000f00ff</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667060</span>  bf8eab18<span style="color:#a61717;background-color:#e3d2d2">`</span>bb00ffff <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00100002</span>
+</span></span><span style="display:flex;"><span>ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667070</span>  bf8eab18<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">1</span>b20ffff <span style="color:#b452cd">00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000001</span>
+</span></span></code></pre></div><p>可以看到从ffffd00b`16667010开始每16字节表示一个_handle_table_entry union体</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">2</span>: kd&gt; dt _handle_table_entry ffffd00b<span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">16667010</span>
+</span></span><span style="display:flex;"><span>nt!_HANDLE_TABLE_ENTRY
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> VolatileLowValue : <span style="color:#b452cd">0</span>n-<span style="color:#b452cd">4643586224107225089</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> LowValue         : <span style="color:#b452cd">0</span>n-<span style="color:#b452cd">4643586224107225089</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> InfoTable        : <span style="color:#b452cd">0xbf8eaaee</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">9430ff</span>ff _HANDLE_TABLE_ENTRY_INFO
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> HighValue        : <span style="color:#b452cd">0</span>n2031619
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> NextFreeHandleEntry : <span style="color:#b452cd">0x00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">001f</span><span style="color:#b452cd">0003</span> _HANDLE_TABLE_ENTRY
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> LeafHandleValue  : _EXHANDLE
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> RefCountField    : <span style="color:#b452cd">0</span>n-<span style="color:#b452cd">4643586224107225089</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> Unlocked         : <span style="color:#b452cd">0</span>y1
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> RefCnt           : <span style="color:#b452cd">0</span>y0111111111111111 (<span style="color:#b452cd">0x7fff</span>)
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> Attributes       : <span style="color:#b452cd">0</span>y000
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> ObjectPointerBits : <span style="color:#b452cd">0</span>y10111111100011101010101011101110100101000011 (<span style="color:#b452cd">0xbf8eaaee943</span>)
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> GrantedAccessBits : <span style="color:#b452cd">0</span>y0000111110000000000000011 (<span style="color:#b452cd">0x1f0003</span>)
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> NoRightsUpgrade  : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> Spare1           : <span style="color:#b452cd">0</span>y000000 (<span style="color:#b452cd">0</span>)
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x00c</span> Spare2           : <span style="color:#b452cd">0</span>
+</span></span></code></pre></div><p><code>(handle_table_entry-&gt;LowValue &gt;&gt; 16) &amp; 0xFFFFFFFFFFFFFFF0ui64)</code>获取_object_header结构体，记得前面填充的要是1，计算一下值</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>In [<span style="color:#b452cd">2</span>]: <span style="color:#658b00">hex</span>(((<span style="color:#b452cd">0xbf8eaaee9430ffff</span> &gt;&gt; <span style="color:#b452cd">0x10</span>) &amp; <span style="color:#b452cd">0xFFFFF</span>                               
+</span></span><span style="display:flex;"><span>   ...: FFFFFFFFFF0) | ((<span style="color:#b452cd">0xffff</span>) &lt;&lt; <span style="color:#b452cd">48</span>))                                          
+</span></span><span style="display:flex;"><span>Out[<span style="color:#b452cd">2</span>]: <span style="color:#cd5555">&#39;0xffffbf8eaaee9430&#39;</span>
+</span></span></code></pre></div><p><code>0xbf8eaaee9430ffff</code>是<code>ffffd00b16667010</code>的值，对应的就是<code>handle_table_entry-&gt;LowValue</code>，得到地址<code>0xffffbf8eaaee9430</code>也就是_object_header</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; dt _object_header <span style="color:#b452cd">0xffffbf8eaaee9430</span>
+</span></span><span style="display:flex;"><span>nt!_OBJECT_HEADER
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> PointerCount     : <span style="color:#b452cd">0</span>n32768
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> HandleCount      : <span style="color:#b452cd">0</span>n1
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x008</span> NextToFree       : <span style="color:#b452cd">0x00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">00000001</span> Void
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x010</span> Lock             : _EX_PUSH_LOCK
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x018</span> TypeIndex        : <span style="color:#b452cd">0xaa</span> <span style="color:#a61717;background-color:#e3d2d2">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x019</span> TraceFlags       : <span style="color:#b452cd">0</span> <span style="color:#a61717;background-color:#e3d2d2">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x019</span> DbgRefTrace      : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x019</span> DbgTracePermanent : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01a</span> InfoMask         : <span style="color:#b452cd">0x8</span> <span style="color:#a61717;background-color:#e3d2d2">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> Flags            : <span style="color:#b452cd">0</span> <span style="color:#a61717;background-color:#e3d2d2">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> NewObject        : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> KernelObject     : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> KernelOnlyAccess : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> ExclusiveObject  : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> PermanentObject  : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> DefaultSecurityQuota : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> SingleHandleEntry : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01b</span> DeletedInline    : <span style="color:#b452cd">0</span>y0
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x01c</span> Reserved         : <span style="color:#b452cd">0</span>
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x020</span> ObjectCreateInfo : <span style="color:#b452cd">0xfffff807</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">28e53780</span> _OBJECT_CREATE_INFORMATION
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x020</span> QuotaBlockCharged : <span style="color:#b452cd">0xfffff807</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">28e53780</span> Void
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x028</span> SecurityDescriptor : (null) 
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x030</span> Body             : _QUAD
+</span></span></code></pre></div><p>可以看到整个object_header的内容，这只是句柄的头部，句柄的内容还在0x30偏移的位置，由于我调试发现这一个进程句柄，所以直接用eprocess展示这个句柄内容。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; dt _EPROCESS <span style="color:#b452cd">0xffffbf8eaaee9430</span> + <span style="color:#b452cd">0x30</span>
+</span></span><span style="display:flex;"><span>nt!_EPROCESS
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> Pcb              : _KPROCESS
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x438</span> ProcessLock      : _EX_PUSH_LOCK
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x440</span> UniqueProcessId  : <span style="color:#b452cd">0xffffbf8e</span><span style="color:#a61717;background-color:#e3d2d2">`</span>aaee9ba0 Void
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x448</span> ActiveProcessLinks : _LIST_ENTRY [ <span style="color:#b452cd">0xffffbf8e</span><span style="color:#a61717;background-color:#e3d2d2">`</span>aaec6370 - <span style="color:#b452cd">0xffffbf8e</span><span style="color:#a61717;background-color:#e3d2d2">`</span>ac4330e0 ]
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x458</span> RundownProtect   : _EX_RUNDOWN_REF
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x460</span> Flags2           : <span style="color:#b452cd">0xcdb1a88a</span>
+</span></span><span style="display:flex;"><span>   ...
+</span></span></code></pre></div><p>这样就通过进程的私有句柄表获得了被打开句柄进程的信息。</p>
+<h2 id="判断句柄类型">判断句柄类型</h2>
+<p>怎么样从一个句柄头(_object_header)判断出这是一个进程句柄(process handle)，文件句柄(file handle)还是设备句柄(device handle)</p>
+<p>这个不同版本的系统判断方法不一样，win7/8/8.1是一样的 win10则不同。网络上大多都是win7, win8的我在这篇<a href="https://medium.com/@ashabdalhalim/a-light-on-windows-10s-object-header-typeindex-value-e8f907e7073a">外网文章</a>上才找到win10的判断方法</p>
+<h3 id="win7881">win7/8/8.1</h3>
+<p>这几个版本的_object_header结构大致如下</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">//0x38 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">struct</span> _OBJECT_HEADER
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    LONGLONG PointerCount;                                                  <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        LONGLONG HandleCount;                                               <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        VOID* NextToFree;                                                   <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">struct</span> _EX_PUSH_LOCK Lock;                                              <span style="color:#228b22">//0x10
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    UCHAR TypeIndex;                                                        <span style="color:#228b22">//0x18
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    UCHAR TraceFlags;                                                       <span style="color:#228b22">//0x19
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    UCHAR InfoMask;                                                         <span style="color:#228b22">//0x1a
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    UCHAR Flags;                                                            <span style="color:#228b22">//0x1b
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">struct</span> _OBJECT_CREATE_INFORMATION* ObjectCreateInfo;                <span style="color:#228b22">//0x20
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        VOID* QuotaBlockCharged;                                            <span style="color:#228b22">//0x20
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    };
+</span></span><span style="display:flex;"><span>    VOID* SecurityDescriptor;                                               <span style="color:#228b22">//0x28
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">struct</span> _QUAD Body;                                                      <span style="color:#228b22">//0x30
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>}; 
+</span></span></code></pre></div><p>一般直接TypeIndex表示这个句柄的类型index。相同的类型这个值会相同，还可以进一步查看这个index在<code>nt!object_type</code>这个表中的具体信息</p>
+<p><img src="https://s2.loli.net/2024/04/29/t2pnKEHbC3QDIez.png" alt="image-20240427100941481"></p>
+<p>上面就是<code>Typeindex = 7</code>对应的意义，是进程句柄</p>
+<h3 id="win10">win10</h3>
+<p>win10的<code>Typeindex</code>就不一样了，测试会发现，哪怕都是进程句柄这个<code>Typeindex</code>的值也会不同。</p>
+<p>需要将3个单字节的值异或起来，<code>Typeindex ^ nt!ObHeaderCookie ^ 地址的第二个字节</code></p>
+<p><img src="https://s2.loli.net/2024/04/29/97xnmAgJDQ5zLKy.png" alt="image-20240427101048535"></p>
+<p>最后得到的才是真的Typeindex</p>
+<h2 id="句柄降权提权">句柄降权/提权</h2>
+<p>一个句柄的权限，表示句柄拥有者对这个句柄的操作权限，权限有以下几种</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_TERMINATE                  (0x0001)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_CREATE_THREAD              (0x0002)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_SET_SESSIONID              (0x0004)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_VM_OPERATION               (0x0008)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_VM_READ                    (0x0010)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_VM_WRITE                   (0x0020)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_DUP_HANDLE                 (0x0040)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_CREATE_PROCESS             (0x0080)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_SET_QUOTA                  (0x0100)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_SET_INFORMATION            (0x0200)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_QUERY_INFORMATION          (0x0400)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_SUSPEND_RESUME             (0x0800)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_QUERY_LIMITED_INFORMATION  (0x1000)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_SET_LIMITED_INFORMATION    (0x2000)  
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#if (NTDDI_VERSION &gt;= NTDDI_VISTA)
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_ALL_ACCESS        (STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | \0xFFFF)
+</span></span></span></code></pre></div><p>当我们通过<code>OpenProcess</code>以多种权限申请打开进程时便将多种权限或运算就得到了我们想要的权限值，我们的目的是为了降低句柄拥有者对我们要保护的进程的操作权限，那最简单暴力的方法便是把<code>handle_table_entry-&gt;GrantedAccessBits</code>的值修改成我们设定的值，直接让句柄拥有者对我们的进程操作权限被修改。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">//0x10 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">union</span> _HANDLE_TABLE_ENTRY
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">volatile</span> LONGLONG VolatileLowValue;                                     <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    LONGLONG LowValue;                                                      <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">struct</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">struct</span> _HANDLE_TABLE_ENTRY_INFO* <span style="color:#8b008b;font-weight:bold">volatile</span> InfoTable;                <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    LONGLONG HighValue;                                                     <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">union</span> _HANDLE_TABLE_ENTRY* NextFreeHandleEntry;                         <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">struct</span> _EXHANDLE LeafHandleValue;                                   <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    };
+</span></span><span style="display:flex;"><span>    LONGLONG RefCountField;                                                 <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    ULONGLONG Unlocked:<span style="color:#b452cd">1</span>;                                                   <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    ULONGLONG RefCnt:<span style="color:#b452cd">16</span>;                                                    <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    ULONGLONG Attributes:<span style="color:#b452cd">3</span>;                                                 <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">struct</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        ULONGLONG ObjectPointerBits:<span style="color:#b452cd">44</span>;                                     <span style="color:#228b22">//0x0
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    ULONG GrantedAccessBits:<span style="color:#b452cd">25</span>;                                             <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    ULONG NoRightsUpgrade:<span style="color:#b452cd">1</span>;                                                <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        ULONG Spare1:<span style="color:#b452cd">6</span>;                                                     <span style="color:#228b22">//0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    };
+</span></span><span style="display:flex;"><span>    ULONG Spare2;                                                           <span style="color:#228b22">//0xc
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>}; 
+</span></span></code></pre></div><p><img src="https://s2.loli.net/2024/04/29/gtmIaVLpNdEnZS1.png" alt="image-20240427101135672"></p>
+<h2 id="代码实现防止ce读取进程内存">代码实现防止CE读取进程内存</h2>
+<p>现在假设一个场景，我们打开一个记事本(notepad.exe)，然后用CE去读取这个进程的内存。我们的目标是保护这个记事本进程，让降低CE中已经打开的记事本进程句柄权限，让CE无法再继续读取内存。</p>
+<p>首先CE打开目标进程</p>
+<p><img src="https://s2.loli.net/2024/04/29/EjYorzmwSiIWy8U.png" alt="image-20240427101154597"></p>
+<p>我这里直接写死进程号了，使用<code>PsLookupProcessByProcessId</code>获取指定PID的<code>eprocess</code>结构体</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">DriverEntry</span>(PDRIVER_OBJECT pDriver, PUNICODE_STRING pRegPath)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PEPROCESS eprocess = <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    NTSTATUS  status   = <span style="color:#008b45">PsLookupProcessByProcessId</span>((HANDLE)<span style="color:#b452cd">0xab4</span>, &amp;eprocess);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;Open process  unsuccessfully!</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">ObDereferenceObject</span>(eprocess);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">ProtectProcessHandleByEprocess</span>(eprocess);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pDriver-&gt;DriverUnload = DriveUnload;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>然后开始写<code>ProtectProcessHandleByEprocess</code>函数，这个函数才是主要的逻辑，传入指定<code>eprocess</code>，然后遍历链表所有的句柄表，匹配是否相同，如果相同则修改权限。</p>
+<p>我首先定义两个结构体，方便后面编程</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">typedef</span> <span style="color:#8b008b;font-weight:bold">struct</span> HANDLE_TABLE_ENTRY
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT64 LowValue;
+</span></span><span style="display:flex;"><span>    UINT32 GrantedAccessBits;
+</span></span><span style="display:flex;"><span>    UINT32 Spare2;
+</span></span><span style="display:flex;"><span>} *PHANDLE_TABLE_ENTRY, HANDLE_TABLE_ENTRY;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 存放每个进程的信息
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">typedef</span> <span style="color:#8b008b;font-weight:bold">struct</span> PROCESS_HANDLE_OBJECT
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PEPROCESS           eprocess;
+</span></span><span style="display:flex;"><span>    PHANDLE_TABLE_ENTRY table_code;
+</span></span><span style="display:flex;"><span>} *PPROCESS_HANDLE_OBJECT, PROCESS_HANDLE_OBJECT;
+</span></span></code></pre></div><p>然后给这两个结构体定义了几个方法</p>
+<ul>
+<li><code>CheckHandleTableEntry</code>：检查HANDLE_TABLE_ENTRY的值是否合法</li>
+<li><code>NewProcessHandleObject</code>：新建一个PROCESS_HANDLE_OBJECT结构体</li>
+<li><code>FreeProcessHandleObject</code>：释放一个PROCESS_HANDLE_OBJECT结构体</li>
+<li><code>HandleEntryTable2ObjectHeader</code>: 计算单个handle_table_entry转化成object_header地址</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 检查一个PHANDLE_TABLE_ENTRY中的数值是否合法，LowValue是否为0，合法返回TRUE，否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleTableEntry PHANDLE_TABLE_ENTRY指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 合法返回TRUE，否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">CheckHandleTableEntry</span>(PHANDLE_TABLE_ENTRY pHandleTableEntry)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!pHandleTableEntry-&gt;LowValue) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 新建一个PROCESS_HANDLE_OBJECT结构体。传入eprocess地址或者handle_table地址，二者至少其一
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 创建成功返回结构体指针，失败则返回NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess eprocess地址或者NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleTable _handle_table地址或者NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 创建成功返回结构体指针，失败则返回NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>PPROCESS_HANDLE_OBJECT <span style="color:#008b45">NewProcessHandleObject</span>(PEPROCESS pEprocess,
+</span></span><span style="display:flex;"><span>                                              PVOID64   pHandleTable)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT64                 uTableCode;
+</span></span><span style="display:flex;"><span>    PPROCESS_HANDLE_OBJECT ptr;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (pEprocess == <span style="color:#658b00">NULL</span> &amp;&amp; pHandleTable == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (pEprocess == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        pEprocess = *(PUINT64)((PUCHAR)pHandleTable +
+</span></span><span style="display:flex;"><span>                               WIN10_21H1_X64_QUOTOPROCESS_OFFSET);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (pHandleTable == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        pHandleTable =
+</span></span><span style="display:flex;"><span>            *(PUINT64)((PUCHAR)pEprocess + WIN10_21H1_X64_OBJECTTABLE_OFFSET);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    uTableCode =
+</span></span><span style="display:flex;"><span>        *(PUINT64)((PUINT8)pHandleTable + WIN10_21H1_X64_TABLECODE_OFFSET);
+</span></span><span style="display:flex;"><span>    ptr = <span style="color:#008b45">ExAllocatePool</span>(NonPagedPool, <span style="color:#8b008b;font-weight:bold">sizeof</span>(PROCESS_HANDLE_OBJECT));
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (ptr == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Alloc struct PROCESS_HANDLE_OBJECT faild</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ptr-&gt;eprocess   = pEprocess;
+</span></span><span style="display:flex;"><span>    ptr-&gt;table_code = uTableCode;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 销毁PROCESS_HANDLE_OBJECT结构体，传入一个对应指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pProcessHandlePbject PROCESS_HANDLE_OBJECT的指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>VOID <span style="color:#008b45">FreeProcessHandleObject</span>(PPROCESS_HANDLE_OBJECT pProcessHandlePbject)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    pProcessHandlePbject-&gt;eprocess   = <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    pProcessHandlePbject-&gt;table_code = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">ExFreePool</span>(pProcessHandlePbject);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入一个HANDLE_TABLE_ENTRY结构体的地址，计算出ObjectHeader地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param addr HANDLE_TABLE_ENTRY结构体的地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 返回ObjectHeader地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>ULONG64 <span style="color:#008b45">HandleEntryTable2ObjectHeader</span>(PHANDLE_TABLE_ENTRY addr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> ((addr-&gt;LowValue &gt;&gt; <span style="color:#b452cd">0x10</span>) &amp; <span style="color:#b452cd">0xFFFFFFFFFFFFFFF0</span>) + <span style="color:#b452cd">0xFFFF000000000000</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>然后看一下ProtectProcessHandleByEprocess函数，传入eprocess地址后，首先计算出来_object_table地址，然后计算出来HandleTableList地址</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    pHandleTable =
+</span></span><span style="display:flex;"><span>        *(PUINT64)((PCHAR)pEprocess + WIN10_21H1_X64_OBJECTTABLE_OFFSET);
+</span></span><span style="display:flex;"><span>    pPriList = (PLIST_ENTRY64)((PUCHAR)pHandleTable +
+</span></span><span style="display:flex;"><span>                               WIN10_21H1_X64_HANDLETABLELIST_OFFSET);
+</span></span></code></pre></div><p>然后遍历链表，我们把链表上每一个节点都创建一个PROCESS_HANDLE_OBJECT结构体，因为链表上每一个节点代表一个进程，每一个进程都有一张或者多张句柄表，我们先将链表上每一个节点的部分信息收集好后放在一个数组中，方便我们后续遍历操作</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 传入一个PLIST_ENTRY64，会遍历这个链表，每个链表节点会生成一个对应的PROCESS_HANDLE_OBJECT指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 组成一个数组，存放指针，存放到ObjArr
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleList Handle_list链表
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param ObjArr PPROCESS_HANDLE_OBJECT* 指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 返回一个指针数组，数组元素是PROCESS_HANDLE_OBJECT指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">CreateProcessObjArrByHandleList</span>(PLIST_ENTRY64            pHandleList,
+</span></span><span style="display:flex;"><span>                                         PPROCESS_HANDLE_OBJECT** ObjArr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64           pTmp;
+</span></span><span style="display:flex;"><span>    UINT64                  cout = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    PPROCESS_HANDLE_OBJECT* pProcessObjArr;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 获取链表节点数量，用于申请内存块大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    pTmp = pHandleList;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">do</span> {
+</span></span><span style="display:flex;"><span>        pTmp = pTmp-&gt;Flink;
+</span></span><span style="display:flex;"><span>        cout += <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#8b008b;font-weight:bold">while</span> (pTmp != pHandleList);
+</span></span><span style="display:flex;"><span>    pProcessObjArr = <span style="color:#008b45">ExAllocatePoolZero</span>(
+</span></span><span style="display:flex;"><span>        NonPagedPool, (cout + <span style="color:#b452cd">1</span>) * <span style="color:#8b008b;font-weight:bold">sizeof</span>(PPROCESS_HANDLE_OBJECT), POOL_TAG);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!pProcessObjArr) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Alloc process handle obj array failed</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_ALLOCATE_BUCKET;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 遍历链表获取节点信息，并创建ProcessHandleObject结构体
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; i &lt; cout; i++) {
+</span></span><span style="display:flex;"><span>        pProcessObjArr[i] = <span style="color:#008b45">NewProcessHandleObject</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#658b00">NULL</span>, ((PUCHAR)pTmp - WIN10_21H1_X64_HANDLETABLELIST_OFFSET));
+</span></span><span style="display:flex;"><span>        pTmp = pTmp-&gt;Flink;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    *ObjArr = pProcessObjArr;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>然后开始遍历这个数组，具体每一个进程都遍历它的句柄表再来对比，关键逻辑在如下的<code>FilterObjByEprocess</code>函数中</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入需要保护的进程eprocess，保护程序句柄
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess PEPROCESS地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">ProtectProcessHandleByEprocess</span>(PEPROCESS pEprocess)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PVOID64                 pHandleTable;
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64           pPriList, pTmp;
+</span></span><span style="display:flex;"><span>    UINT64                  cout;
+</span></span><span style="display:flex;"><span>    PPROCESS_HANDLE_OBJECT* ObjArr;
+</span></span><span style="display:flex;"><span>    NTSTATUS                status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pHandleTable =
+</span></span><span style="display:flex;"><span>        *(PUINT64)((PCHAR)pEprocess + WIN10_21H1_X64_OBJECTTABLE_OFFSET);
+</span></span><span style="display:flex;"><span>    pPriList = (PLIST_ENTRY64)((PUCHAR)pHandleTable +
+</span></span><span style="display:flex;"><span>                               WIN10_21H1_X64_HANDLETABLELIST_OFFSET);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] EPROCESS: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">[+] handle object: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">[+] handle table &#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#cd5555">&#34;list: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>            pEprocess,
+</span></span><span style="display:flex;"><span>            pHandleTable,
+</span></span><span style="display:flex;"><span>            pPriList);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">CreateProcessObjArrByHandleList</span>(pPriList, &amp;ObjArr);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] CreateProcessObjArrByHandleList error&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; ObjArr[i] != <span style="color:#b452cd">0</span>; i++) {
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// kprintf(&#34;[+] Obj[%d]: %llx\r\n&#34;, i, ObjArr[i]);
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#228b22">// DisplayProcessHandleObj(ObjArr[i]);
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] Use handle process imagename: %s; eprocess: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>                (PUCHAR)ObjArr[i]-&gt;eprocess + EPROCESS_IMAGE_OFFSET,
+</span></span><span style="display:flex;"><span>                ObjArr[i]-&gt;eprocess);
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">FilterObjByEprocess</span>(ObjArr[i], pEprocess);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">FreeProcessObjArr</span>(ObjArr);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>下面看我们怎么遍历一个进程节点的句柄表，也就是<code>FilterObjByEprocess</code>函数。</p>
+<p>这里我只考虑一层和两次的句柄表，至于三层的不考虑。大部分恶意软件都只有一层句柄表，CE有两层。所以我们分两种来处理，一种是只有一层句柄表的，一种是两层句柄表的</p>
+<ul>
+<li><code>FilterOneTableByEprocess</code></li>
+<li><code>FilterTWOTabelByEprocess</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 遍历一层/两层句柄表，判断其中是否有目标句柄进程pEprocess
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 如果有则返回TRUE, 否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pProcessHandleObj 需要遍历的pProcessHandleObj的结构体
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess 目标进程句柄
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">FilterObjByEprocess</span>(PPROCESS_HANDLE_OBJECT pProcessHandleObj,
+</span></span><span style="display:flex;"><span>                            PEPROCESS              pEprocess)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT64              tablecode;
+</span></span><span style="display:flex;"><span>    PHANDLE_TABLE_ENTRY pHandleTableEntry;
+</span></span><span style="display:flex;"><span>    PVOID64             pObjHeader;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    tablecode = pProcessHandleObj-&gt;table_code;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">switch</span> (tablecode &amp; TABLE_LEVEL_MASK)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">case</span> TABLE_LEVEL_ZERO:
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">FilterOneTableByEprocess</span>(pEprocess, tablecode);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">case</span> TABLE_LEVEL_ONE:
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">FilterTWOTabelByEprocess</span>(pEprocess, tablecode);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">default</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>FilterOneTableByEprocess</code>需要传入两个参数，一个是需要保护的eprocess地址，一个是一层的句柄表tablecode，大致流程如下</p>
+<p>检查传入的tablecode有没有异常，有异常的跳过</p>
+<p>tablecode其实就是_handle_table_entry数组，所以把所有_handle_table_entry转换成对应的_object_header</p>
+<p>然后提取每个_object_header的body对比是否等于我们的目标EPROCESS，如果等于表示找到了，就修改权限</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 针对单张句柄表的情况，匹配目标eprocess，如果匹配到则修改句柄权限
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess 目标eprocess结构体指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param tablecode 单张句柄表的tablecode
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">FilterOneTableByEprocess</span>(PEPROCESS pEprocess, UINT64 tablecode) {
+</span></span><span style="display:flex;"><span>    PHANDLE_TABLE_ENTRY pHandleTableEntry;
+</span></span><span style="display:flex;"><span>    PVOID64             pObjHeader;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pHandleTableEntry = tablecode;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; i &lt; PAGE_HANDLE_MAX; i++) {
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// 如果tablecode有异常则跳过这个
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">CheckHandleTableEntry</span>(&amp;pHandleTableEntry[i])) {
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">continue</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// 通过_handle_table_entry计算_object_header地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        pObjHeader = <span style="color:#008b45">HandleEntryTable2ObjectHeader</span>(&amp;pHandleTableEntry[i]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// Option: Check this object is process?
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">IsProcess</span>(pObjHeader)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">continue</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// Compare whether the two eprocess variables are the same
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">if</span> ((PVOID64)((PUCHAR)pObjHeader + HANDLE_BODY_OFFSET) == pEprocess) {
+</span></span><span style="display:flex;"><span>            <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] Found tablecode: %llx; object_handle: %p; &#34;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#cd5555">&#34;handle_table_entry: %p;</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>                    tablecode,
+</span></span><span style="display:flex;"><span>                    pObjHeader,
+</span></span><span style="display:flex;"><span>                    &amp;pHandleTableEntry[i]);
+</span></span><span style="display:flex;"><span>            <span style="color:#228b22">// 取消句柄的读写权限
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            <span style="color:#008b45">ModfiyGrantedAccessBits</span>(&amp;pHandleTableEntry[i]);
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>修改权限也很简单，直接去掉内存读和内存写的权限</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 修改handle_entry_table的GrantedAccessBits权限，句柄的内存读写权限
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleTableEntry
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">ModfiyGrantedAccessBits</span>(PHANDLE_TABLE_ENTRY pHandleTableEntry)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    pHandleTableEntry-&gt;GrantedAccessBits &amp;=
+</span></span><span style="display:flex;"><span>        ~(PROCESS_VM_READ | PROCESS_VM_WRITE);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>上面就是一层句柄的修改了，这样改完CE还是能读取内存，因为CE是两层句柄表，所以要再处理一下</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 遍历两层的句柄表，判断其中是否有目标句柄进程pEprocess
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 如果有则返回TRUE, 否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pProcessHandleObj 需要遍历的pProcessHandleObj的结构体
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess 目标进程句柄
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">FilterTWOTabelByEprocess</span>(PEPROCESS pEprocess, UINT64 tablecode) {
+</span></span><span style="display:flex;"><span>    PUINT64 tables;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    tables = tablecode &amp; TABLE_CODE_MASK;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; tables[i] != <span style="color:#b452cd">0</span>; i++) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> (<span style="color:#008b45">FilterOneTableByEprocess</span>(pEprocess, tables[i])){
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这样整个代码逻辑就完全了，下面放一下全部的代码，分两个文件，写的比较难看。</p>
+<ul>
+<li>main.c</li>
+<li>header.c</li>
+</ul>
+<h3 id="mainc">main.c</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;header.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span>VOID <span style="color:#008b45">DriveUnload</span>(PDRIVER_OBJECT pDriver)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;Unload&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">DriverEntry</span>(PDRIVER_OBJECT pDriver, PUNICODE_STRING pRegPath)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PEPROCESS eprocess = <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    NTSTATUS  status   = <span style="color:#008b45">PsLookupProcessByProcessId</span>((HANDLE)<span style="color:#b452cd">0xab4</span>, &amp;eprocess);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;Open process  unsuccessfully!</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">ObDereferenceObject</span>(eprocess);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">ProtectProcessHandleByEprocess</span>(eprocess);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pDriver-&gt;DriverUnload = DriveUnload;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="headerc">header.c</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#pragma once
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ntifs.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#define WIN10_21H1_X64_OBJECTTABLE_OFFSET 0x570
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define WIN10_21H1_X64_HANDLETABLELIST_OFFSET 0x18
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define WIN10_21H1_X64_TABLECODE_OFFSET 0x8
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define WIN10_21H1_X64_QUOTOPROCESS_OFFSET 0x10
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define TABLE_LEVEL_MASK 3
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define TABLE_LEVEL_ZERO 0
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define TABLE_LEVEL_ONE 1
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define TABLE_LEVEL_TWO 2
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PAGE_HANDLE_MAX 256
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define EPROCESS_IMAGE_OFFSET 0x5A8
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define HANDLE_BODY_OFFSET 0x30
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define TYPE_INDEX_OFFSET 0x18
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define TABLE_CODE_MASK 0xFFFFFFFFFFFFFFF8
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define POOL_TAG &#39;axe&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">// GrantedAccessBits
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#1e889b">#define PROCESS_VM_READ (0x0010)
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_VM_WRITE (0x0020)
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"> * 下面两个值是通过调试系统得到的
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"> *  OB_HEADER_COOKIE可以使用`db nt!ObHeaderCookie l1`得到
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"> *  PROCESS_TYPE通过计算得到当前系统的PROCESS的type index值为7
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"> * */</span>
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#define OB_HEADER_COOKIE 0x21
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define PROCESS_TYPE 7
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#define kprintf(...) \
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, __VA_ARGS__))
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">typedef</span> <span style="color:#8b008b;font-weight:bold">struct</span> HANDLE_TABLE_ENTRY
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT64 LowValue;
+</span></span><span style="display:flex;"><span>    UINT32 GrantedAccessBits;
+</span></span><span style="display:flex;"><span>    UINT32 Spare2;
+</span></span><span style="display:flex;"><span>} *PHANDLE_TABLE_ENTRY, HANDLE_TABLE_ENTRY;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 存放每个进程的信息
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">typedef</span> <span style="color:#8b008b;font-weight:bold">struct</span> PROCESS_HANDLE_OBJECT
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PEPROCESS           eprocess;
+</span></span><span style="display:flex;"><span>    PHANDLE_TABLE_ENTRY table_code;
+</span></span><span style="display:flex;"><span>} *PPROCESS_HANDLE_OBJECT, PROCESS_HANDLE_OBJECT;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>VOID <span style="color:#008b45">DisplayProcessHandleObj</span>(PPROCESS_HANDLE_OBJECT pHandleObj)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] eprocess: %p; table_code: %p; image_name: %15s</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>            pHandleObj-&gt;eprocess,
+</span></span><span style="display:flex;"><span>            pHandleObj-&gt;table_code,
+</span></span><span style="display:flex;"><span>            (PUCHAR)(pHandleObj-&gt;eprocess) + EPROCESS_IMAGE_OFFSET);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 检查一个PHANDLE_TABLE_ENTRY中的数值是否合法，LowValue是否为0，合法返回TRUE，否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleTableEntry PHANDLE_TABLE_ENTRY指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 合法返回TRUE，否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">CheckHandleTableEntry</span>(PHANDLE_TABLE_ENTRY pHandleTableEntry)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!pHandleTableEntry-&gt;LowValue) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 新建一个PROCESS_HANDLE_OBJECT结构体。传入eprocess地址或者handle_table地址，二者至少其一
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 创建成功返回结构体指针，失败则返回NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess eprocess地址或者NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleTable _handle_table地址或者NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 创建成功返回结构体指针，失败则返回NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>PPROCESS_HANDLE_OBJECT <span style="color:#008b45">NewProcessHandleObject</span>(PEPROCESS pEprocess,
+</span></span><span style="display:flex;"><span>                                              PVOID64   pHandleTable)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT64                 uTableCode;
+</span></span><span style="display:flex;"><span>    PPROCESS_HANDLE_OBJECT ptr;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (pEprocess == <span style="color:#658b00">NULL</span> &amp;&amp; pHandleTable == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (pEprocess == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        pEprocess = *(PUINT64)((PUCHAR)pHandleTable +
+</span></span><span style="display:flex;"><span>                               WIN10_21H1_X64_QUOTOPROCESS_OFFSET);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (pHandleTable == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        pHandleTable =
+</span></span><span style="display:flex;"><span>            *(PUINT64)((PUCHAR)pEprocess + WIN10_21H1_X64_OBJECTTABLE_OFFSET);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    uTableCode =
+</span></span><span style="display:flex;"><span>        *(PUINT64)((PUINT8)pHandleTable + WIN10_21H1_X64_TABLECODE_OFFSET);
+</span></span><span style="display:flex;"><span>    ptr = <span style="color:#008b45">ExAllocatePool</span>(NonPagedPool, <span style="color:#8b008b;font-weight:bold">sizeof</span>(PROCESS_HANDLE_OBJECT));
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (ptr == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Alloc struct PROCESS_HANDLE_OBJECT faild</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ptr-&gt;eprocess   = pEprocess;
+</span></span><span style="display:flex;"><span>    ptr-&gt;table_code = uTableCode;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 销毁PROCESS_HANDLE_OBJECT结构体，传入一个对应指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pProcessHandlePbject PROCESS_HANDLE_OBJECT的指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>VOID <span style="color:#008b45">FreeProcessHandleObject</span>(PPROCESS_HANDLE_OBJECT pProcessHandlePbject)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    pProcessHandlePbject-&gt;eprocess   = <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    pProcessHandlePbject-&gt;table_code = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">ExFreePool</span>(pProcessHandlePbject);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入一个HANDLE_TABLE_ENTRY结构体的地址，计算出ObjectHeader地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param addr HANDLE_TABLE_ENTRY结构体的地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 返回ObjectHeader地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>ULONG64 <span style="color:#008b45">HandleEntryTable2ObjectHeader</span>(PHANDLE_TABLE_ENTRY addr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> ((addr-&gt;LowValue &gt;&gt; <span style="color:#b452cd">0x10</span>) &amp; <span style="color:#b452cd">0xFFFFFFFFFFFFFFF0</span>) + <span style="color:#b452cd">0xFFFF000000000000</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入一个ObjectHeader地址，判断是否是进程对象，如果是则返回TRUE,
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 不是则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param Address 句柄头的地址，也就是_object_header结构体地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 如果是则返回TRUE, 不是则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">IsProcess</span>(PVOID64 Address)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT8 uTypeIndex;
+</span></span><span style="display:flex;"><span>    UINT8 uByte;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    uByte      = ((ULONG64)Address &gt;&gt; <span style="color:#b452cd">8</span>) &amp; <span style="color:#b452cd">0xff</span>;
+</span></span><span style="display:flex;"><span>    uTypeIndex = *(PCHAR)((PCHAR)Address + TYPE_INDEX_OFFSET);
+</span></span><span style="display:flex;"><span>    uTypeIndex = uTypeIndex ^ OB_HEADER_COOKIE ^ uByte;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (uTypeIndex == PROCESS_TYPE) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 匹配进程的imageName,如果和指定的ImageName相同则返回
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param Address _object_header的地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param Name 需要匹配的程序名称
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 如果这个是进程句柄且是目标进程则返回TRUE，否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">IsProcessName</span>(PVOID64 Address, PUCHAR Name)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PVOID64 pEprocess;
+</span></span><span style="display:flex;"><span>    PUCHAR  ImageName;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">IsProcess</span>(Address)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pEprocess = ((PCHAR)Address + HANDLE_BODY_OFFSET);
+</span></span><span style="display:flex;"><span>    ImageName = (PUCHAR)pEprocess + EPROCESS_IMAGE_OFFSET;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (<span style="color:#008b45">strstr</span>(ImageName, Name) == <span style="color:#658b00">NULL</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 传入一个PLIST_ENTRY64，会遍历这个链表，每个链表节点会生成一个对应的PROCESS_HANDLE_OBJECT指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 组成一个数组，存放指针，存放到ObjArr
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleList Handle_list链表
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param ObjArr PPROCESS_HANDLE_OBJECT* 指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 返回一个指针数组，数组元素是PROCESS_HANDLE_OBJECT指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">CreateProcessObjArrByHandleList</span>(PLIST_ENTRY64            pHandleList,
+</span></span><span style="display:flex;"><span>                                         PPROCESS_HANDLE_OBJECT** ObjArr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64           pTmp;
+</span></span><span style="display:flex;"><span>    UINT64                  cout = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    PPROCESS_HANDLE_OBJECT* pProcessObjArr;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 获取链表节点数量，用于申请内存块大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    pTmp = pHandleList;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">do</span> {
+</span></span><span style="display:flex;"><span>        pTmp = pTmp-&gt;Flink;
+</span></span><span style="display:flex;"><span>        cout += <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#8b008b;font-weight:bold">while</span> (pTmp != pHandleList);
+</span></span><span style="display:flex;"><span>    pProcessObjArr = <span style="color:#008b45">ExAllocatePoolZero</span>(
+</span></span><span style="display:flex;"><span>        NonPagedPool, (cout + <span style="color:#b452cd">1</span>) * <span style="color:#8b008b;font-weight:bold">sizeof</span>(PPROCESS_HANDLE_OBJECT), POOL_TAG);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!pProcessObjArr) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Alloc process handle obj array failed</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_ALLOCATE_BUCKET;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 遍历链表获取节点信息，并创建ProcessHandleObject结构体
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; i &lt; cout; i++) {
+</span></span><span style="display:flex;"><span>        pProcessObjArr[i] = <span style="color:#008b45">NewProcessHandleObject</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#658b00">NULL</span>, ((PUCHAR)pTmp - WIN10_21H1_X64_HANDLETABLELIST_OFFSET));
+</span></span><span style="display:flex;"><span>        pTmp = pTmp-&gt;Flink;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    *ObjArr = pProcessObjArr;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 释放ProcessObject指针数组的内容
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param ObjArr PPROCESS_HANDLE_OBJECT数组
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>VOID <span style="color:#008b45">FreeProcessObjArr</span>(PPROCESS_HANDLE_OBJECT* ObjArr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; ObjArr[i] != <span style="color:#b452cd">0</span>; i++) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">FreeProcessHandleObject</span>(ObjArr[i]);
+</span></span><span style="display:flex;"><span>        ObjArr[i] = <span style="color:#658b00">NULL</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// ExFreePoolWithTag(&amp;ObjArr, POOL_TAG);
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入一个_object_header指针打印body是_eprocess的ImageName字符内容
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param ObjectHeader
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>VOID <span style="color:#008b45">ShowImageNameByObjectHeader</span>(PVOID64 ObjectHeader)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PVOID64 pEprocess;
+</span></span><span style="display:flex;"><span>    PUCHAR  ImageName;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pEprocess = ((PUCHAR)ObjectHeader + HANDLE_BODY_OFFSET);
+</span></span><span style="display:flex;"><span>    ImageName = (PUCHAR)pEprocess + EPROCESS_IMAGE_OFFSET;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] ImageName: %15s</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, ImageName);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 修改handle_entry_table的GrantedAccessBits权限，句柄的内存读写权限
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pHandleTableEntry
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">ModfiyGrantedAccessBits</span>(PHANDLE_TABLE_ENTRY pHandleTableEntry)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    pHandleTableEntry-&gt;GrantedAccessBits &amp;=
+</span></span><span style="display:flex;"><span>        ~(PROCESS_VM_READ | PROCESS_VM_WRITE);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 针对单张句柄表的情况，匹配目标eprocess，如果匹配到则修改句柄权限
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess 目标eprocess结构体指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param tablecode 单张句柄表的tablecode
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">FilterOneTableByEprocess</span>(PEPROCESS pEprocess, UINT64 tablecode) {
+</span></span><span style="display:flex;"><span>    PHANDLE_TABLE_ENTRY pHandleTableEntry;
+</span></span><span style="display:flex;"><span>    PVOID64             pObjHeader;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pHandleTableEntry = tablecode;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; i &lt; PAGE_HANDLE_MAX; i++) {
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// 如果tablecode有异常则跳过这个
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">CheckHandleTableEntry</span>(&amp;pHandleTableEntry[i])) {
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">continue</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// 通过_handle_table_entry计算_object_header地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        pObjHeader = <span style="color:#008b45">HandleEntryTable2ObjectHeader</span>(&amp;pHandleTableEntry[i]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// Option: Check this object is process?
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">IsProcess</span>(pObjHeader)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">continue</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// Compare whether the two eprocess variables are the same
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">if</span> ((PVOID64)((PUCHAR)pObjHeader + HANDLE_BODY_OFFSET) == pEprocess) {
+</span></span><span style="display:flex;"><span>            <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] Found tablecode: %llx; object_handle: %p; &#34;</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#cd5555">&#34;handle_table_entry: %p;</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>                    tablecode,
+</span></span><span style="display:flex;"><span>                    pObjHeader,
+</span></span><span style="display:flex;"><span>                    &amp;pHandleTableEntry[i]);
+</span></span><span style="display:flex;"><span>            <span style="color:#228b22">// 取消句柄的读写权限
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>            <span style="color:#008b45">ModfiyGrantedAccessBits</span>(&amp;pHandleTableEntry[i]);
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 遍历两层的句柄表，判断其中是否有目标句柄进程pEprocess
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 如果有则返回TRUE, 否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pProcessHandleObj 需要遍历的pProcessHandleObj的结构体
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess 目标进程句柄
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">FilterTWOTabelByEprocess</span>(PEPROCESS pEprocess, UINT64 tablecode) {
+</span></span><span style="display:flex;"><span>    PUINT64 tables;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    tables = tablecode &amp; TABLE_CODE_MASK;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; tables[i] != <span style="color:#b452cd">0</span>; i++) {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> (<span style="color:#008b45">FilterOneTableByEprocess</span>(pEprocess, tables[i])){
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">return</span> TRUE;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 遍历一层/两层句柄表，判断其中是否有目标句柄进程pEprocess
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// 如果有则返回TRUE, 否则返回FALSE
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pProcessHandleObj 需要遍历的pProcessHandleObj的结构体
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess 目标进程句柄
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>BOOLEAN <span style="color:#008b45">FilterObjByEprocess</span>(PPROCESS_HANDLE_OBJECT pProcessHandleObj,
+</span></span><span style="display:flex;"><span>                            PEPROCESS              pEprocess)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT64              tablecode;
+</span></span><span style="display:flex;"><span>    PHANDLE_TABLE_ENTRY pHandleTableEntry;
+</span></span><span style="display:flex;"><span>    PVOID64             pObjHeader;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    tablecode = pProcessHandleObj-&gt;table_code;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">switch</span> (tablecode &amp; TABLE_LEVEL_MASK)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">case</span> TABLE_LEVEL_ZERO:
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">FilterOneTableByEprocess</span>(pEprocess, tablecode);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">case</span> TABLE_LEVEL_ONE:
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">FilterTWOTabelByEprocess</span>(pEprocess, tablecode);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">default</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入需要保护的进程eprocess，保护程序句柄
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pEprocess PEPROCESS地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return 
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">ProtectProcessHandleByEprocess</span>(PEPROCESS pEprocess)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PVOID64                 pHandleTable;
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64           pPriList, pTmp;
+</span></span><span style="display:flex;"><span>    UINT64                  cout;
+</span></span><span style="display:flex;"><span>    PPROCESS_HANDLE_OBJECT* ObjArr;
+</span></span><span style="display:flex;"><span>    NTSTATUS                status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pHandleTable =
+</span></span><span style="display:flex;"><span>        *(PUINT64)((PCHAR)pEprocess + WIN10_21H1_X64_OBJECTTABLE_OFFSET);
+</span></span><span style="display:flex;"><span>    pPriList = (PLIST_ENTRY64)((PUCHAR)pHandleTable +
+</span></span><span style="display:flex;"><span>                               WIN10_21H1_X64_HANDLETABLELIST_OFFSET);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] EPROCESS: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">[+] handle object: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">[+] handle table &#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#cd5555">&#34;list: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>            pEprocess,
+</span></span><span style="display:flex;"><span>            pHandleTable,
+</span></span><span style="display:flex;"><span>            pPriList);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">CreateProcessObjArrByHandleList</span>(pPriList, &amp;ObjArr);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] CreateProcessObjArrByHandleList error&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#00688b;font-weight:bold">size_t</span> i = <span style="color:#b452cd">0</span>; ObjArr[i] != <span style="color:#b452cd">0</span>; i++) {
+</span></span><span style="display:flex;"><span>        <span style="color:#228b22">// kprintf(&#34;[+] Obj[%d]: %llx\r\n&#34;, i, ObjArr[i]);
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#228b22">// DisplayProcessHandleObj(ObjArr[i]);
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] Use handle process imagename: %s; eprocess: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>                (PUCHAR)ObjArr[i]-&gt;eprocess + EPROCESS_IMAGE_OFFSET,
+</span></span><span style="display:flex;"><span>                ObjArr[i]-&gt;eprocess);
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">FilterObjByEprocess</span>(ObjArr[i], pEprocess);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">FreeProcessObjArr</span>(ObjArr);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="结果">结果</h3>
+<p>运行后，打印内容大致如下：</p>
+<pre tabindex="0"><code>...
+[+] Use handle process imagename: sppsvc.exe; eprocess: FFFFC40D2B969080
+[+] Use handle process imagename: SppExtComObj.E; eprocess: FFFFC40D26F19080
+[+] Use handle process imagename: svchost.exe; eprocess: FFFFC40D2BA1C080
+[+] Use handle process imagename: slui.exe; eprocess: FFFFC40D2CBF4080
+[+] Use handle process imagename: svchost.exe; eprocess: FFFFC40D24B43080
+[+] Use handle process imagename: backgroundTask; eprocess: FFFFC40D2CCE2080
+[+] Use handle process imagename: HxTsr.exe; eprocess: FFFFC40D2AD7E080
+[+] Use handle process imagename: backgroundTask; eprocess: FFFFC40D295E5080
+[+] Use handle process imagename: CompatTelRunne; eprocess: FFFFC40D2AD42080
+[+] Use handle process imagename: RuntimeBroker.; eprocess: FFFFC40D2CA6F080
+[+] Use handle process imagename: RuntimeBroker.; eprocess: FFFFC40D2CC3D080
+[+] Use handle process imagename: svchost.exe; eprocess: FFFFC40D2B966080
+[+] Use handle process imagename: \; eprocess: FFFFF8066AB8E038
+[+] Found tablecode: ffff9981206e3000; object_handle: FFFFC40D2CBE4050; handle_table_entry: FFFF9981206E3430;
+[+] Use handle process imagename: Registry; eprocess: FFFFC40D23D26080
+[+] Use handle process imagename: smss.exe; eprocess: FFFFC40D24711040
+[+] Use handle process imagename: csrss.exe; eprocess: FFFFC40D24599080
+[+] Use handle process imagename: wininit.exe; eprocess: FFFFC40D2542E080
+[+] Use handle process imagename: csrss.exe; eprocess: FFFFC40D25432140
+[+] Found tablecode: ffff9981262f6000; object_handle: FFFFC40D2CBE4050; handle_table_entry: FFFF9981262F6110;
+[+] Use handle process imagename: services.exe; eprocess: FFFFC40D254CB080
+[+] Use handle process imagename: lsass.exe; eprocess: FFFFC40D254D70C0
+[+] Use handle process imagename: winlogon.exe; eprocess: FFFFC40D255820C0
+[+] Use handle process imagename: svchost.exe; eprocess: FFFFC40D25428080
+[+] Use handle process imagename: fontdrvhost.ex; eprocess: FFFFC40D25D6E140
+[+] Use handle process imagename: fontdrvhost.ex; eprocess: FFFFC40D25D9D140
+[+] Use handle process imagename: svchost.exe; eprocess: FFFFC40D25DBB2C0
+[+] Found tablecode: ffff9981206e8000; object_handle: FFFFC40D2CBE4050; handle_table_entry: FFFF9981206E8390;
+...
+</code></pre><p>然后此时CE已经不能查看内存了</p>
+<p><img src="https://s2.loli.net/2024/04/29/Lf1nXzJh9AkSZqM.png" alt="202404291009831.png"></p>
+<p>但是这只是当前这个CE进程的，如果关掉这个CE进程，再打开新的CE并且Open记事本进程就又可以重新读取了。因为在新的CE进程中，还没有修改句柄表中记事本进程的权限，所以还需要对抗。</p>
+<h2 id="对抗句柄降权思路">对抗句柄降权思路</h2>
+<h3 id="反复修改权限">反复修改权限</h3>
+<p>防护方是通过驱动来遍历私有句柄表，然后修改攻击者进程的私有句柄表中指向被保护进程的句柄属性。</p>
+<p>那我们也可以写一个驱动来不停的修改我们自身进程的私有句柄权限，将句柄权限改成full control</p>
+<h3 id="断链">断链</h3>
+<p>防护方是通过遍历私有句柄链表来查找攻击方的私有句柄表，那我们可以将私有句柄从链表上断掉，放置一个空/假的私有句柄表结构体或者直接让我们的进程私有句柄表从链表上断开。可以参考github项目<a href="https://github.com/nbqofficial/HideDriver">HideDriver</a></p>
+<h2 id="obregistercallbacks-保护">ObRegisterCallbacks 保护</h2>
+<p>实际上上述的句柄降权/提权都是针对callbacks保护来做的，很多厂商是使用这个微软公开的API来保护自身进程句柄的权限.</p>
+<p>ObRegisterCallbacks 例程为线程、进程和桌面句柄操作注册一系列回调例程。也就是我们可以给我们进程句柄设定一个回调函数，当我们的进程句柄被NtOpenProcess打开后，就会执行这个回调函数。如果我们在回调函数中修改这个句柄的权限，那么任何进程获取我们进程句柄将得到修改过后权限的句柄。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">ObRegisterCallbacks</span>(
+</span></span><span style="display:flex;"><span>  [in]  POB_CALLBACK_REGISTRATION CallbackRegistration,
+</span></span><span style="display:flex;"><span>  [out] PVOID                     *RegistrationHandle
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><pre tabindex="0"><code>[in] CallbackRegistration
+</code></pre><p>指向 <a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/ddi/wdm/ns-wdm-_ob_callback_registration">OB_CALLBACK_REGISTRATION</a> 结构的指针，该结构指定回调例程和其他注册信息的列表。</p>
+<pre tabindex="0"><code>[out] RegistrationHandle
+</code></pre><p>指向变量的指针，该变量接收标识注册的回调例程集的值。 调用方将此值传递给 <a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/ddi/wdm/nf-wdm-obunregistercallbacks">ObUnRegisterCallbacks</a> 例程，以取消注册回调集。</p>
+<p>我们看一下OB_CALLBACK_REGISTRATION结构体</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">typedef</span> <span style="color:#8b008b;font-weight:bold">struct</span> _OB_CALLBACK_REGISTRATION {
+</span></span><span style="display:flex;"><span>  USHORT                    Version;
+</span></span><span style="display:flex;"><span>  USHORT                    OperationRegistrationCount;
+</span></span><span style="display:flex;"><span>  UNICODE_STRING            Altitude;
+</span></span><span style="display:flex;"><span>  PVOID                     RegistrationContext;
+</span></span><span style="display:flex;"><span>  OB_OPERATION_REGISTRATION *OperationRegistration;
+</span></span><span style="display:flex;"><span>} OB_CALLBACK_REGISTRATION, *POB_CALLBACK_REGISTRATION;
+</span></span></code></pre></div><p>其中<code>OperationRegistration</code>参数是指向<code>OB_OPERATION_REGISTRATION</code>结构的数组的指针。 每个结构指定 <a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/ddi/wdm/nc-wdm-pob_pre_operation_callback">ObjectPreCallback</a> 和 <a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/ddi/wdm/nc-wdm-pob_post_operation_callback">ObjectPostCallback</a> 回调例程以及调用例程的操作类型。</p>
+<p>ObjectPreCallback就是发生进程或线程句柄操作<strong>时</strong>，操作系统会调用 <em>ObjectPreCallback</em> 例程</p>
+<p>ObjectPostCallback就是发生进程或线程句柄操作<strong>后</strong>，操作系统会调用 <em>ObjectPostCallback</em> 例程</p>
+<p>所以我们的操作函数也就是放在这两个数组当中。</p>
+<blockquote>
+<p><a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/ddi/wdm/nf-wdm-obregistercallbacks">ObRegisterCallbacks</a> 例程使用此结构。 此例程的 <em>CallBackRegistration</em> 参数是指向包含 <a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/ddi/wdm/ns-wdm-_ob_callback_registration">OB_CALLBACK_REGISTRATION</a> 结构的缓冲区的指针，该结构后跟一个或多个 <strong>OB_OPERATION_REGISTRATION</strong> 结构的数组。</p>
+<p>在传递给 <strong>ObRegisterCallback</strong> 的每个<strong>OB_OPERATION_REGISTRATION</strong>结构中，调用方必须提供一个或两个回调例程。 如果此结构的 <strong>PreOperation</strong> 和 <strong>PostOperation</strong> 成员均为 <strong>NULL</strong>，则回调注册操作将失败。</p></blockquote>
+<p>为了保证注册成功，我们可以在不用的操作上注册一个空的函数。比如我要注册Pre的，我也写一个空的Post</p>
+<blockquote>
+<p>具体代码可以参考驱动系统注册回调函数的三篇内容，我不写的主要原因是我64位win10 21h2我不知道怎么过驱动验证</p></blockquote>
+<h1 id="参考">参考</h1>
+<p><a href="https://cloud.tencent.com/developer/article/2316143">https://cloud.tencent.com/developer/article/2316143</a></p>
+<p><a href="https://www.52pojie.cn/thread-1546336-1-1.html">https://www.52pojie.cn/thread-1546336-1-1.html</a></p>
+<p><a href="https://bbs.kanxue.com/thread-281120.htm">https://bbs.kanxue.com/thread-281120.htm</a></p>
+<p><a href="https://mp.weixin.qq.com/s/AXjVjguHaWd3rHqYQ4wfmw">https://mp.weixin.qq.com/s/AXjVjguHaWd3rHqYQ4wfmw</a></p>
+<p><a href="https://www.52pojie.cn/thread-1771006-1-1.html">https://www.52pojie.cn/thread-1771006-1-1.html</a></p>
+<p><a href="https://www.52pojie.cn/thread-1770541-1-1.html">https://www.52pojie.cn/thread-1770541-1-1.html</a></p>
+<p><a href="https://blog.csdn.net/sunjiaoya/article/details/135628674">探索Windows内核系列——句柄，利用句柄进行进程保护_volatilelowvalue-CSDN博客</a></p>
+<p><a href="https://www.52pojie.cn/thread-806825-1-1.html">https://www.52pojie.cn/thread-806825-1-1.html</a></p>
+<p><a href="https://www.cnblogs.com/wingsummer/p/15823780.html">句柄表篇——进程句柄表 - 寂静的羽夏 - 博客园</a></p>
+<p><a href="https://medium.com/@ashabdalhalim/a-light-on-windows-10s-object-header-typeindex-value-e8f907e7073a">https://medium.com/@ashabdalhalim/a-light-on-windows-10s-object-header-typeindex-value-e8f907e7073a</a></p>
+<p><a href="https://spikysabra.gitbook.io/kernelcactus/pocs/handle-elevation">https://spikysabra.gitbook.io/kernelcactus/pocs/handle-elevation</a></p>
+<p><a href="https://github.com/nbqofficial/HideDriver">HideDriver ( Direct kernel object manipulation ) | github.com</a></p>
+<blockquote>
+<p>驱动注册系统回调函数</p></blockquote>
+<p><a href="https://bbs.kanxue.com/thread-248703.htm">https://bbs.kanxue.com/thread-248703.htm</a></p>
+<p><a href="https://xiaodaozhi.com/kernel/4.html">https://xiaodaozhi.com/kernel/4.html</a></p>
+<p><a href="https://www.cnblogs.com/LyShark/p/16818453.html">https://www.cnblogs.com/LyShark/p/16818453.html</a></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2024-04-29</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">
+			Next<br>通过修改物理内存实现跨进程内存读写
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">
+			Previous<br>Rust编写几种hook的方式
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%a5%e6%9f%84%e9%99%8d%e6%9d%83" class="nav-句柄降权">
+									句柄降权
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e4%bb%80%e4%b9%88%e6%98%af%e5%8f%a5%e6%9f%84" class="nav-什么是句柄">
+									什么是句柄
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%a7%81%e6%9c%89%e5%8f%a5%e6%9f%84%e8%a1%a8" class="nav-私有句柄表">
+									私有句柄表
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#tablecode%e5%8f%a5%e6%9f%84%e8%a1%a8" class="nav-tablecode句柄表">
+									TableCode句柄表
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#windbg-%e8%b0%83%e8%af%95" class="nav-windbg-调试">
+									Windbg 调试
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%88%a4%e6%96%ad%e5%8f%a5%e6%9f%84%e7%b1%bb%e5%9e%8b" class="nav-判断句柄类型">
+									判断句柄类型
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#win7881" class="nav-win7881">
+									win7/8/8.1
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#win10" class="nav-win10">
+									win10
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%a5%e6%9f%84%e9%99%8d%e6%9d%83%e6%8f%90%e6%9d%83" class="nav-句柄降权提权">
+									句柄降权/提权
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%bb%a3%e7%a0%81%e5%ae%9e%e7%8e%b0%e9%98%b2%e6%ad%a2ce%e8%af%bb%e5%8f%96%e8%bf%9b%e7%a8%8b%e5%86%85%e5%ad%98" class="nav-代码实现防止ce读取进程内存">
+									代码实现防止CE读取进程内存
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#mainc" class="nav-mainc">
+									main.c
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#headerc" class="nav-headerc">
+									header.c
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%93%e6%9e%9c" class="nav-结果">
+									结果
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%af%b9%e6%8a%97%e5%8f%a5%e6%9f%84%e9%99%8d%e6%9d%83%e6%80%9d%e8%b7%af" class="nav-对抗句柄降权思路">
+									对抗句柄降权思路
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%8f%8d%e5%a4%8d%e4%bf%ae%e6%94%b9%e6%9d%83%e9%99%90" class="nav-反复修改权限">
+									反复修改权限
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%96%ad%e9%93%be" class="nav-断链">
+									断链
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#obregistercallbacks-%e4%bf%9d%e6%8a%a4" class="nav-obregistercallbacks-保护">
+									ObRegisterCallbacks 保护
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

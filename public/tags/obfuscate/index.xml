@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Obfuscate on Mi1itray.axe</title>
+    <link>https://military-axe.github.io/tags/obfuscate/</link>
+    <description>Recent content in Obfuscate on Mi1itray.axe</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>mi1itray.axe copyright.</copyright>
+    <lastBuildDate>Mon, 17 Jul 2023 15:43:19 +0800</lastBuildDate>
+    <atom:link href="https://military-axe.github.io/tags/obfuscate/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Obfuscate hide string &amp;&amp; zer0pts</title>
+      <link>https://military-axe.github.io/post/obfuscate_hide_string_and_zer0pts/</link>
+      <pubDate>Mon, 17 Jul 2023 15:43:19 +0800</pubDate>
+      <guid>https://military-axe.github.io/post/obfuscate_hide_string_and_zer0pts/</guid>
+      <description>&lt;p&gt;Obfuscate项目是用于隐藏字符串，增加分析的难度，但是Obfuscate只能对抗静态的分析。zer0pts比赛中的一题就是利用这个项目，但是它很巧妙，隐藏的是模块的函数名，主要逻辑是调用so文件的模块，它隐藏so中的函数名后，从静态分析是很难看出来调用的逻辑是什么，忽然感觉这个项目就有点用了。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
