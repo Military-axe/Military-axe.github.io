@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>BiAn: Smart Contract Source Code Obfuscation</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/bian-smart-contract-source-code-obfuscation/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="BiAn: Smart Contract Source Code Obfuscation">
+  <meta property="og:description" content="智能合约代码混淆，感觉还是ollvm的影子，还是那三种模式，只是做了相关的适配以及加了很多其他细节，总体思路是没有变的。
+创新点在于使用改进后的混沌映射来做不透明谓词，增加了一定的混淆程度
+会议：IEEE Transactions on Software Engineering
+等级：CCF-A">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-10-12T14:42:18+08:00">
+    <meta property="article:modified_time" content="2023-10-12T14:42:18+08:00">
+    <meta property="article:tag" content="Obfuscation">
+    <meta property="article:tag" content="Smart Contract">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BiAn: Smart Contract Source Code Obfuscation">
+  <meta name="twitter:description" content="智能合约代码混淆，感觉还是ollvm的影子，还是那三种模式，只是做了相关的适配以及加了很多其他细节，总体思路是没有变的。
+创新点在于使用改进后的混沌映射来做不透明谓词，增加了一定的混淆程度
+会议：IEEE Transactions on Software Engineering
+等级：CCF-A">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e6%b7%b7%e6%b7%86" class="nav-控制流混淆">
+									控制流混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e5%b9%b3%e5%9d%a6%e5%8c%96" class="nav-控制流平坦化">
+									控制流平坦化
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%b8%8d%e9%80%8f%e6%98%8e%e8%b0%93%e8%af%8d" class="nav-不透明谓词">
+									不透明谓词
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e6%95%b0%e6%8d%ae%e6%b5%81%e6%b7%b7%e6%b7%86" class="nav-数据流混淆">
+									数据流混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%b8%83%e5%b1%80%e6%b7%b7%e6%b7%86" class="nav-布局混淆">
+									布局混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%b7%b7%e6%b7%86%e6%95%88%e6%9e%9c" class="nav-混淆效果">
+									混淆效果
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    BiAn: Smart Contract Source Code Obfuscation
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-10-12 14:42
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/paper">Paper</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/obfuscation">Obfuscation</a>
+                                &nbsp;
+                            
+                                <a href="/tags/smart-contract">Smart Contract</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>智能合约代码混淆，感觉还是ollvm的影子，还是那三种模式，只是做了相关的适配以及加了很多其他细节，总体思路是没有变的。</p>
+<p>创新点在于使用改进后的混沌映射来做不透明谓词，增加了一定的混淆程度</p>
+<blockquote>
+<p>会议：IEEE Transactions on Software Engineering</p>
+<p>等级：CCF-A</p></blockquote>
+<p>这篇文章聚焦的领域是智能合约代码混淆，首先说说智能合约代码现状的一些问题。</p>
+<p>首先代码是公开的，不容易及时更改的。是很容易可以反编译得到源码的，这增加了漏洞发现的风险。那么现有的智能合约代码安全方面的工作主要集中在源码级别或者字节码级别的漏洞检测，属于静态分析和动态分析</p>
+<p>本文是从另一个角度增加智能合约代码的安全性，通过混淆代码，减少被漏洞挖掘的可能。同时混淆代码还可以用于保护知识产权（比如在源码中插入验证知识产权的代码，混淆后很难被识别出来并删除）</p>
+<p>混淆从三个角度来混淆</p>
+<ul>
+<li>控制流混淆</li>
+<li>数据流混淆</li>
+<li>布局混淆</li>
+</ul>
+<h2 id="控制流混淆">控制流混淆</h2>
+<p>控制流混淆主要有两个部分，不透明谓词和控制流平坦化</p>
+<h3 id="控制流平坦化">控制流平坦化</h3>
+<p>这个是ollvm经典的混淆模式，也是目前在通用领域效果最好的混淆模式之一</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310121439037.png" alt="image-20231012111728772"></p>
+<h3 id="不透明谓词">不透明谓词</h3>
+<p>不透明谓词是生成一些逻辑上永真或者永假效果的复杂表达式，人可以很快分辨出来，但是编译器或者说静态分析器无法推断出这个值，只能在运行时确定。</p>
+<p><code>y &gt; 10 || x * (x + 1) % 2 == 0</code>这是一个永真式</p>
+<p>插入不透明谓词主要的效果是增加一些虚假的控制流。</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310121439830.png" alt="image-20231012112233726"></p>
+<p>本文提出一种构造不透明谓词的CPM混沌映射来提高不透明谓词的质量。CPM混沌映射基于Chebyshev和PWLCM混沌映射改进，保留混沌映射的敏感和随机性的同时提高了性能</p>
+<p>可以理解CPM混沌映射会生成一个伪随机数范围0-1，每次生成都不一样。论文将混沌映射与不透明谓词结合，关键的等式是生成的伪随机数接近1就为真，接近0则为假。这个可以根据项目开发具体的修改来修改</p>
+<h2 id="数据流混淆">数据流混淆</h2>
+<p>主要就是加密程序中的数据部分。</p>
+<p>通过提取AST语法树中的节点，识别出数据在进行混淆，主要混淆有如下几点</p>
+<ul>
+<li>把局部变量转全局变量</li>
+<li>将静态数据转换成动态数据</li>
+<li>将整数常数转换成算数表达式</li>
+<li>拆分布尔变量：如果原本为<code>true</code>则后续接一个 <code>||</code>和后续表达式，<code>false</code>则是<code>&amp;&amp;</code>接后续表达式</li>
+<li>将标量变量转成向量：在结构体中集体声明整数、布尔、地址、字符串和字节等状态变量，并通过结构体调用成员变量。原有状态变量的所有初始化、赋值和使用都将被相应的结构成员变量替换。替换后的变量名和函数名都是用SHA-1生成原本名称的摘要</li>
+</ul>
+<h2 id="布局混淆">布局混淆</h2>
+<p>主要是对代码中的一些标识符和调试信息增加干扰。</p>
+<ul>
+<li>删除注释，打乱布局：使用无意义的字符串来替换</li>
+<li>替换变量名：SHA-1</li>
+</ul>
+<h2 id="混淆效果">混淆效果</h2>
+<p>最后看一下混淆的效果</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310121439215.png" alt="image-20231012142843126"></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-10-12</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/">
+			Next<br>2023 香山杯 Reverse
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/">
+			Previous<br>2023 研究生国赛 Reverse
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e6%b7%b7%e6%b7%86" class="nav-控制流混淆">
+									控制流混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e5%b9%b3%e5%9d%a6%e5%8c%96" class="nav-控制流平坦化">
+									控制流平坦化
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%b8%8d%e9%80%8f%e6%98%8e%e8%b0%93%e8%af%8d" class="nav-不透明谓词">
+									不透明谓词
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e6%95%b0%e6%8d%ae%e6%b5%81%e6%b7%b7%e6%b7%86" class="nav-数据流混淆">
+									数据流混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%b8%83%e5%b1%80%e6%b7%b7%e6%b7%86" class="nav-布局混淆">
+									布局混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%b7%b7%e6%b7%86%e6%95%88%e6%9e%9c" class="nav-混淆效果">
+									混淆效果
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

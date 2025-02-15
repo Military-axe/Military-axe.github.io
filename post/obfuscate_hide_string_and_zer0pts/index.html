@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Obfuscate hide string &amp;&amp; zer0pts</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/obfuscate_hide_string_and_zer0pts/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="Obfuscate hide string && zer0pts">
+  <meta property="og:description" content="Obfuscate项目是用于隐藏字符串，增加分析的难度，但是Obfuscate只能对抗静态的分析。zer0pts比赛中的一题就是利用这个项目，但是它很巧妙，隐藏的是模块的函数名，主要逻辑是调用so文件的模块，它隐藏so中的函数名后，从静态分析是很难看出来调用的逻辑是什么，忽然感觉这个项目就有点用了。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-07-17T15:43:19+08:00">
+    <meta property="article:modified_time" content="2023-07-17T15:43:19+08:00">
+    <meta property="article:tag" content="Rsa">
+    <meta property="article:tag" content="Obfuscate">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Obfuscate hide string && zer0pts">
+  <meta name="twitter:description" content="Obfuscate项目是用于隐藏字符串，增加分析的难度，但是Obfuscate只能对抗静态的分析。zer0pts比赛中的一题就是利用这个项目，但是它很巧妙，隐藏的是模块的函数名，主要逻辑是调用so文件的模块，它隐藏so中的函数名后，从静态分析是很难看出来调用的逻辑是什么，忽然感觉这个项目就有点用了。">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#obfuscate-%e9%a1%b9%e7%9b%ae%e4%bd%bf%e7%94%a8" class="nav-obfuscate-项目使用">
+									Obfuscate 项目使用
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#zer0pts-mimikyu" class="nav-zer0pts-mimikyu">
+									zer0pts mimikyu
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    Obfuscate hide string &amp;&amp; zer0pts
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-07-17 15:43
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/reverse">Reverse</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/rsa">rsa</a>
+                                &nbsp;
+                            
+                                <a href="/tags/obfuscate">obfuscate</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>Obfuscate项目是用于隐藏字符串，增加分析的难度，但是Obfuscate只能对抗静态的分析。zer0pts比赛中的一题就是利用这个项目，但是它很巧妙，隐藏的是模块的函数名，主要逻辑是调用so文件的模块，它隐藏so中的函数名后，从静态分析是很难看出来调用的逻辑是什么，忽然感觉这个项目就有点用了。</p>
+<h1 id="obfuscate-项目使用">Obfuscate 项目使用</h1>
+<p>github地址：<a href="https://github.com/adamyaxley/Obfuscate">adamyaxley/Obfuscate: Guaranteed compile-time string literal obfuscation header-only library for C++14 (github.com)</a></p>
+<p>这个项目是对字符串进行加密与解密的一个项目，使用非常简单。</p>
+<ol>
+<li>复制<code>obfuscate.h</code> 到项目中并include进去</li>
+<li>封装字符串<code>AY_OBFUSCATE(&quot;My String&quot;)</code></li>
+</ol>
+<p>源码</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;iostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;string&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;obfuscate.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>() 
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#8b008b;font-weight:bold">const</span> std::string username(AY_OBFUSCATE(<span style="color:#cd5555">&#34;root&#34;</span>));
+</span></span><span style="display:flex;"><span>	<span style="color:#8b008b;font-weight:bold">const</span> std::string password(AY_OBFUSCATE(<span style="color:#cd5555">&#34;password&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	std::cout &lt;&lt; <span style="color:#cd5555">&#34;Obfuscate naive login example (bloat test)&#34;</span> &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	std::string input_username;
+</span></span><span style="display:flex;"><span>	std::string input_password;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8b008b;font-weight:bold">while</span> (<span style="color:#658b00">true</span>)
+</span></span><span style="display:flex;"><span>	{
+</span></span><span style="display:flex;"><span>		std::cout &lt;&lt; <span style="color:#cd5555">&#34;Username: &#34;</span>;
+</span></span><span style="display:flex;"><span>		std::cin &gt;&gt; input_username;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		std::cout &lt;&lt; <span style="color:#cd5555">&#34;Password: &#34;</span>;
+</span></span><span style="display:flex;"><span>		std::cin &gt;&gt; input_password;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#8b008b;font-weight:bold">if</span> (input_username == username &amp;&amp; input_password == password)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			std::cout &lt;&lt; <span style="color:#cd5555">&#34;Login success!&#34;</span> &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>			<span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			std::cout &lt;&lt; <span style="color:#cd5555">&#34;Login failure: unrecognised username and password&#34;</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#cd5555">&#34;combination.&#34;</span> &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>ida打开分析后，发现</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span>	<span style="color:#8b008b;font-weight:bold">const</span> std::string username(AY_OBFUSCATE(<span style="color:#cd5555">&#34;root&#34;</span>));
+</span></span><span style="display:flex;"><span>	<span style="color:#8b008b;font-weight:bold">const</span> std::string password(AY_OBFUSCATE(<span style="color:#cd5555">&#34;password&#34;</span>));
+</span></span></code></pre></div><p>中的两个字符串找不到了，他们无法被静态的找到了，但是动态运行起来后，还是可以在内存中找到这个字符串。所以这个项目只能防护静态分析字符串。</p>
+<p>如果只是防护字符串，那还是挺鸡肋的。下面这题用这个隐藏需要调用的函数名，一次来做一个隐藏函数逻辑的方法有一点意思。</p>
+<h1 id="zer0pts-mimikyu">zer0pts mimikyu</h1>
+<p>题目地址：<a href="https://github.com/Military-axe/ctf/tree/master/2023/mimikyu">ctf/2023/mimikyu at master · Military-axe/ctf (github.com)</a></p>
+<p>程序很直白，打开main函数看到几乎所有代码</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#8b008b;font-weight:bold">__cdecl</span> <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">int</span> argc, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **argv, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v4; <span style="color:#228b22">// rdx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v5; <span style="color:#228b22">// rdx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> i; <span style="color:#228b22">// [rsp+18h] [rbp-78h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> j; <span style="color:#228b22">// [rsp+20h] [rbp-70h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> k; <span style="color:#228b22">// [rsp+28h] [rbp-68h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *s; <span style="color:#228b22">// [rsp+30h] [rbp-60h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">void</span> *LibraryA; <span style="color:#228b22">// [rsp+40h] [rbp-50h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">void</span> *libgmp; <span style="color:#228b22">// [rsp+48h] [rbp-48h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v12[<span style="color:#b452cd">16</span>]; <span style="color:#228b22">// [rsp+50h] [rbp-40h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v13[<span style="color:#b452cd">16</span>]; <span style="color:#228b22">// [rsp+60h] [rbp-30h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v14[<span style="color:#b452cd">24</span>]; <span style="color:#228b22">// [rsp+70h] [rbp-20h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> v15; <span style="color:#228b22">// [rsp+88h] [rbp-8h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  v15 = <span style="color:#008b45">__readfsqword</span>(<span style="color:#b452cd">0x28u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( argc &gt; <span style="color:#b452cd">1</span> )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    s = (<span style="color:#00688b;font-weight:bold">char</span> *)argv[<span style="color:#b452cd">1</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( <span style="color:#008b45">strlen</span>(s) == <span style="color:#b452cd">40</span> )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      LibraryA = (<span style="color:#00688b;font-weight:bold">void</span> *)<span style="color:#008b45">LoadLibraryA</span>(<span style="color:#cd5555">&#34;libc.so.6&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( !LibraryA )
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">__assert_fail</span>(<span style="color:#cd5555">&#34;hLibc != NULL&#34;</span>, <span style="color:#cd5555">&#34;main.c&#34;</span>, <span style="color:#b452cd">0x4Au</span>, <span style="color:#cd5555">&#34;main&#34;</span>);
+</span></span><span style="display:flex;"><span>      libgmp = (<span style="color:#00688b;font-weight:bold">void</span> *)<span style="color:#008b45">LoadLibraryA</span>(<span style="color:#cd5555">&#34;libgmp.so&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( !libgmp )
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">__assert_fail</span>(<span style="color:#cd5555">&#34;hGMP != NULL&#34;</span>, <span style="color:#cd5555">&#34;main.c&#34;</span>, <span style="color:#b452cd">0x4Cu</span>, <span style="color:#cd5555">&#34;main&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">1907704461</span>, v12);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">1907704461</span>, v13);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">1907704461</span>, v14);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, -<span style="color:#b452cd">58821864</span>, *(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> *)main);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, -<span style="color:#b452cd">1810257824</span>, _bss_start, <span style="color:#b452cd">0LL</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;Checking...&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">for</span> ( i = <span style="color:#b452cd">0LL</span>; i &lt; <span style="color:#b452cd">0x28</span>; ++i )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> ( !(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">1317667610</span>, (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)s[i]) )
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>LABEL_21:
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">puts</span>(<span style="color:#cd5555">&#34;</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#8b008b;font-weight:bold">goto</span> LABEL_22;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">for</span> ( j = <span style="color:#b452cd">0LL</span>; j &lt; <span style="color:#b452cd">0x28</span>; j += <span style="color:#b452cd">4LL</span> )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">249367710</span>, v13, <span style="color:#b452cd">1LL</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">for</span> ( k = <span style="color:#b452cd">0LL</span>; k &lt;= <span style="color:#b452cd">2</span>; ++k )
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">13994153</span>, <span style="color:#b452cd">46LL</span>);
+</span></span><span style="display:flex;"><span>          v4 = (<span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">2070735453</span>) % <span style="color:#b452cd">0x10000</span>;
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">cap</span>(LibraryA, libgmp, v4, v12);
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">880641627</span>, v13, v13, v12);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">13994153</span>, <span style="color:#b452cd">46LL</span>);
+</span></span><span style="display:flex;"><span>        v5 = (<span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">2070735453</span>) % <span style="color:#b452cd">0x10000</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">cap</span>(LibraryA, libgmp, v5, v14);
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">249367710</span>, v12, *(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> *)&amp;s[j]);
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">1876728194</span>, v12, v12, v14, v13);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> ( (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">1309138724</span>, v12, encoded[j &gt;&gt; <span style="color:#b452cd">2</span>]) )
+</span></span><span style="display:flex;"><span>          <span style="color:#8b008b;font-weight:bold">goto</span> LABEL_21;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">puts</span>(<span style="color:#cd5555">&#34;</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">Correct!&#34;</span>);
+</span></span><span style="display:flex;"><span>LABEL_22:
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">835473311</span>, v12);<span style="color:#228b22">// gmpz_clean
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">835473311</span>, v13);<span style="color:#228b22">// gmpz_clean
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">835473311</span>, v14);<span style="color:#228b22">// gmpz_clean
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">CloseHandle</span>(LibraryA);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">CloseHandle</span>(libgmp);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">puts</span>(<span style="color:#cd5555">&#34;Nowhere near close.&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;Usage: %s FLAG</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>, *argv);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>会发现<code>ResolveModuleFunction</code>函数调用两个so文件模块。其实也可以才出来，应该是调用模块中的函数做一个运算吗，但是用<code>ResolveModuleFunction</code>来隐藏具体调用的是哪个函数。</p>
+<p>接下来打开<code>ResolveModuleFunction</code>函数，看看这个函数做了什么</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">__int64</span> <span style="color:#008b45">ResolveModuleFunction</span>(<span style="color:#00688b;font-weight:bold">void</span> *a1, <span style="color:#00688b;font-weight:bold">int</span> a2, ...)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v2; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> *overflow_arg_area; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> v5; <span style="color:#228b22">// [rsp+18h] [rbp-158h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> j; <span style="color:#228b22">// [rsp+1Ch] [rbp-154h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> k; <span style="color:#228b22">// [rsp+20h] [rbp-150h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> v8; <span style="color:#228b22">// [rsp+24h] [rbp-14Ch]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v9; <span style="color:#228b22">// [rsp+28h] [rbp-148h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v10; <span style="color:#228b22">// [rsp+30h] [rbp-140h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v11; <span style="color:#228b22">// [rsp+38h] [rbp-138h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v12; <span style="color:#228b22">// [rsp+40h] [rbp-130h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> *i; <span style="color:#228b22">// [rsp+48h] [rbp-128h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> *v14; <span style="color:#228b22">// [rsp+50h] [rbp-120h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *name; <span style="color:#228b22">// [rsp+58h] [rbp-118h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> (<span style="color:#8b008b;font-weight:bold">__fastcall</span> *v16)(<span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>); <span style="color:#228b22">// [rsp+60h] [rbp-110h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  gcc_va_list va; <span style="color:#228b22">// [rsp+68h] [rbp-108h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v18[<span style="color:#b452cd">8</span>]; <span style="color:#228b22">// [rsp+80h] [rbp-F0h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">va_start</span>(va, a2);
+</span></span><span style="display:flex;"><span>  v18[<span style="color:#b452cd">7</span>] = <span style="color:#008b45">__readfsqword</span>(<span style="color:#b452cd">0x28u</span>);
+</span></span><span style="display:flex;"><span>  v9 = <span style="color:#b452cd">0LL</span>;
+</span></span><span style="display:flex;"><span>  v12 = <span style="color:#b452cd">0LL</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( !(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">GetModuleInformation</span>(a1, &amp;v9) )
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">__assert_fail</span>(<span style="color:#cd5555">&#34;GetModuleInformation(hModule, &amp;lpmodinfo)&#34;</span>, <span style="color:#cd5555">&#34;obfuscate.h&#34;</span>, <span style="color:#b452cd">0x71u</span>, <span style="color:#cd5555">&#34;ResolveModuleFunction&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">for</span> ( i = *(<span style="color:#8b008b;font-weight:bold">__int64</span> **)(v9 + <span style="color:#b452cd">16</span>); *i; i += <span style="color:#b452cd">2</span> )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    v2 = *i;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( *i == <span style="color:#b452cd">11</span> )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      v5 = i[<span style="color:#b452cd">1</span>];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">else</span> <span style="color:#8b008b;font-weight:bold">if</span> ( v2 &lt;= <span style="color:#b452cd">11</span> )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( v2 == <span style="color:#b452cd">5</span> )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        v11 = i[<span style="color:#b452cd">1</span>];
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">else</span> <span style="color:#8b008b;font-weight:bold">if</span> ( v2 == <span style="color:#b452cd">6</span> )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        v10 = i[<span style="color:#b452cd">1</span>];
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">dlerror</span>();
+</span></span><span style="display:flex;"><span>  v8 = v11 - v10;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">for</span> ( j = <span style="color:#b452cd">0</span>; j &lt; v8 / v5; ++j )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    v14 = (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> *)(<span style="color:#b452cd">24LL</span> * j + v10);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( (v14[<span style="color:#b452cd">1</span>] &amp; <span style="color:#b452cd">0xF</span>) == <span style="color:#b452cd">2</span> )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      name = (<span style="color:#00688b;font-weight:bold">char</span> *)(*v14 + v11);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( a2 == (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">CryptGetHashParam</span>(name) )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        v16 = (<span style="color:#8b008b;font-weight:bold">__int64</span> (<span style="color:#8b008b;font-weight:bold">__fastcall</span> *)(<span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>))<span style="color:#008b45">dlsym</span>(a1, name);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> ( <span style="color:#008b45">dlerror</span>() )
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">BUG</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">for</span> ( k = <span style="color:#b452cd">0</span>; k &lt;= <span style="color:#b452cd">5</span>; ++k )
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          <span style="color:#8b008b;font-weight:bold">if</span> ( va[<span style="color:#b452cd">0</span>].gp_offset &gt; <span style="color:#b452cd">0x2F</span> )
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            overflow_arg_area = (<span style="color:#8b008b;font-weight:bold">__int64</span> *)va[<span style="color:#b452cd">0</span>].overflow_arg_area;
+</span></span><span style="display:flex;"><span>            va[<span style="color:#b452cd">0</span>].overflow_arg_area = (<span style="color:#00688b;font-weight:bold">char</span> *)va[<span style="color:#b452cd">0</span>].overflow_arg_area + <span style="color:#b452cd">8</span>;
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>          <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            overflow_arg_area = (<span style="color:#8b008b;font-weight:bold">__int64</span> *)((<span style="color:#00688b;font-weight:bold">char</span> *)va[<span style="color:#b452cd">0</span>].reg_save_area + va[<span style="color:#b452cd">0</span>].gp_offset);
+</span></span><span style="display:flex;"><span>            va[<span style="color:#b452cd">0</span>].gp_offset += <span style="color:#b452cd">8</span>;
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>          v18[k] = *overflow_arg_area;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">v16</span>(v18[<span style="color:#b452cd">0</span>], v18[<span style="color:#b452cd">1</span>], v18[<span style="color:#b452cd">2</span>], v18[<span style="color:#b452cd">3</span>], v18[<span style="color:#b452cd">4</span>], v18[<span style="color:#b452cd">5</span>]);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> v12;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>可以看到很关键的两句，一句是</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>v16 = (<span style="color:#8b008b;font-weight:bold">__int64</span> (<span style="color:#8b008b;font-weight:bold">__fastcall</span> *)(<span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>, <span style="color:#8b008b;font-weight:bold">__int64</span>))<span style="color:#008b45">dlsym</span>(a1, name);
+</span></span></code></pre></div><p>一句是</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span> <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">v16</span>(v18[<span style="color:#b452cd">0</span>], v18[<span style="color:#b452cd">1</span>], v18[<span style="color:#b452cd">2</span>], v18[<span style="color:#b452cd">3</span>], v18[<span style="color:#b452cd">4</span>], v18[<span style="color:#b452cd">5</span>]);
+</span></span></code></pre></div><p>可以知道，前面都是解密运算真正的函数名，然后调用<code>dlsym</code>就可以获取对应函数的指针，再调用函数指针来运行此函数，做到一个隐藏真正调用函数的过程。</p>
+<p>既然知道了这个流程，也非常简单，查看每次调用<code>ResolveModuleFunction</code>时，在<code>dlsym(a1, name)</code>中的name参数，也就知道此时的<code>ResolveModuleFunction</code>等同于那个函数了。</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307171225131.png" alt="image-20230717122504520"></p>
+<p>还原全部的调用后如下</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#8b008b;font-weight:bold">__cdecl</span> <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">int</span> argc, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **argv, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v4; <span style="color:#228b22">// rdx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v5; <span style="color:#228b22">// rdx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> i; <span style="color:#228b22">// [rsp+18h] [rbp-78h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> j; <span style="color:#228b22">// [rsp+20h] [rbp-70h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> k; <span style="color:#228b22">// [rsp+28h] [rbp-68h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *s; <span style="color:#228b22">// [rsp+30h] [rbp-60h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">void</span> *LibraryA; <span style="color:#228b22">// [rsp+40h] [rbp-50h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">void</span> *libgmp; <span style="color:#228b22">// [rsp+48h] [rbp-48h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v12[<span style="color:#b452cd">16</span>]; <span style="color:#228b22">// [rsp+50h] [rbp-40h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v13[<span style="color:#b452cd">16</span>]; <span style="color:#228b22">// [rsp+60h] [rbp-30h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v14[<span style="color:#b452cd">24</span>]; <span style="color:#228b22">// [rsp+70h] [rbp-20h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> v15; <span style="color:#228b22">// [rsp+88h] [rbp-8h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  v15 = <span style="color:#008b45">__readfsqword</span>(<span style="color:#b452cd">0x28u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( argc &gt; <span style="color:#b452cd">1</span> )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    s = (<span style="color:#00688b;font-weight:bold">char</span> *)argv[<span style="color:#b452cd">1</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( <span style="color:#008b45">strlen</span>(s) == <span style="color:#b452cd">40</span> )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      LibraryA = (<span style="color:#00688b;font-weight:bold">void</span> *)<span style="color:#008b45">LoadLibraryA</span>(<span style="color:#cd5555">&#34;libc.so.6&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( !LibraryA )
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">__assert_fail</span>(<span style="color:#cd5555">&#34;hLibc != NULL&#34;</span>, <span style="color:#cd5555">&#34;main.c&#34;</span>, <span style="color:#b452cd">0x4Au</span>, <span style="color:#cd5555">&#34;main&#34;</span>);
+</span></span><span style="display:flex;"><span>      libgmp = (<span style="color:#00688b;font-weight:bold">void</span> *)<span style="color:#008b45">LoadLibraryA</span>(<span style="color:#cd5555">&#34;libgmp.so&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( !libgmp )
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">__assert_fail</span>(<span style="color:#cd5555">&#34;hGMP != NULL&#34;</span>, <span style="color:#cd5555">&#34;main.c&#34;</span>, <span style="color:#b452cd">0x4Cu</span>, <span style="color:#cd5555">&#34;main&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">1907704461</span>, v12);<span style="color:#228b22">// gmpz_init
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">1907704461</span>, v13);<span style="color:#228b22">// gmpz_init
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">1907704461</span>, v14);<span style="color:#228b22">// gmpz_init
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, -<span style="color:#b452cd">58821864</span>, *(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> *)main);<span style="color:#228b22">// srand
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, -<span style="color:#b452cd">1810257824</span>, _bss_start, <span style="color:#b452cd">0LL</span>);<span style="color:#228b22">// setbuf
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;Checking...&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">for</span> ( i = <span style="color:#b452cd">0LL</span>; i &lt; <span style="color:#b452cd">0x28</span>; ++i )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> ( !(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">1317667610</span>, (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)s[i]) )<span style="color:#228b22">// isprint
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        {
+</span></span><span style="display:flex;"><span>LABEL_21:
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">puts</span>(<span style="color:#cd5555">&#34;</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#8b008b;font-weight:bold">goto</span> LABEL_22;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">for</span> ( j = <span style="color:#b452cd">0LL</span>; j &lt; <span style="color:#b452cd">0x28</span>; j += <span style="color:#b452cd">4LL</span> )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">249367710</span>, v13, <span style="color:#b452cd">1LL</span>);<span style="color:#228b22">// gmpz_set_ui
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">for</span> ( k = <span style="color:#b452cd">0LL</span>; k &lt;= <span style="color:#b452cd">2</span>; ++k )
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">13994153</span>, <span style="color:#cd5555">&#39;.&#39;</span>);<span style="color:#228b22">// putchar
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>          v4 = (<span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">2070735453</span>) % <span style="color:#b452cd">0x10000</span>;<span style="color:#228b22">// rand
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>          <span style="color:#008b45">cap</span>(LibraryA, libgmp, v4, (<span style="color:#8b008b;font-weight:bold">__int64</span>)v12);
+</span></span><span style="display:flex;"><span>          <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">880641627</span>, v13, v13, v12);<span style="color:#228b22">// gmpz_mul
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">13994153</span>, <span style="color:#cd5555">&#39;.&#39;</span>);
+</span></span><span style="display:flex;"><span>        v5 = (<span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(LibraryA, <span style="color:#b452cd">2070735453</span>) % <span style="color:#b452cd">0x10000</span>;<span style="color:#228b22">// rand
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#008b45">cap</span>(LibraryA, libgmp, v5, (<span style="color:#8b008b;font-weight:bold">__int64</span>)v14);
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">249367710</span>, v12, *(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> *)&amp;s[j]);<span style="color:#228b22">// gmpz_set_ui
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">1876728194</span>, v12, v12, v14, v13);<span style="color:#228b22">// gmpz_pown
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        <span style="color:#8b008b;font-weight:bold">if</span> ( (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">1309138724</span>, v12, encoded[j &gt;&gt; <span style="color:#b452cd">2</span>]) )<span style="color:#228b22">// gmpz_cmp_ui
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>          <span style="color:#8b008b;font-weight:bold">goto</span> LABEL_21;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">puts</span>(<span style="color:#cd5555">&#34;</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">Correct!&#34;</span>);
+</span></span><span style="display:flex;"><span>LABEL_22:
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">835473311</span>, v12);<span style="color:#228b22">// gmpz_clean
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">835473311</span>, v13);<span style="color:#228b22">// gmpz_clean
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">ResolveModuleFunction</span>(libgmp, <span style="color:#b452cd">835473311</span>, v14);<span style="color:#228b22">// gmpz_clean
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>      <span style="color:#008b45">CloseHandle</span>(LibraryA);
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">CloseHandle</span>(libgmp);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#008b45">puts</span>(<span style="color:#cd5555">&#34;Nowhere near close.&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;Usage: %s FLAG</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>, *argv);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>最重要的是下面这两句</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">249367710</span>, v12, *(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> *)&amp;s[j]);<span style="color:#228b22">// gmpz_set_ui
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">1876728194</span>, v12, v12, v14, v13);<span style="color:#228b22">// gmpz_pown
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">if</span> ( (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)<span style="color:#008b45">ResolveModuleFunction</span>(libgmp, -<span style="color:#b452cd">1309138724</span>, v12, encoded[j &gt;&gt; <span style="color:#b452cd">2</span>]) )<span style="color:#228b22">// gmpz_cmp_ui
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>     <span style="color:#8b008b;font-weight:bold">goto</span> LABEL_21;
+</span></span></code></pre></div><p>首先是读输入4个字符当做一个32bit数据，然后放入gmpz_pown中加密。其实libgmp是一个大数运算库，可以查到函数调声明的。</p>
+<p><code>gmpz_pown</code>就和python中的pow函数类似，需要三个参数<code>pow(a, b, c)</code>计算的就是 \(a^b\bmod c\) 。</p>
+<p>此时a是我们输入的值也就是flag，b，c可以通过动态调试获得。需要注意的值，调用的参数是一个结构体，所以通过查询文档，确定gmp库中调用参数类型结构体如下</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">void</span>
+</span></span><span style="display:flex;"><span><span style="color:#008b45">mpz_powm</span> (mpz_ptr r, mpz_srcptr b, mpz_srcptr e, mpz_srcptr m)<span style="color:#228b22">// 函数声明，结构体是mpz_t
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">typedef</span> __mpz_struct *mpz_ptr;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">typedef</span> <span style="color:#8b008b;font-weight:bold">struct</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">int</span> _mp_alloc;		<span style="color:#228b22">/* Number of *limbs* allocated and pointed
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">				   to by the _mp_d field.  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">int</span> _mp_size;			<span style="color:#228b22">/* abs(_mp_size) is the number of limbs the
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">				   last field points to.  If _mp_size is
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">				   negative this is a negative number.  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">mp_limb_t</span> *_mp_d;		<span style="color:#228b22">/* Pointer to the limbs.  */</span>
+</span></span><span style="display:flex;"><span>} __mpz_struct;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">typedef</span> <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">long</span> <span style="color:#00688b;font-weight:bold">mp_limb_t</span>;
+</span></span></code></pre></div><p>所以可以知道参数结构体中只有三个值，两个int类型，以及一个指针指向存储的内存。</p>
+<p>在ida中定义结构体，然后修改三个参数的类型</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">00000000</span> <span style="color:#00688b;font-weight:bold">mpz_t</span> struc ; (<span style="color:#8b008b;font-weight:bold">sizeof</span>=<span style="color:#b452cd">0x10</span>, mappedto_8) ; XREF: main/r
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">00000000</span>                                         ; main/r ...
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">00000000</span> _mp_alloc dd ?
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">00000004</span> _mp_size dd ?
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">0000000</span><span style="color:#b452cd">8</span> _mp_d dq ?
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">00000010</span> <span style="color:#00688b;font-weight:bold">mpz_t</span> ends
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">00000010</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// 修改类型
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">mpz_t</span> v12; <span style="color:#228b22">// [rsp+50h] [rbp-40h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">mpz_t</span> v13; <span style="color:#228b22">// [rsp+60h] [rbp-30h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">mpz_t</span> v14; <span style="color:#228b22">// [rsp+70h] [rbp-20h] BYREF
+</span></span></span></code></pre></div><p>再动调获取每次调用<code>gmpz_powm</code>的参数值，每次修改一下对比后的跳转，就可以继续调试获取值。获取的值如下</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>powm_argu = [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xD3</span>, <span style="color:#b452cd">0xF0</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xFF</span>, <span style="color:#b452cd">0x0D</span>, <span style="color:#b452cd">0x3A</span>, <span style="color:#b452cd">0xF2</span>, <span style="color:#b452cd">0x50</span>, <span style="color:#b452cd">0x23</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x5F</span>, <span style="color:#b452cd">0x08</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x33</span>, <span style="color:#b452cd">0x4D</span>, <span style="color:#b452cd">0x9D</span>, <span style="color:#b452cd">0x8E</span>, <span style="color:#b452cd">0xD1</span>, <span style="color:#b452cd">0x32</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x63</span>, <span style="color:#b452cd">0x8E</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x1B</span>, <span style="color:#b452cd">0x1F</span>, <span style="color:#b452cd">0xD7</span>, <span style="color:#b452cd">0x6C</span>, <span style="color:#b452cd">0x86</span>, <span style="color:#b452cd">0x03</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x49</span>, <span style="color:#b452cd">0x82</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x8F</span>, <span style="color:#b452cd">0xFC</span>, <span style="color:#b452cd">0xE3</span>, <span style="color:#b452cd">0x9B</span>, <span style="color:#b452cd">0xAE</span>, <span style="color:#b452cd">0x10</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xA1</span>, <span style="color:#b452cd">0xC6</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x7D</span>, <span style="color:#b452cd">0xF6</span>, <span style="color:#b452cd">0xEF</span>, <span style="color:#b452cd">0x42</span>, <span style="color:#b452cd">0xD9</span>, <span style="color:#b452cd">0x09</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x6D</span>, <span style="color:#b452cd">0x0C</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xB1</span>, <span style="color:#b452cd">0x8B</span>, <span style="color:#b452cd">0xAA</span>, <span style="color:#b452cd">0xE3</span>, <span style="color:#b452cd">0xE2</span>, <span style="color:#b452cd">0x1D</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xF5</span>, <span style="color:#b452cd">0xAE</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xF3</span>, <span style="color:#b452cd">0x41</span>, <span style="color:#b452cd">0x58</span>, <span style="color:#b452cd">0xC6</span>, <span style="color:#b452cd">0x3F</span>, <span style="color:#b452cd">0x10</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xDF</span>, <span style="color:#b452cd">0xD5</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xC9</span>, <span style="color:#b452cd">0xED</span>, <span style="color:#b452cd">0x70</span>, <span style="color:#b452cd">0x09</span>, <span style="color:#b452cd">0x1A</span>, <span style="color:#b452cd">0x01</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x8D</span>, <span style="color:#b452cd">0xE6</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x39</span>, <span style="color:#b452cd">0xDF</span>, <span style="color:#b452cd">0xBD</span>, <span style="color:#b452cd">0x20</span>, <span style="color:#b452cd">0x8D</span>, <span style="color:#b452cd">0x5F</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xFB</span>, <span style="color:#b452cd">0xF3</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xED</span>, <span style="color:#b452cd">0xE0</span>, <span style="color:#b452cd">0x11</span>, <span style="color:#b452cd">0x4E</span>, <span style="color:#b452cd">0xB1</span>, <span style="color:#b452cd">0x45</span>]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>这是总过10次加密，每次不同的powm中的指数与模数。</p>
+<p>调用gmpz_powm的加密很像rsa，那可以尝试按照rsa的解密方法来解密。先分解<code>mod</code>，通过代码中可以知道每个mod是3个因子相乘，每个小于0x10000，直接一路爆破过去，可以得到三个因子，然后就是欧拉函数与求逆了。变成了baby rsa的密码题了</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto.Util.number</span> <span style="color:#8b008b;font-weight:bold">import</span> *
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>powm_argu = [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xD3</span>, <span style="color:#b452cd">0xF0</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xFF</span>, <span style="color:#b452cd">0x0D</span>, <span style="color:#b452cd">0x3A</span>, <span style="color:#b452cd">0xF2</span>, <span style="color:#b452cd">0x50</span>, <span style="color:#b452cd">0x23</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x5F</span>, <span style="color:#b452cd">0x08</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x33</span>, <span style="color:#b452cd">0x4D</span>, <span style="color:#b452cd">0x9D</span>, <span style="color:#b452cd">0x8E</span>, <span style="color:#b452cd">0xD1</span>, <span style="color:#b452cd">0x32</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x63</span>, <span style="color:#b452cd">0x8E</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x1B</span>, <span style="color:#b452cd">0x1F</span>, <span style="color:#b452cd">0xD7</span>, <span style="color:#b452cd">0x6C</span>, <span style="color:#b452cd">0x86</span>, <span style="color:#b452cd">0x03</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x49</span>, <span style="color:#b452cd">0x82</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x8F</span>, <span style="color:#b452cd">0xFC</span>, <span style="color:#b452cd">0xE3</span>, <span style="color:#b452cd">0x9B</span>, <span style="color:#b452cd">0xAE</span>, <span style="color:#b452cd">0x10</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xA1</span>, <span style="color:#b452cd">0xC6</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x7D</span>, <span style="color:#b452cd">0xF6</span>, <span style="color:#b452cd">0xEF</span>, <span style="color:#b452cd">0x42</span>, <span style="color:#b452cd">0xD9</span>, <span style="color:#b452cd">0x09</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x6D</span>, <span style="color:#b452cd">0x0C</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xB1</span>, <span style="color:#b452cd">0x8B</span>, <span style="color:#b452cd">0xAA</span>, <span style="color:#b452cd">0xE3</span>, <span style="color:#b452cd">0xE2</span>, <span style="color:#b452cd">0x1D</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xF5</span>, <span style="color:#b452cd">0xAE</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xF3</span>, <span style="color:#b452cd">0x41</span>, <span style="color:#b452cd">0x58</span>, <span style="color:#b452cd">0xC6</span>, <span style="color:#b452cd">0x3F</span>, <span style="color:#b452cd">0x10</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xDF</span>, <span style="color:#b452cd">0xD5</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xC9</span>, <span style="color:#b452cd">0xED</span>, <span style="color:#b452cd">0x70</span>, <span style="color:#b452cd">0x09</span>, <span style="color:#b452cd">0x1A</span>, <span style="color:#b452cd">0x01</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0x8D</span>, <span style="color:#b452cd">0xE6</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0x39</span>, <span style="color:#b452cd">0xDF</span>, <span style="color:#b452cd">0xBD</span>, <span style="color:#b452cd">0x20</span>, <span style="color:#b452cd">0x8D</span>, <span style="color:#b452cd">0x5F</span>]
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;exp&#34;</span>: [<span style="color:#b452cd">0xFB</span>, <span style="color:#b452cd">0xF3</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;mod&#34;</span>: [<span style="color:#b452cd">0xED</span>, <span style="color:#b452cd">0xE0</span>, <span style="color:#b452cd">0x11</span>, <span style="color:#b452cd">0x4E</span>, <span style="color:#b452cd">0xB1</span>, <span style="color:#b452cd">0x45</span>]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>encodes = [<span style="color:#b452cd">0x00000FE4C025C5F4</span>, <span style="color:#b452cd">0x00001B792FF17E8A</span>, <span style="color:#b452cd">0x00000183B156AB40</span>, <span style="color:#b452cd">0x00000BEFFCF5E5DA</span>, <span style="color:#b452cd">0x00000297CF86E251</span>, <span style="color:#b452cd">0x00000EB3EDC1D4B4</span>, <span style="color:#b452cd">0x000000FA10CE3A08</span>, <span style="color:#b452cd">0x0000002BDD418672</span>, <span style="color:#b452cd">0x00005EBB5050EA46</span>, <span style="color:#b452cd">0x000005BF9B73CF86</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">factor</span>(x: <span style="color:#658b00">int</span>) -&gt; <span style="color:#658b00">list</span>[<span style="color:#658b00">int</span>]:
+</span></span><span style="display:flex;"><span>    r = []
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> j <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">2</span>, <span style="color:#b452cd">0x10000</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> x%j==<span style="color:#b452cd">0</span>:
+</span></span><span style="display:flex;"><span>            r.append(j)
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> r
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">inv_x</span>(exp: <span style="color:#658b00">int</span>, r: <span style="color:#658b00">list</span>[<span style="color:#658b00">int</span>]) -&gt; <span style="color:#658b00">int</span>:
+</span></span><span style="display:flex;"><span>    l = (r[<span style="color:#b452cd">0</span>]-<span style="color:#b452cd">1</span>) * (r[<span style="color:#b452cd">1</span>]-<span style="color:#b452cd">1</span>) * (r[<span style="color:#b452cd">2</span>]-<span style="color:#b452cd">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> inverse(exp, l)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">dec</span>(c: <span style="color:#658b00">int</span>, x_inv: <span style="color:#658b00">int</span>, N: <span style="color:#658b00">int</span>):
+</span></span><span style="display:flex;"><span>    m = <span style="color:#658b00">pow</span>(c, x_inv, N)
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>flag = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> i,k <span style="color:#8b008b">in</span> <span style="color:#658b00">enumerate</span>(powm_argu):
+</span></span><span style="display:flex;"><span>    x = <span style="color:#658b00">int</span>.from_bytes(<span style="color:#658b00">bytes</span>(k[<span style="color:#cd5555">&#39;exp&#39;</span>]),<span style="color:#cd5555">&#39;little&#39;</span>)
+</span></span><span style="display:flex;"><span>    N = <span style="color:#658b00">int</span>.from_bytes(<span style="color:#658b00">bytes</span>(k[<span style="color:#cd5555">&#39;mod&#39;</span>]),<span style="color:#cd5555">&#39;little&#39;</span>)
+</span></span><span style="display:flex;"><span>    r = factor(N)
+</span></span><span style="display:flex;"><span>    x_inv = inv_x(x, r)
+</span></span><span style="display:flex;"><span>    m = dec(encodes[i], x_inv, N)
+</span></span><span style="display:flex;"><span>    flag += long_to_bytes(m)[::-<span style="color:#b452cd">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#658b00">print</span>(flag)    
+</span></span></code></pre></div><p>flag: <code>zer0pts{L00k_th3_1nt3rn4l_0f_l1br4r13s!}</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ ./mimikyu zer0pts{L00k_th3_1nt3rn4l_0f_l1br4r13s!}
+</span></span><span style="display:flex;"><span>Checking...........................................
+</span></span><span style="display:flex;"><span>Correct!
+</span></span></code></pre></div><h1 id="参考">参考</h1>
+<p><a href="https://www.cnblogs.com/xinwang-coding/p/12803237.html">GMP-C/C++（大数库）使用方法 - 新望 - 博客园 (cnblogs.com)</a></p>
+<p><a href="https://github.com/adamyaxley/Obfuscate">adamyaxley/Obfuscate: Guaranteed compile-time string literal obfuscation header-only library for C++14 (github.com)</a></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-07-17</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/khao/">
+			Next<br>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/frida_call_method_to_explode/">
+			Previous<br>Frida call java class/method to explode
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#obfuscate-%e9%a1%b9%e7%9b%ae%e4%bd%bf%e7%94%a8" class="nav-obfuscate-项目使用">
+									Obfuscate 项目使用
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#zer0pts-mimikyu" class="nav-zer0pts-mimikyu">
+									zer0pts mimikyu
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

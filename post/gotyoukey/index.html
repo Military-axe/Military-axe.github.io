@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>2023 XCTF GotYouKey Write Up</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/gotyoukey/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="2023 XCTF GotYouKey Write Up">
+  <meta property="og:description" content="前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-06-07T13:37:53+08:00">
+    <meta property="article:modified_time" content="2023-06-07T13:37:53+08:00">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="Reverse">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2023 XCTF GotYouKey Write Up">
+  <meta name="twitter:description" content="前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b" class="nav-分析过程">
+									分析过程
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    2023 XCTF GotYouKey Write Up
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-06-07 13:37
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/reverse">Reverse</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/android">android</a>
+                                &nbsp;
+                            
+                                <a href="/tags/reverse">reverse</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。</p>
+<h2 id="分析过程">分析过程</h2>
+<p>jadx反编译后看源码，前面都是开线程，开端口，都不关键，直接到<code>com.hack.gotyourkey.Oooo000</code>中看到关键函数
+<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519119.png" alt="image.png">
+只有这个<code>check</code>函数关键其他的都是加的，传入<code>check</code>函数中的就是输入的值。
+进入之后是AES加密和base64换表
+<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519871.png" alt="image.png">
+接出来得到flag: <code>flag{345ghyuj!$}</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>from Crypto.Cipher import AES
+</span></span><span style="display:flex;"><span>import base64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b">str1</span> = <span style="color:#cd5555">&#34;UGCA3QBFjPnlAZ6-NbV2Ca^^&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b">string1</span> = <span style="color:#cd5555">&#34;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-+^&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b">string2</span> = <span style="color:#cd5555">&#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b">key</span> = b<span style="color:#cd5555">&#39;1234567890abcdef&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b">c</span> = base64.b64decode(str1.translate(str.maketrans(string1,string2)))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b">e</span> = AES.new(key, AES.MODE_ECB)
+</span></span><span style="display:flex;"><span><span style="color:#00688b">m</span> = e.decrypt(c)
+</span></span><span style="display:flex;"><span>print(m)
+</span></span></code></pre></div><p>但是这个flag是假的，继续分析后发现，存在一个<code>libgotyoukey.so</code>
+打开后在<code>JNI_OnLoad</code>函数存在很多逻辑
+<img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519549.png" alt="image.png">
+进入<code>core</code>函数后，设置第一个参数为<code>JNIEnv *</code>
+可以发现core中的函数是调用各种java中的函数，还原函数类型后，重命名后逻辑如下</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-basic" data-lang="basic"><span style="display:flex;"><span>v54<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;android/app/ActivityThread&#34;</span>);
+</span></span><span style="display:flex;"><span>v53<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetStaticFieldID(env,<span style="color:#bbb"> </span>v54,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;sCurrentActivityThread&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;Landroid/app/ActivityThread;&#34;</span>);
+</span></span><span style="display:flex;"><span>v52<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetFieldID(env,<span style="color:#bbb"> </span>v54,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;mInitialApplication&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;Landroid/app/Application;&#34;</span>);
+</span></span><span style="display:flex;"><span>v51<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetStaticObjectField(env,<span style="color:#bbb"> </span>v54,<span style="color:#bbb"> </span>v53);
+</span></span><span style="display:flex;"><span>v50<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetObjectField(env,<span style="color:#bbb"> </span>v51,<span style="color:#bbb"> </span>v52);
+</span></span><span style="display:flex;"><span>v49<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;android/app/Application&#34;</span>);
+</span></span><span style="display:flex;"><span>v48<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v49,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;getAssets&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;()Landroid/content/res/AssetManager;&#34;</span>);
+</span></span><span style="display:flex;"><span>v47<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallObjectMethodV(env,<span style="color:#bbb"> </span>v50,<span style="color:#bbb"> </span>v48);
+</span></span><span style="display:flex;"><span>v46<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;android/content/res/AssetManager&#34;</span>);
+</span></span><span style="display:flex;"><span>v45<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v46,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;openFd&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;(Ljava/lang/String;)Landroid/content/res/AssetFileDescriptor;&#34;</span>);
+</span></span><span style="display:flex;"><span>v44<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>NewStringUTF(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;asset.bin&#34;</span>);
+</span></span><span style="display:flex;"><span>v43<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallObjectMethodV(env,<span style="color:#bbb"> </span>v47,<span style="color:#bbb"> </span>v45,<span style="color:#bbb"> </span>v44);
+</span></span><span style="display:flex;"><span>v42<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;android/content/res/AssetFileDescriptor&#34;</span>);
+</span></span><span style="display:flex;"><span>v41<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v42,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;getLength&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;()J&#34;</span>);
+</span></span><span style="display:flex;"><span>length<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallLongMethodV(env,<span style="color:#bbb"> </span>v43,<span style="color:#bbb"> </span>v41);
+</span></span><span style="display:flex;"><span>v39<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v46,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;open&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;(Ljava/lang/String;)Ljava/io/InputStream;&#34;</span>);
+</span></span><span style="display:flex;"><span>v38<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallObjectMethodV(env,<span style="color:#bbb"> </span>v47,<span style="color:#bbb"> </span>v39,<span style="color:#bbb"> </span>v44);
+</span></span><span style="display:flex;"><span>new_array<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>NewByteArray(env,<span style="color:#bbb"> </span>length);
+</span></span><span style="display:flex;"><span>v36<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;java/io/InputStream&#34;</span>);
+</span></span><span style="display:flex;"><span>v35<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v36,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;read&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;([BII)I&#34;</span>);
+</span></span><span style="display:flex;"><span>my_input<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallIntMethodV(env,<span style="color:#bbb"> </span>v38,<span style="color:#bbb"> </span>v35,<span style="color:#bbb"> </span>new_array,<span style="color:#bbb"> </span><span style="color:#b452cd">0</span>LL,<span style="color:#bbb"> </span>length);
+</span></span><span style="display:flex;"><span>v33<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>malloc(length);
+</span></span><span style="display:flex;"><span>if<span style="color:#bbb"> </span>(<span style="color:#bbb"> </span>my_input<span style="color:#bbb"> </span>&gt;<span style="color:#bbb"> </span><span style="color:#b452cd">0</span><span style="color:#bbb"> </span>)
+</span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>GetByteArrayRegion(env,<span style="color:#bbb"> </span>new_array,<span style="color:#bbb"> </span><span style="color:#b452cd">0</span>,<span style="color:#bbb"> </span>length,<span style="color:#bbb"> </span>v33);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>v32<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>malloc(length);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>rc4(<span style="color:#cd5555">&#34;goodluck&#34;</span>,<span style="color:#bbb"> </span>v33,<span style="color:#bbb"> </span>length,<span style="color:#bbb"> </span>v32);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>SetByteArrayRegion(env,<span style="color:#bbb"> </span>new_array,<span style="color:#bbb"> </span><span style="color:#b452cd">0</span>,<span style="color:#bbb"> </span>length,<span style="color:#bbb"> </span>v32);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">  </span>if<span style="color:#bbb"> </span>(<span style="color:#bbb"> </span>v32<span style="color:#bbb"> </span>)
+</span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>free(v32);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>if<span style="color:#bbb"> </span>(<span style="color:#bbb"> </span>v33<span style="color:#bbb"> </span>)
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>free(v33);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v31<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;java/nio/ByteBuffer&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v30<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetStaticMethodID(env,<span style="color:#bbb"> </span>v31,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;allocate&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;(I)Ljava/nio/ByteBuffer;&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v29<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallStaticObjectMethodV(env,<span style="color:#bbb"> </span>v31,<span style="color:#bbb"> </span>v30,<span style="color:#bbb"> </span>length);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v28<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v31,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;put&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;([B)Ljava/nio/ByteBuffer;&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v27<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v31,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;position&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;(I)Ljava/nio/Buffer;&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>CallObjectMethodV(env,<span style="color:#bbb"> </span>v29,<span style="color:#bbb"> </span>v28,<span style="color:#bbb"> </span>new_array);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>CallObjectMethodV(env,<span style="color:#bbb"> </span>v29,<span style="color:#bbb"> </span>v27,<span style="color:#bbb"> </span><span style="color:#b452cd">0</span>LL);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v26<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;com/hack/gotyourkey/MainActivity&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v25<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;java/lang/Class&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v24<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v25,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;getClassLoader&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;()Ljava/lang/ClassLoader;&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v23<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallObjectMethodV(env,<span style="color:#bbb"> </span>v26,<span style="color:#bbb"> </span>v24);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v22<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;dalvik/system/PathClassLoader&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v21<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetFieldID(env,<span style="color:#bbb"> </span>v22,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;pathList&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;Ldalvik/system/DexPathList;&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v20<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;dalvik/system/DexPathList&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v19<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetFieldID(env,<span style="color:#bbb"> </span>v20,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;dexElements&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;[Ldalvik/system/DexPathList$Element;&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v18<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;dalvik/system/InMemoryDexClassLoader&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v17<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v18,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;&lt;init&gt;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;(Ljava/nio/ByteBuffer;Ljava/lang/ClassLoader;)V&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v16<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>NewObjectV(env,<span style="color:#bbb"> </span>v18,<span style="color:#bbb"> </span>v17,<span style="color:#bbb"> </span>v29,<span style="color:#bbb"> </span>v23);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v15<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetObjectField(env,<span style="color:#bbb"> </span>v16,<span style="color:#bbb"> </span>v21);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v14<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetObjectField(env,<span style="color:#bbb"> </span>v15,<span style="color:#bbb"> </span>v19);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v13<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetObjectField(env,<span style="color:#bbb"> </span>v23,<span style="color:#bbb"> </span>v21);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v12<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetObjectField(env,<span style="color:#bbb"> </span>v13,<span style="color:#bbb"> </span>v19);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v11<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>FindClass(env,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;java/util/ArrayList&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v10<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v11,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;add&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;(Ljava/lang/Object;)Z&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v9<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v11,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;toArray&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;()[Ljava/lang/Object;&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v8<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetMethodID(env,<span style="color:#bbb"> </span>v11,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;&lt;init&gt;&#34;</span>,<span style="color:#bbb"> </span><span style="color:#cd5555">&#34;()V&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>v7<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>NewObjectV(env,<span style="color:#bbb"> </span>v11,<span style="color:#bbb"> </span>v8);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>for<span style="color:#bbb"> </span>(<span style="color:#bbb"> </span>i<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#b452cd">0</span>;<span style="color:#bbb"> </span>i<span style="color:#bbb"> </span>&lt;<span style="color:#bbb"> </span>GetArrayLength(env,<span style="color:#bbb"> </span>v14);<span style="color:#bbb"> </span>++i<span style="color:#bbb"> </span>)
+</span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>{
+</span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>v5<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetObjectArrayElement(env,<span style="color:#bbb"> </span>v14,<span style="color:#bbb"> </span>i);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>CallBooleanMethodV(env,<span style="color:#bbb"> </span>v7,<span style="color:#bbb"> </span>v10,<span style="color:#bbb"> </span>v5);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>}
+</span></span><span style="display:flex;"><span><span style="color:#bbb">        </span>for<span style="color:#bbb"> </span>(<span style="color:#bbb"> </span>j<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span><span style="color:#b452cd">0</span>;<span style="color:#bbb"> </span>j<span style="color:#bbb"> </span>&lt;<span style="color:#bbb"> </span>GetArrayLength(env,<span style="color:#bbb"> </span>v12);<span style="color:#bbb"> </span>++j<span style="color:#bbb"> </span>)
+</span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>{
+</span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>v3<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>GetObjectArrayElement(env,<span style="color:#bbb"> </span>v12,<span style="color:#bbb"> </span>j);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>CallBooleanMethodV(env,<span style="color:#bbb"> </span>v7,<span style="color:#bbb"> </span>v10,<span style="color:#bbb"> </span>v3);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>}
+</span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>v1<span style="color:#bbb"> </span>=<span style="color:#bbb"> </span>CallObjectMethodV(env,<span style="color:#bbb"> </span>v7,<span style="color:#bbb"> </span>v9);
+</span></span><span style="display:flex;"><span><span style="color:#bbb">          </span>return<span style="color:#bbb"> </span>SetObjectField(env,<span style="color:#bbb"> </span>v13,<span style="color:#bbb"> </span>v19,<span style="color:#bbb"> </span>v1);
+</span></span></code></pre></div><p>中间调用了一个rc4，key是<code>goodluck</code>
+直接给chatgpt解释后知道，这里用rc4解密了asset.bin这个文件，然后加载进入apk，中间都是使用java的函数。所以还原了之后很好做
+解密asset.bin代码</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;stdio.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;stdlib.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;string.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">void</span> <span style="color:#008b45">rc4_init</span>(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>* s, <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>* key,
+</span></span><span style="display:flex;"><span>              <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">long</span> len)   <span style="color:#228b22">// s最开始是传入的长度为256的char型空数组，用来存放初始化后的s
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#228b22">// key是密钥，内容可定义  //最后一个len是密钥的长度
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">int</span>           i      = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">int</span>           j      = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span> k[<span style="color:#b452cd">256</span>] = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span> temp   = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (i = <span style="color:#b452cd">0</span>; i &lt; <span style="color:#b452cd">256</span>; i++) {
+</span></span><span style="display:flex;"><span>        s[i] = i;              <span style="color:#228b22">// 0-255赋给s
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        k[i] = key[i % len];   <span style="color:#228b22">// 将k重新计算
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (i = <span style="color:#b452cd">0</span>; i &lt; <span style="color:#b452cd">256</span>; i++) {
+</span></span><span style="display:flex;"><span>        j    = (j + s[i] + k[i]) % <span style="color:#b452cd">256</span>;   <span style="color:#228b22">// 给j赋
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        temp = s[i];
+</span></span><span style="display:flex;"><span>        s[i] = s[j];
+</span></span><span style="display:flex;"><span>        s[j] = temp;   <span style="color:#228b22">// s[i]和s[j]交换
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">void</span> <span style="color:#008b45">rc4_crypt</span>(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>* s, <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>* data,
+</span></span><span style="display:flex;"><span>               <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">long</span> len)   <span style="color:#228b22">// s是上面初始化之后的，data是我们要加密的数据，len是data的长度
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">int</span>           i = <span style="color:#b452cd">0</span>, j = <span style="color:#b452cd">0</span>, t = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">long</span> k = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span> temp;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> (k = <span style="color:#b452cd">0</span>; k &lt; len; k++) {
+</span></span><span style="display:flex;"><span>        i    = (i + <span style="color:#b452cd">1</span>) % <span style="color:#b452cd">256</span>;      <span style="color:#228b22">// 固定方式生成的i
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        j    = (j + s[i]) % <span style="color:#b452cd">256</span>;   <span style="color:#228b22">// 固定方式生成的j
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        temp = s[i];
+</span></span><span style="display:flex;"><span>        s[i] = s[j];
+</span></span><span style="display:flex;"><span>        s[j] = temp;                  <span style="color:#228b22">// 交换
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        t    = (s[i] + s[j]) % <span style="color:#b452cd">256</span>;   <span style="color:#228b22">// 固定方式生成的t
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>        data[k] ^= s[t];              <span style="color:#228b22">// 异或运算
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>  s[<span style="color:#b452cd">256</span>]   = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>  s2[<span style="color:#b452cd">256</span>]  = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>  key[<span style="color:#b452cd">256</span>] = {<span style="color:#cd5555">&#34;goodluck&#34;</span>};
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>* data;
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">long</span>  len;
+</span></span><span style="display:flex;"><span>    FILE*          file1;
+</span></span><span style="display:flex;"><span>    FILE*          file2;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    file1 = <span style="color:#008b45">fopen</span>(<span style="color:#cd5555">&#34;./asset.bin&#34;</span>, <span style="color:#cd5555">&#34;rb&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">fseek</span>(file1, <span style="color:#b452cd">0</span>, SEEK_END);
+</span></span><span style="display:flex;"><span>    len = <span style="color:#008b45">ftell</span>(file1);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;file len: %ld </span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, len);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    data = <span style="color:#008b45">calloc</span>(len + <span style="color:#b452cd">1</span>, <span style="color:#8b008b;font-weight:bold">sizeof</span>(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">rewind</span>(file1);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">fread</span>(data, <span style="color:#8b008b;font-weight:bold">sizeof</span>(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>), len, file1);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">fclose</span>(file1);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">rc4_init</span>(s, (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>*)key, <span style="color:#008b45">strlen</span>((<span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span>*)key));
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">rc4_crypt</span>(s, (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>*)data, len);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    file2 = <span style="color:#008b45">fopen</span>(<span style="color:#cd5555">&#34;./dec&#34;</span>, <span style="color:#cd5555">&#34;wb&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">fwrite</span>(data, <span style="color:#8b008b;font-weight:bold">sizeof</span>(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">char</span>), len, file2);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">fclose</span>(file2);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>解密之后发现和原来的逻辑几乎一样，但是在最关节的check函数不同</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519480.png" alt="image.png"></p>
+<p>这里是base64换表和rc4加密，不是原来的base+aes
+所以，直接base64换表后rc4解密</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519880.png" alt="image.png"></p>
+<p>但是得到这个flag: <code>flag{ikjnmkjh±$}</code>还是过不了原apk的check
+通过调试发现，密文变了不是<code>SSro3CogRALMhCnQRBDyWa^^</code>变成了<code>SSro3CogRALMhCnQRG9yWa^^</code></p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519811.png" alt="fa686bcd2089778e03832656e34b71c.png"></p>
+<p>所以再用<code>SSro3CogRALMhCnQRG9yWa^^</code>解密一次，得到flag: <code>flag{ikjnmkjh@$}</code>，这就可以过check了</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306071519143.jpeg" alt="7c41a84fd36fb8cf5da333553b0480e.jpg"></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-06-07</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/driver_development_and_debug_config/">
+			Next<br>Driver Development and Debug Config
+                </a>
+                
+                
+                
+                <a class="older-posts">
+			Previous<br>No older posts.
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b" class="nav-分析过程">
+									分析过程
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

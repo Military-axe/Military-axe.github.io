@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Driver Development and Debug Config</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/driver_development_and_debug_config/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="Driver Development and Debug Config">
+  <meta property="og:description" content="配置windows驱动开发环境与windbg preview调试技巧，还会记录一下遇到的问题">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-06-08T13:58:36+08:00">
+    <meta property="article:modified_time" content="2023-06-08T13:58:36+08:00">
+    <meta property="article:tag" content="Debug">
+    <meta property="article:tag" content="Driver Development">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Driver Development and Debug Config">
+  <meta name="twitter:description" content="配置windows驱动开发环境与windbg preview调试技巧，还会记录一下遇到的问题">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e5%bc%80%e5%8f%91" class="nav-驱动开发">
+									驱动开发
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%bc%80%e5%8f%91%e7%8e%af%e5%a2%83" class="nav-开发环境">
+									开发环境
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%a1%b9%e7%9b%ae%e8%ae%be%e7%bd%ae" class="nav-项目设置">
+									项目设置
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%99%9a%e6%8b%9f%e6%9c%ba%e8%ae%be%e7%bd%ae" class="nav-虚拟机设置">
+									虚拟机设置
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e8%b0%83%e8%af%95" class="nav-驱动调试">
+									驱动调试
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%97%a5%e5%bf%97%e8%b0%83%e8%af%95%e7%ad%89%e7%ba%a7" class="nav-日志调试等级">
+									日志调试等级
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    Driver Development and Debug Config
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-06-08 13:58
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/driver">Driver</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/debug">debug</a>
+                                &nbsp;
+                            
+                                <a href="/tags/driver-development">driver development</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>配置windows驱动开发环境与windbg preview调试技巧，还会记录一下遇到的问题</p>
+<h2 id="驱动开发">驱动开发</h2>
+<p>我选择的模式是物理机编译开发驱动，虚拟机调试</p>
+<h3 id="开发环境">开发环境</h3>
+<p>开发环境：vs2019 + vscode</p>
+<blockquote>
+<p>选择vs2019的原因是我用vs2022，配置wdk和sdk后，模板中没有minifilter，刚好又是我要用的，只能选择vs2019.
+如果有师傅解决了这个问题麻烦mail我，感激不尽.</p></blockquote>
+<p>sdk version: <code>10.0.19041</code>
+wdk version: <code>10.0.19041</code>, <a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/other-wdk-downloads">WDK 版本和其他下载</a></p>
+<blockquote>
+<p>wdk和sdk版本务必一样，查看wdk是下载下来后，点击安装在安装界面的上边可以看到，我这里是已经安装了所以报错</p></blockquote>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081420890.png" alt="image-20230608142033119"></p>
+<h3 id="项目设置">项目设置</h3>
+<p>根据vs2019的配置与需求配置项目，配置都是在<code>project-&gt;properties</code>中设置，不一定按照这个配置，这个配置是为了开发时候方便调试，一切从简。从上线项目的角度来看，不建议开启下面的，但是我测试项目，上线再说。</p>
+<ol>
+<li><code>c++-&gt;General-&gt;Treat Warnings As Err</code>设置为 No</li>
+<li><code>c++-&gt;Code Generation-&gt;Spectre Mitigation</code>设置Disable</li>
+<li><code>Linker-&gt;General-&gt;Treat Warnings As Err</code>设置为No</li>
+<li><code>Driver-&gt;Settings-&gt;Target OS version</code>设置为<code>Windows 10 or higher</code>，因为我的虚拟机是win10</li>
+<li><code>Configuartion</code>选择Debug，没有证书别选release，否则安装不上</li>
+</ol>
+<p>这些都是vs2019中用于编译的，我开发代码是用vscode，写完了再去vs2019点一下编译，直接用vscode打开项目会很多头文件缺失，补全也很简单，在项目目录下配置一下。</p>
+<p>vscode control+shift+p打开控制面板，选择<code>C/C++ Edit Configuration(JSON)</code>，然后在vs2019右键引用在vscode中缺失的头文件，copy一下路径，配置在vscode的项目json中。实际上只用添加一个路径，我这是<code>&quot;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/km&quot;</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">&#34;configurations&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;name&#34;</span>: <span style="color:#cd5555">&#34;Win32&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;includePath&#34;</span>: [
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;${workspaceFolder}/**&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/km&#34;</span>
+</span></span><span style="display:flex;"><span>            ],
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;defines&#34;</span>: [
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;_DEBUG&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;UNICODE&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;_UNICODE&#34;</span>
+</span></span><span style="display:flex;"><span>            ],
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;windowsSdkVersion&#34;</span>: <span style="color:#cd5555">&#34;10.0.22000.0&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;compilerPath&#34;</span>: <span style="color:#cd5555">&#34;cl.exe&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;cStandard&#34;</span>: <span style="color:#cd5555">&#34;c17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;cppStandard&#34;</span>: <span style="color:#cd5555">&#34;c++17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;intelliSenseMode&#34;</span>: <span style="color:#cd5555">&#34;windows-msvc-x64&#34;</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">&#34;version&#34;</span>: <span style="color:#b452cd">4</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>然后vscode就可以愉快的打代码了</p>
+<h3 id="虚拟机设置">虚拟机设置</h3>
+<p>这个很多文章都有很详细的配置，这里只记录简单的几个我用到的命令，详细的请找别的文章</p>
+<p>虚拟机需要开启测试模式，一般的驱动无法直接安装上在win10 x64下，需要签名，开启测试模式则无需签名</p>
+<blockquote>
+<p>如果安装驱动服务，启动时报签名损毁，577错误时，需要打开windows启动中的高级设置，强制关闭驱动签名验证。</p>
+<p>shift+单机重启 -&gt; 高级选项-&gt;启动设置-&gt;重启，然后选择强制禁用驱动签名</p></blockquote>
+<p><strong>管理员 powershell</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>bcdedit /<span style="color:#8b008b;font-weight:bold">set</span> testsigning on
+</span></span><span style="display:flex;"><span>bcdedit /Debug on
+</span></span><span style="display:flex;"><span>bcdedit /dbgsettings serial baudrate:<span style="color:#b452cd">115200</span> debugport:<span style="color:#b452cd">2</span>
+</span></span></code></pre></div><p>最后一个开启后，还要再虚拟机上设置，开启一个端口才能在物理机上用windbg连上虚拟机</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081444764.png" alt=""></p>
+<p>以下命令都是在管理员权限下执行</p>
+<p><strong>启动服务</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>net start &lt;service_name&gt;
+</span></span></code></pre></div><p><strong>关闭服务</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>net stop &lt;service_anem&gt;
+</span></span></code></pre></div><p><strong>删除服务</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span>sc delete &lt;service_name&gt;
+</span></span></code></pre></div><h2 id="驱动调试">驱动调试</h2>
+<p>在物理机上调试虚拟机中的驱动</p>
+<p>调试软件: <code>windbg preview</code>，设置截图</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306081458667.png" alt=""></p>
+<p>然后再setting中设置源码与符号目录</p>
+<p>连接之后开始调试。</p>
+<p>系统运行中间不能再键入命令，需要再设置什么值则可以点击左上角的Break，然后再键入命令</p>
+<h3 id="日志调试等级">日志调试等级</h3>
+<p>开发中在源码中写入<code>KdPrintEx</code>，并在参数中设置调试等级。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#008b45">KdPrintEx</span>(( DPFLTR_IHVDRIVER_ID,
+</span></span><span style="display:flex;"><span>            DPFLTR_WARNING_LEVEL,
+</span></span><span style="display:flex;"><span>            <span style="color:#cd5555">&#34;[+] HoneyFile: FileNameInfo-&gt;Name.MaximumLength: %d &gt;= 260</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>,
+</span></span><span style="display:flex;"><span>            FileNameInfo-&gt;Name.MaximumLength));
+</span></span></code></pre></div><p><code>DPFLTR_WARNING_LEVEL</code>就是等级，对应的值是1</p>
+<p>在windbg中运行起来后设置</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kd&gt; ed Kd_IHVDRIVER_Mask <span style="color:#b452cd">3</span>
+</span></span></code></pre></div><p>这样，打印的时候进行的运算是<code>(1 &lt;&lt; DPFLTR_WARNING_LEVEL) &amp; Kd_IHVDRIVER_Mask = 2</code>只要值不是0就可以打印出来</p>
+<p><code>Kd_IHVDRIVER_Mask</code>的设置是根据源码中第一个参数设置成<code>Kd_XXXX_Mask</code>的，要是怕变量名重复可以改成</p>
+<pre tabindex="0"><code>nt!Kd_IHVDRIVER_Mask
+</code></pre><p>下面是调试日志等级对应的值</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#define DPFLTR_ERROR_LEVEL 0
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define DPFLTR_WARNING_LEVEL 1
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define DPFLTR_TRACE_LEVEL 2
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define DPFLTR_INFO_LEVEL 3
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#define DPFLTR_MASK 0x80000000
+</span></span></span></code></pre></div>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-06-08</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/pyfet/">
+			Next<br>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/gotyoukey/">
+			Previous<br>2023 XCTF GotYouKey Write Up
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e5%bc%80%e5%8f%91" class="nav-驱动开发">
+									驱动开发
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%bc%80%e5%8f%91%e7%8e%af%e5%a2%83" class="nav-开发环境">
+									开发环境
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%a1%b9%e7%9b%ae%e8%ae%be%e7%bd%ae" class="nav-项目设置">
+									项目设置
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%99%9a%e6%8b%9f%e6%9c%ba%e8%ae%be%e7%bd%ae" class="nav-虚拟机设置">
+									虚拟机设置
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e8%b0%83%e8%af%95" class="nav-驱动调试">
+									驱动调试
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%97%a5%e5%bf%97%e8%b0%83%e8%af%95%e7%ad%89%e7%ba%a7" class="nav-日志调试等级">
+									日志调试等级
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

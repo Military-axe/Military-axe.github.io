@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Frida learn &amp;&amp; sctf 2023 checkFlow</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/frida_learn_and_2023_sctf_check_flow/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="Frida learn && sctf 2023 checkFlow">
+  <meta property="og:description" content="没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-07-03T16:06:30+08:00">
+    <meta property="article:modified_time" content="2023-07-03T16:06:30+08:00">
+    <meta property="article:tag" content="Sctf">
+    <meta property="article:tag" content="Frida">
+    <meta property="article:tag" content="Reverse">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Frida learn && sctf 2023 checkFlow">
+  <meta name="twitter:description" content="没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#frida-hook-%e5%87%bd%e6%95%b0" class="nav-frida-hook-函数">
+									frida hook 函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#checkflow" class="nav-checkflow">
+									checkFlow
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#frida-from-nu1l-wp" class="nav-frida-from-nu1l-wp">
+									frida from NU1L WP
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#ldpc-from-official-wp" class="nav-ldpc-from-official-wp">
+									LDPC from Official WP
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    Frida learn &amp;&amp; sctf 2023 checkFlow
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-07-03 16:06
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/reverse">Reverse</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/sctf">sctf</a>
+                                &nbsp;
+                            
+                                <a href="/tags/frida">frida</a>
+                                &nbsp;
+                            
+                                <a href="/tags/reverse">reverse</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下</p>
+<h1 id="frida-hook-函数">frida hook 函数</h1>
+<p>平时看frida hook函数都是在android中，这里主要还是在elf和pe上。</p>
+<p>下面的脚本是frida attach到进程上，并捕获对应函数，函数给地址就可以，当函数指针一样。然后将值打印出来。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">frida</span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">sys</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>session = frida.attach(<span style="color:#cd5555">&#34;hello&#34;</span>)
+</span></span><span style="display:flex;"><span>script = session.create_script(<span style="color:#cd5555">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">Interceptor.attach(ptr(&#34;</span><span style="color:#cd5555">%s</span><span style="color:#cd5555">&#34;), {
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">    onEnter(args) {
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">        send(args[0].toInt32());
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">});
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">&#34;&#34;&#34;</span> % <span style="color:#658b00">int</span>(sys.argv[<span style="color:#b452cd">1</span>], <span style="color:#b452cd">16</span>))
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">on_message</span>(message, data):
+</span></span><span style="display:flex;"><span>    <span style="color:#658b00">print</span>(message)
+</span></span><span style="display:flex;"><span>script.on(<span style="color:#cd5555">&#39;message&#39;</span>, on_message)
+</span></span><span style="display:flex;"><span>script.load()
+</span></span><span style="display:flex;"><span>sys.stdin.read()
+</span></span></code></pre></div><p>命令行传入需要hook的函数的地址。可以gdb attach进去看再detch出来。或者关掉pie自己算一下偏移。</p>
+<p>捕获函数指针并调用可以这么写</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">frida</span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">sys</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>session = frida.attach(<span style="color:#cd5555">&#34;hello&#34;</span>)
+</span></span><span style="display:flex;"><span>script = session.create_script(<span style="color:#cd5555">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">const f = new NativeFunction(ptr(&#34;</span><span style="color:#cd5555">%s</span><span style="color:#cd5555">&#34;), &#39;void&#39;, [&#39;int&#39;]);
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">f(1911);
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">f(1911);
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">f(1911);
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">&#34;&#34;&#34;</span> % <span style="color:#658b00">int</span>(sys.argv[<span style="color:#b452cd">1</span>], <span style="color:#b452cd">16</span>))
+</span></span><span style="display:flex;"><span>script.load()
+</span></span></code></pre></div><p>用<code>new NativeFunction(ptr(&quot;%s&quot;), 'void', ['int'])</code>来捕获，第一个参数是函数指针，第二个是返回值，第三个是函数的参数类型列表。</p>
+<p>有意思的是，如果在逆向或者分析时不知道确定类型，只知道是指针，那我们可以直接说是指针类型（只要确定是要被引用的就可以用指针类型）。</p>
+<pre tabindex="0"><code>new NativeFunction(ptr(&#34;%s&#34;), &#39;void&#39;, [&#39;pointer&#39;])
+</code></pre><p>比如字符串类型的参数，直接传指针就可以。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">frida</span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">sys</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>session = frida.attach(<span style="color:#cd5555">&#34;hi&#34;</span>)
+</span></span><span style="display:flex;"><span>script = session.create_script(<span style="color:#cd5555">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">const st = Memory.allocUtf8String(&#34;TESTMEPLZ!&#34;);
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">const f = new NativeFunction(ptr(&#34;</span><span style="color:#cd5555">%s</span><span style="color:#cd5555">&#34;), &#39;int&#39;, [&#39;pointer&#39;]);
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">    // In NativeFunction param 2 is the return value type,
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">    // and param 3 is an array of input types
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">f(st);
+</span></span></span><span style="display:flex;"><span><span style="color:#cd5555">&#34;&#34;&#34;</span> % <span style="color:#658b00">int</span>(sys.argv[<span style="color:#b452cd">1</span>], <span style="color:#b452cd">16</span>))
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">def</span> <span style="color:#008b45">on_message</span>(message, data):
+</span></span><span style="display:flex;"><span>    <span style="color:#658b00">print</span>(message)
+</span></span><span style="display:flex;"><span>script.on(<span style="color:#cd5555">&#39;message&#39;</span>, on_message)
+</span></span><span style="display:flex;"><span>script.load()
+</span></span></code></pre></div><p>对于调用PE中的一些api也可以这样，不同的是api一般我们需要“找到”，然后才能调用，（只出js代码）。</p>
+<p>这时候需要用到<code>Module</code>模块，同时对于我们自己生成的一些数据可能要用Memory模块</p>
+<blockquote>
+<p>Module模块主要是对一些库操作，比如查找库机制，查找库中函数地址等。对frida api的具体学习可以查看官方文档或参考FRIDA-API使用篇</p></blockquote>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">var</span> pMessageBoxW = Module.findExportByName(<span style="color:#cd5555">&#34;user32.dll&#34;</span>, <span style="color:#cd5555">&#39;MessageBoxA&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">var</span> lpText = Memory.allocAnsiString(<span style="color:#cd5555">&#34;I&#39;m New MessageBox&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">var</span> funMsgBox = <span style="color:#8b008b;font-weight:bold">new</span> NativeFunction(pMessageBoxW, <span style="color:#cd5555">&#39;uint32&#39;</span>,[<span style="color:#cd5555">&#39;uint32&#39;</span>,<span style="color:#cd5555">&#39;pointer&#39;</span>,<span style="color:#cd5555">&#39;pointer&#39;</span>,<span style="color:#cd5555">&#39;uint32&#39;</span>]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">// 调用
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>funMsgBox(<span style="color:#b452cd">0</span>,ptr(lpText),ptr(lpText),<span style="color:#b452cd">0</span>);
+</span></span></code></pre></div><h1 id="checkflow">checkFlow</h1>
+<p>这题分析两个write up的做法，一个是NU1L的，一个是官方WP，因为NU1L使用的做法就是frida注入来爆破。官方wp说这是一个算法，也能学到一些东西。先按照NU1L的来分析。</p>
+<p>题目地址：<a href="https://github.com/Military-axe/ctf/tree/master/2023/checkflow">ctf/2023/checkflow at master · Military-axe/ctf · GitHub</a></p>
+<h2 id="frida-from-nu1l-wp">frida from NU1L WP</h2>
+<p>打开程序分析后，发现是c++静态编译+去符号的程序。我个人直接使用Finger恢复符号。官方WP说可以用bindiff或者flair来恢复符号，这个flair可以研究一下。因为Finger恢复符号是存在一定的假阳性的，而且我直接恢复程序所有的函数，还用了挺长时间（十几分钟？）</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">__int64</span> <span style="color:#008b45">sub_4062C5</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v0; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> v1; <span style="color:#228b22">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">bool</span> v2; <span style="color:#228b22">// bl
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v3; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> v4; <span style="color:#228b22">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">bool</span> v5; <span style="color:#228b22">// bl
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v6; <span style="color:#228b22">// rbx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v7; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> v8; <span style="color:#228b22">// eax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">bool</span> v9; <span style="color:#228b22">// bl
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v10; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v11; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> v12; <span style="color:#228b22">// rbx
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#8b008b;font-weight:bold">__int64</span> v13; <span style="color:#228b22">// rax
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v15; <span style="color:#228b22">// [rsp+Eh] [rbp-162h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v16; <span style="color:#228b22">// [rsp+Fh] [rbp-161h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> i; <span style="color:#228b22">// [rsp+10h] [rbp-160h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> v18; <span style="color:#228b22">// [rsp+14h] [rbp-15Ch]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> j; <span style="color:#228b22">// [rsp+18h] [rbp-158h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span> v20; <span style="color:#228b22">// [rsp+1Ch] [rbp-154h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *v21; <span style="color:#228b22">// [rsp+20h] [rbp-150h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *v22; <span style="color:#228b22">// [rsp+28h] [rbp-148h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *v23; <span style="color:#228b22">// [rsp+30h] [rbp-140h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *v24; <span style="color:#228b22">// [rsp+38h] [rbp-138h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *v25; <span style="color:#228b22">// [rsp+40h] [rbp-130h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> *v26; <span style="color:#228b22">// [rsp+48h] [rbp-128h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v27[<span style="color:#b452cd">32</span>]; <span style="color:#228b22">// [rsp+50h] [rbp-120h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v28[<span style="color:#b452cd">32</span>]; <span style="color:#228b22">// [rsp+70h] [rbp-100h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v29[<span style="color:#b452cd">32</span>]; <span style="color:#228b22">// [rsp+90h] [rbp-E0h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v30[<span style="color:#b452cd">32</span>]; <span style="color:#228b22">// [rsp+B0h] [rbp-C0h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v31[<span style="color:#b452cd">32</span>]; <span style="color:#228b22">// [rsp+D0h] [rbp-A0h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v32[<span style="color:#b452cd">32</span>]; <span style="color:#228b22">// [rsp+F0h] [rbp-80h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v33[<span style="color:#b452cd">32</span>]; <span style="color:#228b22">// [rsp+110h] [rbp-60h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v34[<span style="color:#b452cd">40</span>]; <span style="color:#228b22">// [rsp+130h] [rbp-40h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span> v35; <span style="color:#228b22">// [rsp+158h] [rbp-18h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  v35 = __readfsqword(<span style="color:#b452cd">0x28u</span>);
+</span></span><span style="display:flex;"><span>  sub_406AE5();
+</span></span><span style="display:flex;"><span>  std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char__::basic_string_std::allocator_char__const__(v30);
+</span></span><span style="display:flex;"><span>  sub_481E90(&amp;unk_5E32E0, <span style="color:#cd5555">&#34;Input the flow:</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>  sub_40E100(&amp;unk_5E3400, v30);
+</span></span><span style="display:flex;"><span>  v22 = v28;
+</span></span><span style="display:flex;"><span>  v21 = &amp;v16;
+</span></span><span style="display:flex;"><span>  std::vector_int__2__2__std::allocator_int__2__2___::vector_ulong_std::allocator_int__2__2___const__(v29, <span style="color:#b452cd">12LL</span>, &amp;v16);
+</span></span><span style="display:flex;"><span>  std::vector_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap___std::allocator_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap____::vector_ulong_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap___const__std::allocator_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap____const__(
+</span></span><span style="display:flex;"><span>    v27,
+</span></span><span style="display:flex;"><span>    <span style="color:#b452cd">1LL</span>,
+</span></span><span style="display:flex;"><span>    v29,
+</span></span><span style="display:flex;"><span>    v28);
+</span></span><span style="display:flex;"><span>  sub_407658(v29);
+</span></span><span style="display:flex;"><span>  _gnu_cxx::new_allocator_std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char___::_new_allocator___0(&amp;v16);
+</span></span><span style="display:flex;"><span>  _gnu_cxx::new_allocator_std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char___::_new_allocator___1(v28);
+</span></span><span style="display:flex;"><span>  v24 = &amp;v16;
+</span></span><span style="display:flex;"><span>  v23 = &amp;v15;
+</span></span><span style="display:flex;"><span>  std::vector_int__2__2__std::allocator_int__2__2___::vector_ulong_std::allocator_int__2__2___const__(v29, <span style="color:#b452cd">6LL</span>, &amp;v15);
+</span></span><span style="display:flex;"><span>  std::vector_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap___std::allocator_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap____::vector_ulong_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap___const__std::allocator_std::vector_Solution::SiteSnap_std::allocator_Solution::SiteSnap____const__(
+</span></span><span style="display:flex;"><span>    v28,
+</span></span><span style="display:flex;"><span>    <span style="color:#b452cd">1LL</span>,
+</span></span><span style="display:flex;"><span>    v29,
+</span></span><span style="display:flex;"><span>    &amp;v16);
+</span></span><span style="display:flex;"><span>  sub_407658(v29);
+</span></span><span style="display:flex;"><span>  _gnu_cxx::new_allocator_std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char___::_new_allocator___0(&amp;v15);
+</span></span><span style="display:flex;"><span>  _gnu_cxx::new_allocator_std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char___::_new_allocator___1(&amp;v16);
+</span></span><span style="display:flex;"><span>  v25 = v29;
+</span></span><span style="display:flex;"><span>  sub_407782(v31, <span style="color:#cd5555">&#34;000000000000&#34;</span>, v29);
+</span></span><span style="display:flex;"><span>  _gnu_cxx::new_allocator_std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char___::_new_allocator__(v29);
+</span></span><span style="display:flex;"><span>  std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char__::basic_string_std::allocator_char__const__(v32);
+</span></span><span style="display:flex;"><span>  std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char__::basic_string_std::allocator_char__const__(v33);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">for</span> ( i = <span style="color:#b452cd">0</span>; ; i += <span style="color:#b452cd">12</span> )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    v12 = i;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( v12 &gt;= sub_493F60(v30) )
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char__::substr_ulong_ulong_(v34, v30, i, <span style="color:#b452cd">12LL</span>);
+</span></span><span style="display:flex;"><span>    sub_493D80(v33, v34);
+</span></span><span style="display:flex;"><span>    llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( sub_493F60(v33) != <span style="color:#b452cd">12</span> )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      v0 = sub_481E90(&amp;unk_5E32E0, <span style="color:#cd5555">&#34;Length error.&#34;</span>);
+</span></span><span style="display:flex;"><span>      sub_480730(v0, std::endl_char_std::char_traits_char___std::basic_ostream_char_std::char_traits_char_____);
+</span></span><span style="display:flex;"><span>      exit(<span style="color:#b452cd">1LL</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( !(<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int8</span>)sub_407028(v33, v27, v28) )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      v11 = sub_481E90(&amp;unk_5E32E0, <span style="color:#cd5555">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>      sub_480730(v11, std::endl_char_std::char_traits_char___std::basic_ostream_char_std::char_traits_char_____);
+</span></span><span style="display:flex;"><span>      exit(<span style="color:#b452cd">1LL</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( i )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      sub_496AA0(v34, v31);
+</span></span><span style="display:flex;"><span>      v18 = sub_407141(v34);
+</span></span><span style="display:flex;"><span>      llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      v18 = -<span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    sub_496AA0(v34, v33);
+</span></span><span style="display:flex;"><span>    v1 = sub_407141(v34);
+</span></span><span style="display:flex;"><span>    v2 = v18 &lt; v1;
+</span></span><span style="display:flex;"><span>    llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( !v2 )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      v10 = sub_481E90(&amp;unk_5E32E0, <span style="color:#cd5555">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>      sub_480730(v10, std::endl_char_std::char_traits_char___std::basic_ostream_char_std::char_traits_char_____);
+</span></span><span style="display:flex;"><span>      exit(<span style="color:#b452cd">1LL</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> ( j = v18 + <span style="color:#b452cd">1</span>; ; ++j )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      sub_496AA0(v34, v33);
+</span></span><span style="display:flex;"><span>      v4 = sub_407141(v34);
+</span></span><span style="display:flex;"><span>      v5 = j &lt; v4;
+</span></span><span style="display:flex;"><span>      llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( !v5 )
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>      sub_4070E1(v34, j);
+</span></span><span style="display:flex;"><span>      sub_493D80(v32, v34);
+</span></span><span style="display:flex;"><span>      llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">if</span> ( (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int8</span>)sub_407028(v32, v27, v28) )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        v3 = sub_481E90(&amp;unk_5E32E0, <span style="color:#cd5555">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>        sub_480730(v3, std::endl_char_std::char_traits_char___std::basic_ostream_char_std::char_traits_char_____);
+</span></span><span style="display:flex;"><span>        exit(<span style="color:#b452cd">1LL</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    v6 = (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#00688b;font-weight:bold">int</span>)(i + <span style="color:#b452cd">12</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> ( v6 == sub_493F60(v30) )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      sub_496AA0(v34, v33);
+</span></span><span style="display:flex;"><span>      v20 = sub_407141(v34) + <span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>      llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">while</span> ( <span style="color:#b452cd">1</span> )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        v26 = v29;
+</span></span><span style="display:flex;"><span>        sub_407782(v34, <span style="color:#cd5555">&#34;111111111111&#34;</span>, v29);
+</span></span><span style="display:flex;"><span>        v8 = sub_407141(v34);
+</span></span><span style="display:flex;"><span>        v9 = v8 &gt;= v20;
+</span></span><span style="display:flex;"><span>        llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>        _gnu_cxx::new_allocator_std::__cxx11::basic_string_char_std::char_traits_char__std::allocator_char___::_new_allocator__(v29);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> ( !v9 )
+</span></span><span style="display:flex;"><span>          <span style="color:#8b008b;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>        sub_4070E1(v34, v20);
+</span></span><span style="display:flex;"><span>        sub_493D80(v32, v34);
+</span></span><span style="display:flex;"><span>        llvm::SmallVector_uint_4u_::_SmallVector___3(v34);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">if</span> ( (<span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int8</span>)sub_407028(v32, v27, v28) )
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          v7 = sub_481E90(&amp;unk_5E32E0, <span style="color:#cd5555">&#34;Emmmmmm......Wrong.&#34;</span>);
+</span></span><span style="display:flex;"><span>          sub_480730(v7, std::endl_char_std::char_traits_char___std::basic_ostream_char_std::char_traits_char_____);
+</span></span><span style="display:flex;"><span>          exit(<span style="color:#b452cd">1LL</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        ++v20;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    ngx_http_lua_ffi_parse_http_time(v31, v33);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  v13 = sub_481E90(&amp;unk_5E32E0, <span style="color:#cd5555">&#34;Get the flag to MD5, and package with sctf{}&#34;</span>);
+</span></span><span style="display:flex;"><span>  sub_480730(v13, std::endl_char_std::char_traits_char___std::basic_ostream_char_std::char_traits_char_____);
+</span></span><span style="display:flex;"><span>  llvm::SmallVector_uint_4u_::_SmallVector___3(v33);
+</span></span><span style="display:flex;"><span>  llvm::SmallVector_uint_4u_::_SmallVector___3(v32);
+</span></span><span style="display:flex;"><span>  llvm::SmallVector_uint_4u_::_SmallVector___3(v31);
+</span></span><span style="display:flex;"><span>  sub_40772C(v28);
+</span></span><span style="display:flex;"><span>  sub_40772C(v27);
+</span></span><span style="display:flex;"><span>  llvm::SmallVector_uint_4u_::_SmallVector___3(v30);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0LL</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>可以看到<code>sub_407028</code>这个函数是一个关键的检查函数，通过调试发现，输入并不会改变docheck函数中的状态值，也就说我们可以不停构造输入去爆破，直到能过check。</p>
+<p>上述程序两次调用<code>sub_407028</code>，实际上分段检查flag，每一段是12个字符。并且经过调试，字符只能是0或者1，那么12个bit就是小于4096是可以爆破的。</p>
+<p>如果使用frida来爆破，那首先需要这个循环不停执行，所以需要patch出一个死循环，在<code>sub_407028</code>的位置。并且要保证vector这些初始化已经结束，因为3个参数，第一个是输入，其他两个是两个vector。所以尝试直接在函数调用时patch成死循环，再通过gdb attach的方法，attach进去查看参数地址，在frida脚本中可以直接以指针形式指向这两个参数地址。</p>
+<p>patch前</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406531</span>                               loc_406531:                             <span style="color:#228b22">; CODE XREF: sub_4062C5+235↑j
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406531</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">8</span><span style="color:#008b45">D</span> <span style="color:#b452cd">95</span> <span style="color:#b452cd">00</span> <span style="color:#00688b">FF</span> <span style="color:#00688b">FF</span> <span style="color:#00688b">FF</span>          <span style="color:#00688b">lea</span>     <span style="color:#00688b">rdx</span>, [<span style="color:#00688b">rbp</span><span style="color:#a61717;background-color:#e3d2d2">+</span><span style="color:#00688b">var_100</span>]
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406538</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">8</span><span style="color:#008b45">D</span> <span style="color:#b452cd">8</span><span style="color:#00688b">D</span> <span style="color:#00688b">E0</span> <span style="color:#00688b">FE</span> <span style="color:#00688b">FF</span> <span style="color:#00688b">FF</span>          <span style="color:#00688b">lea</span>     <span style="color:#00688b">rcx</span>, [<span style="color:#00688b">rbp</span><span style="color:#a61717;background-color:#e3d2d2">+</span><span style="color:#00688b">var_120</span>]
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">000000000040653</span><span style="color:#008b45">F</span> <span style="color:#b452cd">48</span> <span style="color:#b452cd">8</span><span style="color:#00688b">D</span> <span style="color:#b452cd">45</span> <span style="color:#00688b">A0</span>                   <span style="color:#00688b">lea</span>     <span style="color:#00688b">rax</span>, [<span style="color:#00688b">rbp</span><span style="color:#a61717;background-color:#e3d2d2">+</span><span style="color:#00688b">var_60</span>]
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406543</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">89</span> <span style="color:#008b45">CE</span>                      <span style="color:#00688b">mov</span>     <span style="color:#00688b">rsi</span>, <span style="color:#00688b">rcx</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406546</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">89</span> <span style="color:#008b45">C7</span>                      <span style="color:#00688b">mov</span>     <span style="color:#00688b">rdi</span>, <span style="color:#00688b">rax</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406549</span> <span style="color:#008b45">E8</span> <span style="color:#00688b">DA</span> <span style="color:#b452cd">0</span><span style="color:#00688b">A</span> <span style="color:#b452cd">00</span> <span style="color:#b452cd">00</span>                <span style="color:#00688b">call</span>    <span style="color:#00688b">sub_407028</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406549</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">000000000040654</span><span style="color:#008b45">E</span> <span style="color:#b452cd">84</span> <span style="color:#00688b">C0</span>                         <span style="color:#00688b">test</span>    <span style="color:#00688b">al</span>, <span style="color:#00688b">al</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406550</span> <span style="color:#a61717;background-color:#e3d2d2">0</span><span style="color:#008b45">F</span> <span style="color:#b452cd">84</span> <span style="color:#b452cd">09</span> <span style="color:#b452cd">03</span> <span style="color:#b452cd">00</span> <span style="color:#b452cd">00</span>             <span style="color:#00688b">jz</span>      <span style="color:#00688b">loc_40685F</span>
+</span></span></code></pre></div><p>patch后</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406531</span>                               loc_406531:                             <span style="color:#228b22">; CODE XREF: sub_4062C5+235↑j
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406531</span>                                                                       <span style="color:#228b22">; sub_4062C5+289↓j
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406531</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">8</span><span style="color:#008b45">D</span> <span style="color:#b452cd">95</span> <span style="color:#b452cd">00</span> <span style="color:#00688b">FF</span> <span style="color:#00688b">FF</span> <span style="color:#00688b">FF</span>          <span style="color:#00688b">lea</span>     <span style="color:#00688b">rdx</span>, [<span style="color:#00688b">rbp</span><span style="color:#a61717;background-color:#e3d2d2">+</span><span style="color:#00688b">var_100</span>]
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406538</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">8</span><span style="color:#008b45">D</span> <span style="color:#b452cd">8</span><span style="color:#00688b">D</span> <span style="color:#00688b">E0</span> <span style="color:#00688b">FE</span> <span style="color:#00688b">FF</span> <span style="color:#00688b">FF</span>          <span style="color:#00688b">lea</span>     <span style="color:#00688b">rcx</span>, [<span style="color:#00688b">rbp</span><span style="color:#a61717;background-color:#e3d2d2">+</span><span style="color:#00688b">var_120</span>]
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">000000000040653</span><span style="color:#008b45">F</span> <span style="color:#b452cd">48</span> <span style="color:#b452cd">8</span><span style="color:#00688b">D</span> <span style="color:#b452cd">45</span> <span style="color:#00688b">A0</span>                   <span style="color:#00688b">lea</span>     <span style="color:#00688b">rax</span>, [<span style="color:#00688b">rbp</span><span style="color:#a61717;background-color:#e3d2d2">+</span><span style="color:#00688b">var_60</span>]
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406543</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">89</span> <span style="color:#008b45">CE</span>                      <span style="color:#00688b">mov</span>     <span style="color:#00688b">rsi</span>, <span style="color:#00688b">rcx</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406546</span> <span style="color:#a61717;background-color:#e3d2d2">48</span> <span style="color:#a61717;background-color:#e3d2d2">89</span> <span style="color:#008b45">C7</span>                      <span style="color:#00688b">mov</span>     <span style="color:#00688b">rdi</span>, <span style="color:#00688b">rax</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406549</span> <span style="color:#008b45">E8</span> <span style="color:#00688b">DA</span> <span style="color:#b452cd">0</span><span style="color:#00688b">A</span> <span style="color:#b452cd">00</span> <span style="color:#b452cd">00</span>                <span style="color:#00688b">call</span>    <span style="color:#00688b">sub_407028</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">0000000000406549</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#a61717;background-color:#e3d2d2">000000000040654</span><span style="color:#008b45">E</span> <span style="color:#00688b">EB</span> <span style="color:#00688b">E1</span>                         <span style="color:#00688b">jmp</span>     <span style="color:#00688b">short</span> <span style="color:#00688b">loc_406531</span>                <span style="color:#228b22">; Keypatch modified this from:
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>.text:<span style="color:#a61717;background-color:#e3d2d2">000000000040654</span><span style="color:#008b45">E</span>                                                                       <span style="color:#228b22">;   test al, al
+</span></span></span></code></pre></div><p>patch成这样后，调用完<code>sub_4070208</code>后会继续调用原本的参数地址，再进入函数，形成一个死循环（保留原本参数是为了在frida脚本没hook之前能正常运行，不让程序崩溃）</p>
+<p>启动patch后的程序，gdb attch上去后，断在sub_407028上，看一下两个vector的指针地址</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307031328915.png" alt="image-20230703132805333"></p>
+<p>然后写js脚本</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span>console.log(<span style="color:#cd5555">&#34;[+] load script&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">var</span> doCheck = <span style="color:#8b008b;font-weight:bold">new</span> NativeFunction(<span style="color:#8b008b;font-weight:bold">new</span> NativePointer(<span style="color:#b452cd">0x407028</span>), <span style="color:#cd5555">&#39;bool&#39;</span>, [<span style="color:#cd5555">&#39;pointer&#39;</span>, <span style="color:#cd5555">&#39;pointer&#39;</span>, <span style="color:#cd5555">&#39;pointer&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">var</span> string_init = <span style="color:#8b008b;font-weight:bold">new</span> NativeFunction(<span style="color:#8b008b;font-weight:bold">new</span> NativePointer(<span style="color:#b452cd">0x407782</span>), <span style="color:#cd5555">&#39;pointer&#39;</span>, [<span style="color:#cd5555">&#39;pointer&#39;</span>, <span style="color:#cd5555">&#39;pointer&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">var</span> s = Memory.alloc(<span style="color:#b452cd">100</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">function</span> intTo12BitBinaryString(num) {
+</span></span><span style="display:flex;"><span>    num = num &amp; <span style="color:#b452cd">0xFFF</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">let</span> binaryString = num.toString(<span style="color:#b452cd">2</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">while</span> (binaryString.length &lt; <span style="color:#b452cd">12</span>) {
+</span></span><span style="display:flex;"><span>        binaryString = <span style="color:#cd5555">&#39;0&#39;</span> + binaryString;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> binaryString;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#8b008b;font-weight:bold">var</span> i = <span style="color:#b452cd">0</span>; i &lt; <span style="color:#b452cd">4096</span>; i++) {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">var</span> ss = intTo12BitBinaryString(i)
+</span></span><span style="display:flex;"><span>    string_init(s, Memory.allocUtf8String(ss))
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (doCheck(s, <span style="color:#8b008b;font-weight:bold">new</span> NativePointer(<span style="color:#b452cd">0x00007ffff0c05b60</span>), <span style="color:#8b008b;font-weight:bold">new</span> NativePointer(<span style="color:#b452cd">0x00007ffff0c05b80</span>))) {
+</span></span><span style="display:flex;"><span>        console.log(ss)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>console.log(<span style="color:#cd5555">&#34;[+] script end&#34;</span>)
+</span></span></code></pre></div><p>gdb detach后运行frida脚本。爆破出来的结果是能通过0x406549检查的输入，但是NU1L的脚本就到这了，与实际结果还是有差的，并且每次运行的结果会不同。考虑到可能是patch的方法不好，每次循环使用同样的vector可能会有问题。但是NU1L也没说怎么patch的。只是按上面这样调用是可以得到结果，只是不能用于解题。</p>
+<h2 id="ldpc-from-official-wp">LDPC from Official WP</h2>
+<p>官方WP显示这是一个LDPC校验码</p>
+<pre tabindex="0"><code>原码:
+          |0 1 0|
+生成矩阵:
+          |1 0 0 0 1 1|
+          |0 1 0 1 0 1|
+          |0 0 1 1 1 0|
+LDPC校验码生成, 就是矩阵乘法(元素乘法使用与运算代替, 加法使用异或代替):
+          |1 0 0 0 1 1|
+|0 1 0| * |0 1 0 1 0 1| = |0 1 0 1 0 1|
+          |0 0 1 1 1 0|
+经过矩阵乘法得到的1 * 6矩阵就是LDPC校验码. 其中: 前三位是原码, 后三位是校验码
+</code></pre><p>可以看到，源码是前三位，校验码是后三位。也就是生成过程中，校验码只和生成矩阵的后三列有关。</p>
+<p>根据后三列的不同，可以得到不同的源码与校验码的关系，如果是上面的矩阵，则源码(x1,x2,x3)与校验码(y1,y2,y3)的关系如下</p>
+<p>$$ y_1 = x_2\oplus x_3 $$
+$$ y_2 = x_1\oplus x_3 $$
+$$ y_3 = x_1\oplus x_2 $$</p>
+<p>同样的，根据上面的映射我们也能得到对应的矩阵。</p>
+<p>然后程序一开始初始化了一个矩阵</p>
+<pre tabindex="0"><code>|1 1 1 0 1 1 0 1 0 1 0 1|
+|1 0 0 1 1 0 1 1 0 1 0 0|
+|0 1 1 1 0 0 1 0 1 0 0 1|
+|0 1 0 0 0 1 1 0 1 1 1 0|
+|1 0 1 1 1 0 0 0 1 0 1 0|
+|0 0 0 0 0 1 0 1 0 0 1 1|
+</code></pre><p>然后程序的逻辑是</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307031436901.png" alt="image-20230703143655965"></p>
+<p>也就是找出这个生成矩阵，能验证的所有LDPC码，并按从小到大的顺序排列</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">import</span> <span style="color:#008b45;text-decoration:underline">numpy</span> <span style="color:#8b008b;font-weight:bold">as</span> <span style="color:#008b45;text-decoration:underline">np</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>N = <span style="color:#b452cd">12</span>
+</span></span><span style="display:flex;"><span>K = <span style="color:#b452cd">6</span>
+</span></span><span style="display:flex;"><span>H = np.array(
+</span></span><span style="display:flex;"><span>    [
+</span></span><span style="display:flex;"><span>        [<span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">0</span>, <span style="color:#b452cd">1</span>, <span style="color:#b452cd">1</span>],
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># print(H)</span>
+</span></span><span style="display:flex;"><span>b = []
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">2</span>**N):  <span style="color:#228b22"># 2^10 = 1024</span>
+</span></span><span style="display:flex;"><span>    a = <span style="color:#658b00">format</span>(i, <span style="color:#cd5555">&#34;b&#34;</span>)  <span style="color:#228b22"># 列举出所有可能的校验码</span>
+</span></span><span style="display:flex;"><span>    b.append(<span style="color:#cd5555">&#34;</span><span style="color:#cd5555">{:0&gt;12s}</span><span style="color:#cd5555">&#34;</span>.format(a))
+</span></span><span style="display:flex;"><span>v = np.zeros((<span style="color:#b452cd">2</span>**N, N))  <span style="color:#228b22"># 存储所有的校验码的元组</span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">2</span>**N):  <span style="color:#228b22"># 从⼩到⼤</span>
+</span></span><span style="display:flex;"><span>    v[i] = b[i]
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">for</span> j <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(N):  <span style="color:#228b22"># 存储校验码</span>
+</span></span><span style="display:flex;"><span>        v[i][j] = b[i][j]  <span style="color:#228b22"># v是0000000~1111111</span>
+</span></span><span style="display:flex;"><span>w = np.zeros((<span style="color:#b452cd">1</span>, N - K))
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#b452cd">2</span>**N):
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> np.all(np.dot(v[i], H.T) % <span style="color:#b452cd">2</span> == w):
+</span></span><span style="display:flex;"><span>        <span style="color:#658b00">print</span>(v[i])
+</span></span></code></pre></div><h1 id="参考">参考</h1>
+<p><a href="https://frida.re/docs/functions/">Functions | Frida • A world-class dynamic instrumentation toolkit</a></p>
+<p><a href="https://blog.csdn.net/fenfei331/article/details/117755003">Frida在windows上的玩法_frida hook windows_奋飞安全的博客-CSDN博客</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/101401252">FRIDA-API使用篇：rpc、Process、Module、Memory使用方法及示例 - 知乎 (zhihu.com)</a></p>
+<p><a href="https://mp.weixin.qq.com/s/56nSyavj9ovMrzBN0BhEOA">SCTF 2023 WP By Nu1L Team (qq.com)</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/514670102">LDPC码（一种前向纠错码）：基础 &amp; 译码算法 - 知乎 (zhihu.com)</a></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-07-03</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/ida_symbolic_recovery/">
+			Next<br>Ida Symbolic Recovery
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/%E5%A4%A9%E8%9E%8D%E4%BF%A1wp/">
+			Previous<br>2023 Two Reverse CrackMe WriteUp
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#frida-hook-%e5%87%bd%e6%95%b0" class="nav-frida-hook-函数">
+									frida hook 函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#checkflow" class="nav-checkflow">
+									checkFlow
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#frida-from-nu1l-wp" class="nav-frida-from-nu1l-wp">
+									frida from NU1L WP
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#ldpc-from-official-wp" class="nav-ldpc-from-official-wp">
+									LDPC from Official WP
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

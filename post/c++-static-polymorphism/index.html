@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/c&#43;&#43;-static-polymorphism/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="C&#43;&#43; static polymorphism && Curiously recurring template pattern">
+  <meta property="og:description" content="在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C&#43;&#43;多态我都不太熟，于是简单学习一下这个部分（C&#43;&#43;真tm难啊">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2025-01-10T00:40:23+08:00">
+    <meta property="article:modified_time" content="2025-01-10T00:40:23+08:00">
+    <meta property="article:tag" content="C&#43;&#43;">
+    <meta property="article:tag" content="Polymorphism">
+    <meta property="article:tag" content="CRTP">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="C&#43;&#43; static polymorphism && Curiously recurring template pattern">
+  <meta name="twitter:description" content="在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C&#43;&#43;多态我都不太熟，于是简单学习一下这个部分（C&#43;&#43;真tm难啊">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%a4%9a%e6%80%81" class="nav-多态">
+									多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%8a%a8%e6%80%81%e5%a4%9a%e6%80%81" class="nav-动态多态">
+									动态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e7%8e%b0%e6%9c%ba%e5%88%b6" class="nav-实现机制">
+									实现机制
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%81%b5%e6%b4%bb%e6%80%a7%e5%92%8c%e5%8f%af%e7%bb%b4%e6%8a%a4%e6%80%a7" class="nav-灵活性和可维护性">
+									灵活性和可维护性
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%80%a7%e8%83%bd" class="nav-性能">
+									性能
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%b8%b8%e8%a7%81%e5%8a%a8%e6%80%81%e5%a4%9a%e6%80%81" class="nav-常见动态多态">
+									常见动态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e9%9d%99%e6%80%81%e5%a4%9a%e6%80%81" class="nav-静态多态">
+									静态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e7%8e%b0%e6%9c%ba%e5%88%b6-1" class="nav-实现机制-1">
+									实现机制
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%81%b5%e6%b4%bb%e6%80%a7%e5%92%8c%e5%8f%af%e7%bb%b4%e6%8a%a4%e6%80%a7-1" class="nav-灵活性和可维护性-1">
+									灵活性和可维护性
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%80%a7%e8%83%bd-1" class="nav-性能-1">
+									性能
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%b8%b8%e8%a7%81%e9%9d%99%e6%80%81%e5%a4%9a%e6%80%81" class="nav-常见静态多态">
+									常见静态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#curiously-recurring-template-pattern" class="nav-curiously-recurring-template-pattern">
+									Curiously recurring template pattern
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e7%8e%b0%e6%9c%ba%e5%88%b6%e4%b8%8e%e5%8e%9f%e7%90%86" class="nav-实现机制与原理">
+									实现机制与原理
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%b1%87%e7%bc%96%e5%af%b9%e6%af%94" class="nav-汇编对比">
+									汇编对比
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%bc%98%e5%8a%bf" class="nav-优势">
+									优势
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%af%b9%e8%b1%a1%e8%ae%a1%e6%95%b0%e5%99%a8" class="nav-对象计数器">
+									对象计数器
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%a4%9a%e6%80%81%e9%93%be" class="nav-多态链">
+									多态链
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%a4%9a%e6%80%81%e5%85%8b%e9%9a%86%e5%87%bd%e6%95%b0" class="nav-多态克隆函数">
+									多态克隆函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83%e6%96%87%e6%a1%a3" class="nav-参考文档">
+									参考文档
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2025-01-10 00:40
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/c&#43;&#43;">C&#43;&#43;</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/c&#43;&#43;">c&#43;&#43;</a>
+                                &nbsp;
+                            
+                                <a href="/tags/polymorphism">polymorphism</a>
+                                &nbsp;
+                            
+                                <a href="/tags/crtp">CRTP</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C++多态我都不太熟，于是简单学习一下这个部分（C++真tm难啊</p>
+<h1 id="多态">多态</h1>
+<p>多态（Polymorphism）是面向对象编程（Object - Oriented Programming，OOP）中的一个重要概念。它指的是同一个操作作用于不同的对象，可以有不同的解释，产生不同的执行结果。简单来说，多态允许使用统一的接口来处理多种不同类型的对象。</p>
+<p>在C++中多态分为两种，静态多态和动态多态。</p>
+<p>动态多态的优势是灵活性，能在运行时才确定具体类型。静态多态相对应的则是在性能上比动态多态更具备优势。动态多态是需要使用虚表来查找具体的函数实现，再通过函数指针间接调用函数，会造成性能的损失。</p>
+<h2 id="动态多态">动态多态</h2>
+<h3 id="实现机制">实现机制</h3>
+<p>依赖于虚函数表（v-table）。当一个类包含虚函数时，编译器会为这个类创建一个虚函数表，虚函数表中存储了虚函数的地址。每个含有虚函数的类对象内部会有一个指针（v-pointer），这个指针指向所属类的虚函数表。在运行时，当通过基类指针或引用调用虚函数时，就会根据对象的 v-pointer 找到对应的虚函数表，然后根据虚函数在表中的位置调用正确的函数。这种机制有一定的运行时开销，因为需要通过额外的指针查找来确定函数调用。</p>
+<h3 id="灵活性和可维护性">灵活性和可维护性</h3>
+<p>提供了高度的灵活性，特别是在处理具有层次结构的对象集合时。可以方便地添加新的派生类，只要遵循基类的虚函数接口规范，就可以在不修改原有代码（通过基类指针或引用调用虚函数的代码）的基础上，实现新的功能。例如，在一个图形绘制系统中，有<code>Shape</code>基类和<code>Circle</code>、<code>Rectangle</code>等派生类。如果要添加一个新的图形类型（如<code>Triangle</code>），只需要从<code>Shape</code>类派生，并重写<code>draw</code>等虚函数，而不用修改绘制图形的主程序代码（只要主程序是通过<code>Shape*</code>或<code>Shape&amp;</code>来调用<code>draw</code>函数的）。不过，动态多态的代码调试可能会稍微复杂一些，因为函数调用的实际路径是在运行时确定的。</p>
+<h3 id="性能">性能</h3>
+<p>由于运行时需要查找虚函数表来确定函数调用，会有一定的性能开销。每次通过基类指针或引用调用虚函数时，都需要进行间接的内存访问来获取虚函数表指针，然后再查找函数地址。在对性能要求极高的场景下，这种开销可能需要考虑。不过，现代编译器和处理器在优化方面也做了很多工作，在一定程度上减轻了这种性能损失。</p>
+<h3 id="常见动态多态">常见动态多态</h3>
+<p>常见的动态多态是通过虚函数来实现的</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;iostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;string&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;vector&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span><span style="color:#8b008b;font-weight:bold">constexpr</span> <span style="color:#00688b;font-weight:bold">double</span> PI = <span style="color:#b452cd">3.14159</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Shape</span> {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">virtual</span> <span style="color:#00688b;font-weight:bold">double</span> area() <span style="color:#8b008b;font-weight:bold">const</span> = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Circle</span> : <span style="color:#8b008b;font-weight:bold">public</span> Shape {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> radius;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  Circle(<span style="color:#00688b;font-weight:bold">double</span> r) : radius(r) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> <span style="color:#008b45">area</span>() <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#8b008b;font-weight:bold">override</span> { <span style="color:#8b008b;font-weight:bold">return</span> PI * radius * radius; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Bracket</span> : <span style="color:#8b008b;font-weight:bold">public</span> Shape {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> edge;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  Bracket(<span style="color:#00688b;font-weight:bold">double</span> e) : edge(e) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> <span style="color:#008b45">area</span>() <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#8b008b;font-weight:bold">override</span> { <span style="color:#8b008b;font-weight:bold">return</span> edge * edge; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">double</span> <span style="color:#008b45">sum_all_shape</span>(std::vector&lt;Shape*&gt; vec = {}) {
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> sum(<span style="color:#b452cd">0</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#8b008b;font-weight:bold">auto</span> s : vec) {
+</span></span><span style="display:flex;"><span>    sum += s-&gt;area();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> sum;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">int</span> argc, <span style="color:#00688b;font-weight:bold">char</span> **argv) {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> (argc &lt; <span style="color:#b452cd">3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> -<span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Circle circle(std::stod(argv[<span style="color:#b452cd">1</span>]));
+</span></span><span style="display:flex;"><span>  Bracket bracket(std::stod(argv[<span style="color:#b452cd">2</span>]));
+</span></span><span style="display:flex;"><span>  std::vector&lt;Shape *&gt; vec = {&amp;circle, &amp;bracket};
+</span></span><span style="display:flex;"><span>  std::cout &lt;&lt; sum_all_shape(vec) &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="静态多态">静态多态</h2>
+<h3 id="实现机制-1">实现机制</h3>
+<p>函数重载是基于编译器对函数签名（包括函数名、参数类型、参数个数、参数顺序等）的匹配。编译器在编译阶段扫描代码，根据函数调用的实参情况，在符号表中查找匹配的函数定义。对于模板，编译器会在编译时根据模板参数进行模板实例化。它根据模板的定义和调用时提供的模板实参，生成具体的函数或类代码。相比动态多态，静态多态在编译时就确定了调用关系，没有运行时查找虚函数表的开销。</p>
+<h3 id="灵活性和可维护性-1">灵活性和可维护性</h3>
+<p>函数重载的灵活性相对较低。当需要增加新的功能，可能需要修改函数的参数列表或者添加新的重载函数，这可能会导致代码的膨胀和维护成本的增加。但是，由于函数调用是在编译时确定的，所以调试相对容易，编译器能够在编译阶段发现一些错误，如参数类型不匹配等。模板的灵活性较高，它可以用于创建通用的代码结构，适用于多种数据类型。不过，模板代码的编译错误信息可能比较复杂，而且模板的实例化过程可能会导致代码膨胀（生成了多个针对不同类型的函数或类版本）</p>
+<h3 id="性能-1">性能</h3>
+<p>因为函数调用是在编译时确定的，没有运行时查找虚函数表的开销，所以在性能上通常比动态多态要好。特别是对于一些对性能敏感的代码，如底层的数值计算库等，静态多态可以提供更好的性能。但是，模板的实例化可能会导致代码体积增大，这可能会对程序的加载时间和内存占用等方面产生一定的影响。</p>
+<h3 id="常见静态多态">常见静态多态</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">add</span>(<span style="color:#00688b;font-weight:bold">int</span> a, <span style="color:#00688b;font-weight:bold">int</span> b) {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> a + b;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">double</span> <span style="color:#008b45">add</span>(<span style="color:#00688b;font-weight:bold">double</span> a, <span style="color:#00688b;font-weight:bold">double</span> b) {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> a + b;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">int</span> result1 = add(<span style="color:#b452cd">3</span>, <span style="color:#b452cd">4</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> result2 = add(<span style="color:#b452cd">3.5</span>, <span style="color:#b452cd">4.5</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>模板也是实现静态多态的一种方式。例如函数模板</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">template</span>&lt;<span style="color:#8b008b;font-weight:bold">typename</span> T&gt;T max(T a, T b) {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> (a &gt; b)? a : b;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">int</span> result1 = max(<span style="color:#b452cd">3</span>, <span style="color:#b452cd">4</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> result2 = max(<span style="color:#b452cd">3.5</span>, <span style="color:#b452cd">4.5</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h1 id="curiously-recurring-template-pattern">Curiously recurring template pattern</h1>
+<p>Curiously Recurring Template Pattern（CRTP），即奇异递归模板模式，是一种 C++ 编程中的设计模式。它是一种基于模板的技术，用于在编译时实现静态多态性。这种模式的特点是将派生类作为模板参数传递给基类。</p>
+<p>使用这种方式来实现常规动态多态的例子</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;iostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;string&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">constexpr</span> <span style="color:#00688b;font-weight:bold">double</span> PI = <span style="color:#b452cd">3.14159</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">T</span>&gt; <span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Shape</span> {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> area() { <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#8b008b;font-weight:bold">static_cast</span>&lt;T *&gt;(<span style="color:#8b008b;font-weight:bold">this</span>)-&gt;area_impl(); }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Circle</span> : <span style="color:#8b008b;font-weight:bold">public</span> Shape&lt;Circle&gt; {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> radius;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  Circle(<span style="color:#00688b;font-weight:bold">double</span> r) : radius(r) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> <span style="color:#008b45">area_impl</span>() { <span style="color:#8b008b;font-weight:bold">return</span> PI * radius * radius; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Bracket</span> : <span style="color:#8b008b;font-weight:bold">public</span> Shape&lt;Bracket&gt; {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> edge;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  Bracket(<span style="color:#00688b;font-weight:bold">double</span> e) : edge(e) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> <span style="color:#008b45">area_impl</span>() { <span style="color:#8b008b;font-weight:bold">return</span> edge * edge; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">int</span> argc, <span style="color:#00688b;font-weight:bold">char</span> **argv) {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> (argc &lt; <span style="color:#b452cd">3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> -<span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Circle circle(std::stod(argv[<span style="color:#b452cd">1</span>]));
+</span></span><span style="display:flex;"><span>  Bracket bracket(std::stod(argv[<span style="color:#b452cd">2</span>]));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">double</span> sum = circle.area() + bracket.area();
+</span></span><span style="display:flex;"><span>  std::cout &lt;&lt; sum &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="实现机制与原理">实现机制与原理</h2>
+<ul>
+<li>
+<p>编译时多态性：CRTP 主要利用了模板在编译时实例化的特性。当编译器遇到<code>Shape&lt;T&gt;</code>这种模板实例化的代码时，它会在编译时生成具体的代码。在<code>Shape</code>类的<code>area</code>函数中，通过<code>static_cast</code>强制转换<code>this</code>指针，编译器能够确定转换后的类型是<code>T*</code>，因为<code>T</code>类在继承<code>Shape</code>类时明确了自己作为模板参数。这种在编译时确定的函数调用关系体现了静态多态性。</p>
+</li>
+<li>
+<p>代码生成与继承关系：由于<code>T</code>类继承自<code>Shape&lt;T&gt;</code>，<code>T</code>类中的成员函数（如<code>aera_impl</code>）可以访问<code>T</code>类中的成员（通过<code>static_cast</code>转换后的<code>this</code>指针）。编译器在生成代码时，会根据<code>T</code>类的实际定义来确定<code>aera_impl</code>函数的具体实现。例如，如果<code>T</code>类的<code>area_impl</code>函数有不同的实现逻辑，那么在不同的<code>T</code>类实例中，<code>Shape</code>类的<code>area</code>函数调用<code>aera_impl</code>函数时会产生不同的行为，这类似于多态性，但这种多态是在编译时确定的。</p>
+</li>
+</ul>
+<h2 id="汇编对比">汇编对比</h2>
+<p>使用静态多态，在编译时就确定了调用的函数</p>
+<pre tabindex="0"><code class="language-Assembly" data-lang="Assembly">lea     rcx, [rbp+40h+var_28]
+call    j_?area@?$Shape@VCircle@@@@QEAANXZ ; Shape&lt;Circle&gt;::area(void)
+movsd   [rbp+40h+var_A0], xmm0
+lea     rcx, [rbp+40h+var_50]
+</code></pre><p>对应的就是</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>v5 = Shape&lt;Circle&gt;::area();    
+</span></span></code></pre></div><p>而动态多态则需要在查询虚表获取函数指针</p>
+<pre tabindex="0"><code class="language-Assembly" data-lang="Assembly">mov     rax, [rax]
+mov     [rbp+var_38], rax
+mov     rcx, [rbp+var_38]
+mov     rax, [rcx]
+mov     rax, [rax]
+loc_14000C0E4:                          ; DATA XREF: .rdata:000000014010E5C4↓o
+try {
+  call    rax  
+} // starts at 14000C0E4
+loc_14000C0E6:                          ; DATA XREF: .rdata:000000014010E5CC↓o
+movsd   [rbp+var_48], xmm0
+jmp     $+5
+</code></pre><p>对应的c++代码是</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>v4 = (*v1)-&gt;area(*v1);
+</span></span></code></pre></div><h2 id="优势">优势</h2>
+<p>除了静态多态的固有优势外，这种模拟多态绑定的模式，可以方便的实现代码复用。虽然无法做到运行时多态那么灵活，但是也可以在一些场景中方便的做代码复用</p>
+<p>接下来介绍几种CRTP有优势场景</p>
+<h1 id="对象计数器">对象计数器</h1>
+<p>对象计数器的主要用途是检索给定类的对象创建和销毁统计数据，使用CRTP可以很简单的解决</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;cstdint&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;iostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;memory&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;string&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;vector&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span><span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">typename</span> T&gt; <span style="color:#8b008b;font-weight:bold">struct</span> <span style="color:#008b45;font-weight:bold">counter</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">static</span> <span style="color:#8b008b;font-weight:bold">inline</span> <span style="color:#00688b;font-weight:bold">int</span> objects_created = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">static</span> <span style="color:#8b008b;font-weight:bold">inline</span> <span style="color:#00688b;font-weight:bold">int</span> objects_alive = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  counter() {
+</span></span><span style="display:flex;"><span>    ++objects_created;
+</span></span><span style="display:flex;"><span>    ++objects_alive;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  counter(<span style="color:#8b008b;font-weight:bold">const</span> counter &amp;) {
+</span></span><span style="display:flex;"><span>    ++objects_created;
+</span></span><span style="display:flex;"><span>    ++objects_alive;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">protected</span>:
+</span></span><span style="display:flex;"><span>  ~counter() <span style="color:#228b22">// objects should never be removed through pointers of this type
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  {
+</span></span><span style="display:flex;"><span>    --objects_alive;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">X</span> : <span style="color:#8b008b;font-weight:bold">public</span> counter&lt;X&gt; {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">uint32_t</span> x;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  X(<span style="color:#00688b;font-weight:bold">uint32_t</span> val) : x(val) {}
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Y</span> : <span style="color:#8b008b;font-weight:bold">public</span> counter&lt;Y&gt; {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">uint32_t</span> y;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  Y(<span style="color:#00688b;font-weight:bold">uint32_t</span> val) : y(val) {}
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">int</span> argc, <span style="color:#00688b;font-weight:bold">char</span> **argv) {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> (argc &lt; <span style="color:#b452cd">3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> -<span style="color:#b452cd">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  std::vector&lt;std::unique_ptr&lt;X&gt;&gt; x_arr;
+</span></span><span style="display:flex;"><span>  std::vector&lt;std::unique_ptr&lt;Y&gt;&gt; y_arr;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#8b008b;font-weight:bold">auto</span> i = <span style="color:#b452cd">0</span>; i &lt; std::stoul(argv[<span style="color:#b452cd">1</span>]); ++i) {
+</span></span><span style="display:flex;"><span>    x_arr.push_back(std::make_unique&lt;X&gt;(i));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">for</span> (<span style="color:#8b008b;font-weight:bold">auto</span> i = <span style="color:#b452cd">0</span>; i &lt; std::stoul(argv[<span style="color:#b452cd">2</span>]); ++i) {
+</span></span><span style="display:flex;"><span>    y_arr.push_back(std::make_unique&lt;Y&gt;(i));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  std::cout &lt;&lt; <span style="color:#cd5555">&#34;object x num: &#34;</span> &lt;&lt; X::objects_alive &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>  std::cout &lt;&lt; <span style="color:#cd5555">&#34;object y num: &#34;</span> &lt;&lt; Y::objects_alive &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>每次创建 X 类对象时，都会调用计数器<!-- raw HTML omitted -->的构造函数，使创建计数和存活计数递增。 每次销毁 X 类对象时，存活计数都会递减。</p>
+<p>需要注意的是，counter<!-- raw HTML omitted --> 和 counter<!-- raw HTML omitted --> 是两个不同的类，这就是它们分别保存 X 和 Y 的计数的原因。 在 CRTP 的这个示例中，类的这种区别是模板参数（counter<!-- raw HTML omitted --> 中的 T）的唯一用途，也是我们不能使用简单的非模板基类的原因。</p>
+<h1 id="多态链">多态链</h1>
+<p>方法链又称命名参数习语，是面向对象编程语言中调用多个方法的常用语法。 每个方法都会返回一个对象，这样就可以在一条语句中将这些调用串联起来，而无需使用变量来存储中间结果。</p>
+<p>多态链就是使用多态来实现方法链。先来看一个失败的例子，在未使用多态的情况下，链条可能会中断，无法连续调用。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;iostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">enum</span> <span style="color:#008b45;font-weight:bold">Color</span> {
+</span></span><span style="display:flex;"><span>  Red,
+</span></span><span style="display:flex;"><span>  Blue,
+</span></span><span style="display:flex;"><span>  Green,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Printer</span> {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  Printer(std::ostream &amp;pstream) : m_stream(pstream) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">typename</span> T&gt; Printer &amp;print(T &amp;&amp;t) {
+</span></span><span style="display:flex;"><span>    m_stream &lt;&lt; t;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> *<span style="color:#8b008b;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">typename</span> T&gt; Printer &amp;println(T &amp;&amp;t) {
+</span></span><span style="display:flex;"><span>    m_stream &lt;&lt; t &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> *<span style="color:#8b008b;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  std::ostream &amp;m_stream;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">CoutPrinter</span> : <span style="color:#8b008b;font-weight:bold">public</span> Printer {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  CoutPrinter() : Printer(std::cout) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  CoutPrinter &amp;SetConsoleColor(Color c) {
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// ...
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">return</span> *<span style="color:#8b008b;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>上面的两个类，可以使用如下的链来打印</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>Printer(myStream).println(<span style="color:#cd5555">&#34;hello&#34;</span>).println(<span style="color:#b452cd">500</span>);
+</span></span></code></pre></div><p>但是如果使用父类的调用子类函数就会失败，哪怕链条最开始是由子类对象调用</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#228b22">//                           v----- we have a &#39;Printer&#39; here, not a &#39;CoutPrinter&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>CoutPrinter().print(<span style="color:#cd5555">&#34;Hello &#34;</span>).SetConsoleColor(Color.red).println(<span style="color:#cd5555">&#34;Printer!&#34;</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#228b22">// compile error
+</span></span></span></code></pre></div><p>编译报错是因为，<code>print</code> 函数返回的是<code>Printer &amp;</code>类型，是基类，链后续调用的函数<code>SetConsoleColor</code>是子类函数，所以会报错。这里就需要用到多态，可以使用CRTP来避免这种问题</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;iostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ostream&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">enum</span> <span style="color:#008b45;font-weight:bold">Color</span> {
+</span></span><span style="display:flex;"><span>  Red,
+</span></span><span style="display:flex;"><span>  Blue,
+</span></span><span style="display:flex;"><span>  Green,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">typename</span> ConcretePrinter&gt; <span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Printer</span> {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  Printer(std::ostream &amp;pstream) : m_stream(pstream) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">typename</span> T&gt; Printer &amp;print(T &amp;&amp;t) {
+</span></span><span style="display:flex;"><span>    m_stream &lt;&lt; t;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> *<span style="color:#8b008b;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">typename</span> T&gt; Printer &amp;println(T &amp;&amp;t) {
+</span></span><span style="display:flex;"><span>    m_stream &lt;&lt; t &lt;&lt; std::endl;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> *<span style="color:#8b008b;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">private</span>:
+</span></span><span style="display:flex;"><span>  std::ostream &amp;m_stream;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">// Derived class
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">CoutPrinter</span> : <span style="color:#8b008b;font-weight:bold">public</span> Printer&lt;CoutPrinter&gt; {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  CoutPrinter() : Printer(std::cout) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  CoutPrinter &amp;SetConsoleColor(Color c) {
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// ...
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#8b008b;font-weight:bold">return</span> *<span style="color:#8b008b;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">// usage
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>CoutPrinter().print(<span style="color:#cd5555">&#34;Hello &#34;</span>).SetConsoleColor(Color.red).println(<span style="color:#cd5555">&#34;Printer!&#34;</span>);
+</span></span></code></pre></div><h1 id="多态克隆函数">多态克隆函数</h1>
+<p>在使用多态性时，有时需要通过基类指针创建对象副本。 一个常用的成语就是在每个派生类中定义一个虚拟克隆函数。 CRTP 可用于避免在每个派生类中复制该函数或其他类似函数。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#228b22">// Base class has a pure virtual function for cloning
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">AbstractShape</span> {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">virtual</span> ~AbstractShape() = <span style="color:#8b008b;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">virtual</span> std::unique_ptr&lt;AbstractShape&gt; clone() <span style="color:#8b008b;font-weight:bold">const</span> = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">// This CRTP class implements clone() for Derived
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#8b008b;font-weight:bold">template</span> &lt;<span style="color:#8b008b;font-weight:bold">typename</span> Derived&gt; <span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Shape</span> : <span style="color:#8b008b;font-weight:bold">public</span> AbstractShape {
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">public</span>:
+</span></span><span style="display:flex;"><span>  std::unique_ptr&lt;AbstractShape&gt; clone() <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#8b008b;font-weight:bold">override</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> std::make_unique&lt;Derived&gt;(<span style="color:#8b008b;font-weight:bold">static_cast</span>&lt;Derived <span style="color:#8b008b;font-weight:bold">const</span> &amp;&gt;(*<span style="color:#8b008b;font-weight:bold">this</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">protected</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#228b22">// We make clear Shape class needs to be inherited
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  Shape() = <span style="color:#8b008b;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span>  Shape(<span style="color:#8b008b;font-weight:bold">const</span> Shape &amp;) = <span style="color:#8b008b;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span>  Shape(Shape &amp;&amp;) = <span style="color:#8b008b;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">// Every derived class inherits from CRTP class instead of abstract class
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Square</span> : <span style="color:#8b008b;font-weight:bold">public</span> Shape&lt;Square&gt; {};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">class</span> <span style="color:#008b45;font-weight:bold">Circle</span> : <span style="color:#8b008b;font-weight:bold">public</span> Shape&lt;Circle&gt; {};
+</span></span></code></pre></div><p>静态多态性的一个问题是，如果不使用像上例中的 AbstractShape 这样的通用基类，派生类就无法同构存储，也就是说，无法将同一基类派生的不同类型放在同一容器中。 例如，定义为 std::vector&lt;Shape*&gt; 的容器是行不通的，因为 Shape 不是一个类，而是一个需要特殊化的模板。 定义为 std::vector&lt;Shape<!-- raw HTML omitted --><em>&gt; 的容器只能存储圆形，而不能存储正方形。 这是因为从 CRTP 基类 Shape 派生的每个类都是唯一的类型。 解决这一问题的常见方法是从具有虚拟析构函数的共享基类继承，如上面的 AbstractShape 示例，这样就可以创建一个 std::vector&lt;AbstractShape</em>&gt;。</p>
+<h1 id="参考文档">参考文档</h1>
+<p><a href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern</a></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2025-01-10</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/llvm-base-dev/">
+			Next<br>llvm base development environment configuration
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">
+			Previous<br>Windows进程隐藏初探
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%a4%9a%e6%80%81" class="nav-多态">
+									多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%8a%a8%e6%80%81%e5%a4%9a%e6%80%81" class="nav-动态多态">
+									动态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e7%8e%b0%e6%9c%ba%e5%88%b6" class="nav-实现机制">
+									实现机制
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%81%b5%e6%b4%bb%e6%80%a7%e5%92%8c%e5%8f%af%e7%bb%b4%e6%8a%a4%e6%80%a7" class="nav-灵活性和可维护性">
+									灵活性和可维护性
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%80%a7%e8%83%bd" class="nav-性能">
+									性能
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%b8%b8%e8%a7%81%e5%8a%a8%e6%80%81%e5%a4%9a%e6%80%81" class="nav-常见动态多态">
+									常见动态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e9%9d%99%e6%80%81%e5%a4%9a%e6%80%81" class="nav-静态多态">
+									静态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e7%8e%b0%e6%9c%ba%e5%88%b6-1" class="nav-实现机制-1">
+									实现机制
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%81%b5%e6%b4%bb%e6%80%a7%e5%92%8c%e5%8f%af%e7%bb%b4%e6%8a%a4%e6%80%a7-1" class="nav-灵活性和可维护性-1">
+									灵活性和可维护性
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%80%a7%e8%83%bd-1" class="nav-性能-1">
+									性能
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%b8%b8%e8%a7%81%e9%9d%99%e6%80%81%e5%a4%9a%e6%80%81" class="nav-常见静态多态">
+									常见静态多态
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#curiously-recurring-template-pattern" class="nav-curiously-recurring-template-pattern">
+									Curiously recurring template pattern
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e7%8e%b0%e6%9c%ba%e5%88%b6%e4%b8%8e%e5%8e%9f%e7%90%86" class="nav-实现机制与原理">
+									实现机制与原理
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%b1%87%e7%bc%96%e5%af%b9%e6%af%94" class="nav-汇编对比">
+									汇编对比
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%bc%98%e5%8a%bf" class="nav-优势">
+									优势
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%af%b9%e8%b1%a1%e8%ae%a1%e6%95%b0%e5%99%a8" class="nav-对象计数器">
+									对象计数器
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%a4%9a%e6%80%81%e9%93%be" class="nav-多态链">
+									多态链
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%a4%9a%e6%80%81%e5%85%8b%e9%9a%86%e5%87%bd%e6%95%b0" class="nav-多态克隆函数">
+									多态克隆函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83%e6%96%87%e6%a1%a3" class="nav-参考文档">
+									参考文档
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

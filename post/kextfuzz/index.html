@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/kextfuzz/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations">
+  <meta property="og:description" content="来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章
+讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决
+通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-06-14T15:53:46+08:00">
+    <meta property="article:modified_time" content="2023-06-14T15:53:46+08:00">
+    <meta property="article:tag" content="Fuzz">
+    <meta property="article:tag" content="MacOS">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations">
+  <meta name="twitter:description" content="来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章
+讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决
+通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%83%8c%e6%99%af%e4%b8%8e%e5%9b%b0%e9%9a%be" class="nav-背景与困难">
+									背景与困难
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%9f%e8%ae%a1%e4%bb%a3%e7%a0%81%e8%a6%86%e7%9b%96%e7%8e%87" class="nav-统计代码覆盖率">
+									统计代码覆盖率
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%8e%a5%e5%8f%a3%e8%af%86%e5%88%ab" class="nav-接口识别">
+									接口识别
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%9d%83%e9%99%90%e8%bf%87%e6%bb%a4%e5%99%a8" class="nav-权限过滤器">
+									权限过滤器
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#kextfuzz-%e7%bb%93%e6%9e%84" class="nav-kextfuzz-结构">
+									KextFuzz 结构
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#binary-rewriting" class="nav-binary-rewriting">
+									binary rewriting
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%a8%a1%e6%8b%9f%e6%89%a7%e8%a1%8c%e7%9a%84%e6%b1%a1%e7%82%b9" class="nav-模拟执行的污点">
+									模拟执行的污点
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%88%9d%e5%a7%8b%e5%8c%96%e5%af%84%e5%ad%98%e5%99%a8%e4%b8%8e%e5%86%85%e5%ad%98" class="nav-初始化寄存器与内存">
+									初始化寄存器与内存
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%88%86%e6%9e%90%e5%88%9b%e5%bb%bacorefoundation%e5%af%b9%e8%b1%a1%e7%9a%84%e5%87%bd%e6%95%b0" class="nav-分析创建corefoundation对象的函数">
+									分析创建CoreFoundation对象的函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e6%95%b0%e6%8d%ae" class="nav-实验数据">
+									实验数据
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e4%b8%80" class="nav-实验一">
+									实验一
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e4%ba%8c" class="nav-实验二">
+									实验二
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e4%b8%89" class="nav-实验三">
+									实验三
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-06-14 15:53
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/paper">Paper</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/fuzz">fuzz</a>
+                                &nbsp;
+                            
+                                <a href="/tags/macos">macOS</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章</p>
+<p>讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决</p>
+<p>通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz</p>
+<h1 id="背景与困难">背景与困难</h1>
+<p>macOS的内核中有很大一部分是KEXT(Kernel Extension)，可以直接当作Linux中的驱动。但是在mac中是闭源的。由于闭源，分析难度高，所以漏洞挖掘与测试不充分，这也使得kext成为主要的攻击面。
+但是对kext fuzz有3方面的问题</p>
+<ol>
+<li>怎么采集代码覆盖率：Coverage 反馈是提升 fuzz 效率的基本手段。其采集方法通常有代码插桩（kcov）、硬件监听（Intel-PT）与虚拟层监听（AFL-qemu）几种方式。但是三种方法都不使用kext. 源码插桩无法适用闭源组件，binary rewriting的闭源插桩具有一定可行，但是内核中使用这种插桩很容易系统崩溃，不使用与内核；apple silicon不提供Intel-PT 相似的硬件监听功能；Apple Silicon macOS 系统虚拟化技术仍不成熟，虚拟化环境能够支持的 kext 十分有限。</li>
+<li>如何识别接口格式：能准确得到接口格式，对fuzz数据的生成有更好的帮助，但是闭源程序信息少，macOS驱动接口又复杂，大量不同种类与格式的输入。</li>
+<li>如何绕过权限检查：macOS 驱动广泛使用 Entitlement 检查限制能够调用驱动的用户态程序，而大部分 Entitlement 仅分配给苹果公司或部分特殊开发者（如大型公司），包括 Fuzzer 在内的普通第三方程序难以获取，这限制了 Fuzzer 能够触发的代码范围。然而，在实战中，攻击者仍然可以通过构造攻击链，利用受保护代码中的漏洞，使得受 Entitlement 保护的特权代码成为了一个缺少测试的独特攻击面。</li>
+</ol>
+<h1 id="统计代码覆盖率">统计代码覆盖率</h1>
+<p>kext在统计代码覆盖率上使用的还是binary rewriting实现代码覆盖率插桩。直接加入指令会造成原有指令便宜，很容易破坏原有程序（静态分析修复可以修复一部分，但是也难以全面），在内核环境下不适用。
+kext中使用了ARM的一个PA（Pointer Authentication）机制，这个机制是插入一些指令来保证控制流完整，这些指令会提高漏洞利用的难度，但是对于fuzz来说这些指令是没有实际作用的，同时不对正常功能有影响。所以作者直接去除这些PA指令，用这些指令的位置来添加插桩的代码。</p>
+<!-- raw HTML omitted -->
+<h1 id="接口识别">接口识别</h1>
+<p>kext用户态的调用很规范，所以可以通过静态污点分析来分析用户态调用kext接口片段代码，从而分析出接口参数格式。KextFuzz设计了一个多标签静态五点方法来分析kext用户空间包装器代码。</p>
+<blockquote>
+<p>macOS为内核服务提供了抽象层，其中的组件将复杂的kext调用封装成良好的服务，并以标准的方式与kext互动。但是这些包装器也是闭源的，所以还是得二进制文件静态污点分析来还原出来。</p></blockquote>
+<!-- raw HTML omitted -->
+<p>KextFuzz建立了调用kext接口(\(I\))的函数(\(F\))的控制流程图(CFG)。然后，KextFuzz提取了从\(F\)的函数入口开始到\(I\)结束的路径(\(\lambda\))作为分析目标，也就是上图
+污点分析定义污点源</p>
+<ul>
+<li>kext接口的输出(\(s1\))：一些kext接口使用其他接口的输出作为输入，这些值要求很精确，很难通过突变产生，所以通过这个标签来识别</li>
+<li>全局变量(\(s2\))</li>
+<li>对象创建函数返回值(\(s3\)) ：有一些参数是一些特别的对象，这些对象很复杂，由特殊的API创建，所以识别这些函数，在函数的返回值上打上标记。</li>
+<li>栈和堆的指针(\(s4\))：在堆栈寄存器（SP，arm64的x29）和内存分配函数的返回值上添加污点标签</li>
+<li>调用者函数参数(\(s5\))：c++开发的二进制文件在导入外部函数时，函数名是经过命令粉碎（name mangling）机制的，此时外部函数的参数信息也会在命名上得到显示，如果\(I\)接口调用函数\(F\)的参数，那也可以用于识别，所以在\(F\)的参数上识别</li>
+</ul>
+<h1 id="权限过滤器">权限过滤器</h1>
+<p>权限保护敏感功能不被普通用户调用，只有授权的公司和产品才能调用，这也增加了测试的难度，使得这些代码缺乏测试。KextFuzz自动像攻击者一样绕过这部分检查。
+kexts调用检查函数来检查权限（这部分函数由 macOS XNU和AMFI kext实现）。需要被检查kexts（也就是外部驱动）需要调用外部的kexts检查函数。
+KextFuzz通过二进制重写来hook检查器函数来劫持权限检查。</p>
+<blockquote>
+<p>在57个有权限检查的kexts中，有8个与安全有关，9个与系统管理有关，使用权限过滤器成功绕郭权限检查，并使用kextFuzz发现了18个特权代码漏洞。</p></blockquote>
+<h1 id="kextfuzz-结构">KextFuzz 结构</h1>
+<!-- raw HTML omitted -->
+<h2 id="binary-rewriting">binary rewriting</h2>
+<!-- raw HTML omitted -->
+<h2 id="模拟执行的污点">模拟执行的污点</h2>
+<p>使用Triton作为污点分析引擎。由于只分析代码片段，所有有两个问题</p>
+<ul>
+<li>如何初始化寄存器和内存</li>
+<li>对于其他调用函数怎么分析？尤其是创建CoreFoundation对象的函数，这些函数提供了参数类型信息？</li>
+</ul>
+<p>KextFuzz使用特殊的值来初始化程序状态。同时必须在分析开始前对函数参数和堆栈指针初始化，对应就是\(s4,s5\)</p>
+<!-- raw HTML omitted -->
+<h3 id="初始化寄存器与内存">初始化寄存器与内存</h3>
+<p>在初始化中使用的特殊值被编码，如图6所示。KextFuzz将寄存器和内存分为32位单元。在每个单元中，KextFuzz使用高位来记录污点来源和详细信息（例如，函数和参数索引）。
+它还记录了嵌套级别以识别指针。嵌套级别指的是访问该值所需的解除引用次数。指针使用零级。它们所指向的内存块使用第一级，进一步说，第二级和第三级。
+在执行之前，KextFuzz初始化了寄存器和内存，如图6所示。参数以及它们所指向的内存都是用\(s5\)标签初始化的。因此，污点标签不会在指针解除引用时丢失。
+macOS中的封装二进制文件主要是用C++开发的，所以KextFuzz认为存储在X0中的F的第一个参数是一个THIS变量指针，它可以被看作是一个全局变量，需要使用标签\(s2\)。</p>
+<h3 id="分析创建corefoundation对象的函数">分析创建CoreFoundation对象的函数</h3>
+<p>KextFuzz为这些函数创建了一个通用抽象函数\(M\)，共同模式是输入为值和大小，输出为指向一段内存的指针，在返回的指针和内存块上会被我们添加\(s3\)的标签</p>
+<h1 id="实验数据">实验数据</h1>
+<p>实验数据来解答以下几个问题：</p>
+<ul>
+<li>覆盖率采集器可以采集多少基本块？开销如何，能帮助KextFuzz找到更多bug吗?</li>
+<li>kexts生成的接口规范与SyzGen生成的接口规范相比如何？</li>
+<li>KextFuzz能在kexts中发现多少个bug？</li>
+</ul>
+<h2 id="实验一">实验一</h2>
+<!-- raw HTML omitted -->
+<h2 id="实验二">实验二</h2>
+<p>分析接口识别模块的效果与作用，与SyzGen对比，SyzGen是目前最先进的macOS接口识别工具。</p>
+<blockquote>
+<p>SyzGen是intel芯片下的，kextFuzz是arm芯片下的。所以选取了一个有两种版本的mac系统macOS 11.5.2，然后去除两个不同服务的部分。只保留在两个系统中都存在的服务，接口等。</p></blockquote>
+<p>结果显示KextFuzz发现70个有效的服务和97个客户端。SyzGen发现了43个服务和43个客户端</p>
+<h2 id="实验三">实验三</h2>
+<p>对KextFuzz使用不同的配置来测试</p>
+<ul>
+<li>KF-K: 只用kext二进制文件中提取的接口信息来Fuzz。（接口信息包括服务名称，客户端类型，函数名，参数）</li>
+<li>KF-En-K: 二进制文件提取信息+权限过滤，与KF-K相比，可以多测试有权限检查器保护的特权代码</li>
+<li>KF-En-K&amp;U：在KF-En-K上加上使用接口分析器</li>
+<li>KF-En-SyzGen: 使用SyzGen分析接口信息</li>
+</ul>
+<!-- raw HTML omitted -->
+<h1 id="参考">参考</h1>
+<p><a href="https://mp.weixin.qq.com/s?__biz=Mzg5ODUxMzg0Ng==&amp;mid=2247495000&amp;idx=1&amp;sn=c52f5395e5fcec0196733e83e7d3c212&amp;chksm=c063c381f7144a979d712e9467e82f8e2a22f87417f17af1960d13591f3f07dc2ddb65d0e444&amp;scene=178&amp;cur_album_id=2324026554710114306#rd">G.O.S.S.I.P 阅读推荐 2023-04-26 KextFuzz</a></p>
+<p><a href="https://github.com/JonathanSalwan/Triton">Triton 污点分析引擎 github</a></p>
+<p><a href="https://www.usenix.org/conference/usenixsecurity23/presentation/yin#:~:text=KextFuzz%20exploits%20these%20mitigation%20schemes%20to%20instrument%20the,48%20unique%20kernel%20bugs%20in%20the%20macOS%20kexts">usenix security</a></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-06-14</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/%E5%A4%A9%E8%9E%8D%E4%BF%A1wp/">
+			Next<br>2023 Two Reverse CrackMe WriteUp
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/pyfet/">
+			Previous<br>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%83%8c%e6%99%af%e4%b8%8e%e5%9b%b0%e9%9a%be" class="nav-背景与困难">
+									背景与困难
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%9f%e8%ae%a1%e4%bb%a3%e7%a0%81%e8%a6%86%e7%9b%96%e7%8e%87" class="nav-统计代码覆盖率">
+									统计代码覆盖率
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%8e%a5%e5%8f%a3%e8%af%86%e5%88%ab" class="nav-接口识别">
+									接口识别
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%9d%83%e9%99%90%e8%bf%87%e6%bb%a4%e5%99%a8" class="nav-权限过滤器">
+									权限过滤器
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#kextfuzz-%e7%bb%93%e6%9e%84" class="nav-kextfuzz-结构">
+									KextFuzz 结构
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#binary-rewriting" class="nav-binary-rewriting">
+									binary rewriting
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%a8%a1%e6%8b%9f%e6%89%a7%e8%a1%8c%e7%9a%84%e6%b1%a1%e7%82%b9" class="nav-模拟执行的污点">
+									模拟执行的污点
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%88%9d%e5%a7%8b%e5%8c%96%e5%af%84%e5%ad%98%e5%99%a8%e4%b8%8e%e5%86%85%e5%ad%98" class="nav-初始化寄存器与内存">
+									初始化寄存器与内存
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%88%86%e6%9e%90%e5%88%9b%e5%bb%bacorefoundation%e5%af%b9%e8%b1%a1%e7%9a%84%e5%87%bd%e6%95%b0" class="nav-分析创建corefoundation对象的函数">
+									分析创建CoreFoundation对象的函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e6%95%b0%e6%8d%ae" class="nav-实验数据">
+									实验数据
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e4%b8%80" class="nav-实验一">
+									实验一
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e4%ba%8c" class="nav-实验二">
+									实验二
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%9e%e9%aa%8c%e4%b8%89" class="nav-实验三">
+									实验三
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>
