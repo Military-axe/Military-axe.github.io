@@ -1,93 +1,207 @@
-baseURL = "https://military-axe.github.io/"
-DefaultContentLanguage = "en" # Theme's display language, supports: en, fr, zh, zh-hant
+
+baseurl = "https://military-axe.github.io/"
+disablePathToLower = false
 languageCode = "en-us"
 title = "Mi1itray.axe"
-copyright = "mi1itray.axe copyright."
-theme = "diary"
-disablePathToLower = false
+theme = "Hugo-Octopress"
 
+# Disqus shortcode
+# Disable comments for any individual post by adding "comments: false" in its frontmatter
+# Note it's not under [params] anymore
+# disqusShortname = "Your disqus shortname"
 
-# Generate sitemap in the public folder
-[sitemap]
-  changefreq = "always"
-  filename = "sitemap.xml"
-  priority = 0.5
+# Number of blog posts in each pagination page
+[pagination]
+  pagerSize = 6
 
-# Google Analytics
-[services]
-  [services.googleAnalytics]
-    id = "G-XXXXXXXXXX"  # Your Google Analytics ID
+[permalinks]
+post = "/blog/:year-:month-:day-:title/" # change the post URL to look like the old ones
 
 [markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true  # 允许渲染 HTML 标签
+  # Default is startLevel 2 and endLevel 3, we want to render every heading
+  [markup.tableOfContents]
+    endLevel = 8
+    startLevel = 1
+  # set the Chroma highlighting options
+  # https://gohugo.io/getting-started/configuration-markup/#highlight
   [markup.highlight]
-    codeFences = true
-    guessSyntax = false
-    hl_Lines = ""
-    lineNoStart = 1
-    lineNos = false
-    lineNumbersInTable = true
-    noClasses = true
-    style = "perldoc"
-    tabWidth = 4
+    style = "solarized-dark"
+  # if you want to keep using Blackfriday
+  # defaultMarkdownHandler = "blackfriday"
+  #   [markup.blackFriday]
+  #     hrefTargetBlank = true # open links in a new tab
 
 [params]
-subtitle = "mi1itray.axe@gmail.com"
-enableGitalk = false
-enableGiscus = true
 
-# Microsoft Clarity (https://clarity.microsoft.com/) is a free user behavior recording and analytics tool
-clarity = "abcdefghzd"
+  # --- Start sidebar options ---
+  # Number of last posts that will be displayed in the sidebar - set to 0 or remove to hide this section
+  sidebarRecentLimit = 8
 
-# Twitter Card and Open Graph settings
-enableOpenGraph = true
-enableTwitterCards = true
-title = "My Blog" # will set 'og:site_name'
-description = "My HomePage Description"  # will set 'og:description'
+  # Sidebar header - passed to markdownify so you can write markdown here
+  sidebarHeader = "About"
 
-[params.gitalk]
-  owner = "user"
-  repo = "repo name"
-  client_id = "your client id"
-  client_secret = "your client secret"
-[taxonomies]
-   tag = "tags"
-   category = "categories"
+  # Sidebar text also supports markdown
+  # New lines can be added with two spaces at the end of line. New paragraphs can be added with two an empty line.
+  # when adding two new lines, remember to remove the indentation otherwise the new line will be treated as a codeblock
+  sidebarText = """mi1itray.axe's blog
 
-[params.utterances]
-repo="your repo"
-term="[ENTER TERM HERE]"
-label="your label"
-theme="github-light"
+  This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.
 
-# Please visit https://giscus.app/ to generate settings.
-[params.giscus]
-    data_repo="username/repo"
-    data_repo_id="**************************"    
-    data_category="General"
-    data_category_id="*********************"
-    data_mapping="pathname"
-    data_strict="0"
-    data_reactions_enabled="1"
-    data_emit_metadata="0"
-    data_input_position="bottom"
-    data_theme="preferred_color_scheme"
-    data_lang="en"
-    crossorigin="anonymous"
+  You can use gpg to contact me, My public key in [here](./gpg_publickey.asc)
+  """
+  # Sidebar menu - if true will add a sidebar menu between sidebar text and recent posts
+  sidebarMenuEnabled = true
+  sidebarMenuHeader = "Friend Link"
 
+  # sidebar links
+  github = "https://github.com/Military-axe"
+  email = "mailto:mi1itray.axe@gmail.com"
+  bitbucket = ""
+  twitter = ""
+  mastodon = ""
+  keybase = ""
+  stackoverflow = ""
+  linkedin = ""
+  youtube = ""
+  facebook = ""
+  instagram = ""
+
+  # --- End sidebar options ---
+
+  # If set to true, navigation menu links will open in a new window with the exception of links to root ("/")
+  # If this item does not exist or set to false, then navigation menu links will open in the same window
+  navigationNewWindow = true
+
+  # If false, all of blog post will appear on front page (and in pagination)
+  truncate = true
+
+  # Author's name (appears in meta tags and under posts)
+  author = "Mi1itray.axe"
+
+  # This text appears in the site header under website title
+  subtitle = "mi1itray.axe@gmail.com"
+
+  # Search engine URL
+  searchEngineURL = "https://www.google.com/search"
+
+  # Text of the "Continue Reading" label. Supports markdown and inline HTML.
+  # For example, &rarr; == right arrow.
+  continueReadingText = "Would you like to know more? &rarr;"
+
+  # Optional piwik tracking
+  # [params.analytics.piwik]
+  #  URL = "https://stats.example.com"
+  #  ID = "42"
+
+  # Switch to true to enable RSS icon link
+  rss = true
+
+  # Set to true to use a text label for RSS instead of an icon
+  # This is overwritten by the "rss" setting
+  textrss = false
+
+  # Website's default description
+  description = ""
+
+  # Populate this with your own search keywords - these will appear in the meta tags
+  # defaultKeywords = ["keyword1" , "keyword2" , "keyword3" , "keyword4"]
+
+  # CSS override files
+  # Paths should be relative to the `static` directory
+  # customCSS = ["css/custom.css","css/custom2.css"]
+
+  # 404.html header and text - both support markdown
+  notFoundHeader = "There's nothing here"
+
+  notFoundText = """Please either go back or use the navigation/sidebar menus.
+  """
+
+  # Set to true to hide ReadingTime on posts
+  disableReadingTime = false
+
+  # Set to true to disable downloading of remote Google fonts
+  disableGoogleFonts = false
+
+  # Remove or Set to false to use local fonts
+  # remoteFonts = false
+  
+  # Remove or set to false to use FontAwesome CDN, otherwise the theme uses ForkAwesome local fonts.
+  # fontAwesome = false
+
+  # Generate taxonomy pages
+  generateTaxonomyList = true
+
+  # Sort the taxonomy alphabetically.
+  # sortTaxonomyAlphabetical = true
+
+  # Twitter card config
+  # Enable with this.
+  # twitterCardEnabled = true
+  # Don't include the @.
+  # twitterCardSite = 
+  # twitterCardDomain = "parsiya.net"
+  # Don't include the @.
+  # twitterCardAuthor = "CryptoGangsta"
+
+  # Set to true to enable compact index. Set to false or remove to go back to classic view.
+  # compactIndex = true
+
+  # Set mainSections.
+  # mainSections = ["post", "blog"]
+
+  # Site's custom favicon, this is a relative path to the `/static` directory
+  # favicon = "newfav.png"
+
+# Google analytics code - remove if you do not have/want Google
+# Analytics - needs JavaScript.
+# googleAnalytics = "G-MEASUREMENT_ID"
+
+
+# Menu
+# If navigationNewWindow (under [params]) is set to true then all links except root ("/") will open in a new window
+# If it does not exist or is set to false then links will open in the same window
+[[menu.main]]
+  Name = "Blog"
+  URL = "/"
+  weight = -5
 
 [[menu.main]]
-url = "/categories"
-name = "Categories"
-weight = 2
+  Name = "Categories"
+  URL = "/categories"
+  weight = -5
+
 [[menu.main]]
-url = "/tags"
-name = "Tags"
-weight = 3
-[[menu.main]]
-url = "/posts"
-name = "Archive"
-weight = 1
-[[menu.main]]
-url = "/index.xml"
-name = "RSS Feed"
-weight = 4
+  Name = "Tags"
+  URL = "/tags"
+  weight = -5
+
+# Sidebar menus
+# Enable with "sidebarMenuEnabled = true" under [params]
+# Header text is "sidebarMenuHeader" under [params]
+[[menu.sidebar]]
+  Name = "h0pe"
+  URL = "https://h0pe-ay.github.io/"
+  weight = 1
+
+[[menu.sidebar]]
+  Name = "l0ck"
+  URL = "https://lindll.github.io/"
+  weight = 2
+
+[[menu.sidebar]]
+  Name = "Ar3sh1"
+  URL = "https://www.cnblogs.com/Ar3sh1"
+  weight = 3
+
+[[menu.sidebar]]
+  Name = "Char0n"
+  URL = "https://github.com/WyHlj"
+  weight = 4
+
+[[menu.sidebar]]
+  Name = "southsea"
+  URL = "https://southsea.st/"
+  weight = 5

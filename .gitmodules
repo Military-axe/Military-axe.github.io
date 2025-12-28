@@ -1,6 +1,6 @@
 [submodule "themes/Hugo-Octopress"]
 	path = themes/Hugo-Octopress
 	url = https://github.com/parsiya/Hugo-Octopress
-[submodule "themes/diary"]
-	path = themes/diary
-	url = https://github.com/AmazingRise/hugo-theme-diary.git
+[submodule "content"]
+	path = content
+	url = git@github.com:Military-axe/blog_markdown.git

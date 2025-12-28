@@ -6,14 +6,13 @@
     <description>Recent content in Binary Diffing on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>mi1itray.axe copyright.</copyright>
     <lastBuildDate>Sat, 19 Aug 2023 15:56:52 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/tags/binary-diffing/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Binary Diffing</title>
-      <link>https://military-axe.github.io/post/binary-diffing-1/</link>
+      <link>https://military-axe.github.io/blog/2023-08-19-binary-diffing/</link>
       <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/binary-diffing-1/</guid>
+      <guid>https://military-axe.github.io/blog/2023-08-19-binary-diffing/</guid>
       <description>&lt;p&gt;最近想看看binary diffing的内容，直接从头看看一篇篇翻，涉及到很多机器学习内容，很多不懂的，慢慢来看吧。这里先看了10几篇，很多都只看了一个摘要。&#xA;主要是了解一下思路，看看这个领域的内容的研究历史，Binary Diffing 1暂时只看到2016年的paper，后续继续更新，主要文章引用如下&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Bitshred: feature hashing malware for scalable triage and semantic analysis.&lt;/li&gt;&#xA;&lt;li&gt;Binary function clustering using semantic hashes.&lt;/li&gt;&#xA;&lt;li&gt;Binslayer: accurate comparison of binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Control flow-based malware variant detection.&lt;/li&gt;&#xA;&lt;li&gt;{MutantX-S}: Scalable Malware Clustering Based on Static Features.&lt;/li&gt;&#xA;&lt;li&gt;Semantics-based obfuscation-resilient binary code similarity comparison with applications to software plagiarism detection.&lt;/li&gt;&#xA;&lt;li&gt;Leveraging semantic signatures for bug search in binary programs.&lt;/li&gt;&#xA;&lt;li&gt;Cross-architecture bug search in binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Bingo: Crossarchitecture cross-os binary search.&lt;/li&gt;&#xA;&lt;li&gt;Statistical similarity of binaries.&lt;/li&gt;&#xA;&lt;li&gt;discovRE: Efficient Cross-Architecture Identification of Bugs in Binary Code.&lt;/li&gt;&#xA;&lt;li&gt;Scalable Graph-based Bug Search for Firmware Images.&lt;/li&gt;&#xA;&lt;li&gt;Crossarchitecture binary semantics understanding via similar code comparison.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
   </channel>

@@ -6,63 +6,62 @@
     <description>Recent content in Reverse on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>mi1itray.axe copyright.</copyright>
     <lastBuildDate>Mon, 06 May 2024 11:17:50 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/tags/reverse/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>通过修改物理内存实现跨进程内存读写</title>
-      <link>https://military-axe.github.io/post/%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</link>
+      <link>https://military-axe.github.io/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</link>
       <pubDate>Mon, 06 May 2024 11:17:50 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</guid>
+      <guid>https://military-axe.github.io/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</guid>
       <description>&lt;p&gt;跨进程内存读写有多种方式，这里主要了解一下修改物理内存来实现跨进程内存修改方法。这种方法主要是无痕，对比修改cr3来说要无痕的多。&lt;/p&gt;&#xA;&lt;p&gt;后面再试试修改cr3和修改MDL映射来做到跨进程内存读写方式。&lt;/p&gt;</description>
     </item>
     <item>
       <title>Binary Diffing</title>
-      <link>https://military-axe.github.io/post/binary-diffing-1/</link>
+      <link>https://military-axe.github.io/blog/2023-08-19-binary-diffing/</link>
       <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/binary-diffing-1/</guid>
+      <guid>https://military-axe.github.io/blog/2023-08-19-binary-diffing/</guid>
       <description>&lt;p&gt;最近想看看binary diffing的内容，直接从头看看一篇篇翻，涉及到很多机器学习内容，很多不懂的，慢慢来看吧。这里先看了10几篇，很多都只看了一个摘要。&#xA;主要是了解一下思路，看看这个领域的内容的研究历史，Binary Diffing 1暂时只看到2016年的paper，后续继续更新，主要文章引用如下&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Bitshred: feature hashing malware for scalable triage and semantic analysis.&lt;/li&gt;&#xA;&lt;li&gt;Binary function clustering using semantic hashes.&lt;/li&gt;&#xA;&lt;li&gt;Binslayer: accurate comparison of binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Control flow-based malware variant detection.&lt;/li&gt;&#xA;&lt;li&gt;{MutantX-S}: Scalable Malware Clustering Based on Static Features.&lt;/li&gt;&#xA;&lt;li&gt;Semantics-based obfuscation-resilient binary code similarity comparison with applications to software plagiarism detection.&lt;/li&gt;&#xA;&lt;li&gt;Leveraging semantic signatures for bug search in binary programs.&lt;/li&gt;&#xA;&lt;li&gt;Cross-architecture bug search in binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Bingo: Crossarchitecture cross-os binary search.&lt;/li&gt;&#xA;&lt;li&gt;Statistical similarity of binaries.&lt;/li&gt;&#xA;&lt;li&gt;discovRE: Efficient Cross-Architecture Identification of Bugs in Binary Code.&lt;/li&gt;&#xA;&lt;li&gt;Scalable Graph-based Bug Search for Firmware Images.&lt;/li&gt;&#xA;&lt;li&gt;Crossarchitecture binary semantics understanding via similar code comparison.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
     <item>
       <title>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques</title>
-      <link>https://military-axe.github.io/post/khao/</link>
+      <link>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
       <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/khao/</guid>
+      <guid>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
       <description>&lt;p&gt;这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。&lt;/p&gt;&#xA;&lt;p&gt;从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。&lt;/p&gt;</description>
     </item>
     <item>
       <title>Frida call java class/method to explode</title>
-      <link>https://military-axe.github.io/post/frida_call_method_to_explode/</link>
+      <link>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</link>
       <pubDate>Fri, 07 Jul 2023 10:01:10 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/frida_call_method_to_explode/</guid>
-      <description>&lt;p&gt;利用Frida去调用java代码中的类，然后爆破。算是一种主动的方法。主要是之前有一道apk题目是爆破的思路，但是我不会写java代码，想起来很难受，冲浪的时候看到&lt;a href=&#34;https://eternalsakura13.com/&#34;&gt;Sakura&lt;/a&gt;的blog有感，就再去试试，并记录在此。然后发现这题原来是adword原题，（其实题目挺简单，只是当时摆），气死✌了。&lt;/p&gt;&#xA;&lt;p&gt;主要是记录Frida主动调用apk中Java中的代码。主动调用可以用于爆破，模拟程序部分执行。&lt;/p&gt;&#xA;&lt;p&gt;需要注意的知识点是在java代码中的static类型数据在爆破过程中需要每次都对这种类型值重新设置。因为static类型在所有实例中都是统一，修改一个实例就会修改所有实例，需要用&lt;code&gt;变量.属性.value = ...&lt;/code&gt;的写法重新设置值。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;var&lt;/span&gt; bvar = b.$new(IntClass.$new(&lt;span style=&#34;color:#b452cd&#34;&gt;2&lt;/span&gt;));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;for&lt;/span&gt; (...) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    bvar._static_val.value = ...;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+      <guid>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</guid>
+      <description>&lt;p&gt;利用Frida去调用java代码中的类，然后爆破。算是一种主动的方法。主要是之前有一道apk题目是爆破的思路，但是我不会写java代码，想起来很难受，冲浪的时候看到&#xD;&#xA;&lt;a href=&#34;https://eternalsakura13.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Sakura&lt;/a&gt;的blog有感，就再去试试，并记录在此。然后发现这题原来是adword原题，（其实题目挺简单，只是当时摆），气死✌了。&lt;/p&gt;&#xA;&lt;p&gt;主要是记录Frida主动调用apk中Java中的代码。主动调用可以用于爆破，模拟程序部分执行。&lt;/p&gt;&#xA;&lt;p&gt;需要注意的知识点是在java代码中的static类型数据在爆破过程中需要每次都对这种类型值重新设置。因为static类型在所有实例中都是统一，修改一个实例就会修改所有实例，需要用&lt;code&gt;变量.属性.value = ...&lt;/code&gt;的写法重新设置值。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#268bd2&#34;&gt;var&lt;/span&gt; bvar &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; b.$new(IntClass.$new(&lt;span style=&#34;color:#2aa198&#34;&gt;2&lt;/span&gt;));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;for&lt;/span&gt; (...) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    bvar._static_val.value &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; ...;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
     </item>
     <item>
       <title>Ida Symbolic Recovery</title>
-      <link>https://military-axe.github.io/post/ida_symbolic_recovery/</link>
+      <link>https://military-axe.github.io/blog/2023-07-03-ida-symbolic-recovery/</link>
       <pubDate>Mon, 03 Jul 2023 21:51:06 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/ida_symbolic_recovery/</guid>
+      <guid>https://military-axe.github.io/blog/2023-07-03-ida-symbolic-recovery/</guid>
       <description>&lt;p&gt;最近发现二进制文件中符号恢复的手段有不少，这里想记录一下几种符号恢复的工具使用与效果对比。&lt;/p&gt;&#xA;&lt;p&gt;Finger，lscan，flair，bindiff&lt;/p&gt;</description>
     </item>
     <item>
       <title>Frida learn &amp;&amp; sctf 2023 checkFlow</title>
-      <link>https://military-axe.github.io/post/frida_learn_and_2023_sctf_check_flow/</link>
+      <link>https://military-axe.github.io/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</link>
       <pubDate>Mon, 03 Jul 2023 16:06:30 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/frida_learn_and_2023_sctf_check_flow/</guid>
+      <guid>https://military-axe.github.io/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</guid>
       <description>&lt;p&gt;没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下&lt;/p&gt;</description>
     </item>
     <item>
       <title>2023 Two Reverse CrackMe WriteUp</title>
-      <link>https://military-axe.github.io/post/%E5%A4%A9%E8%9E%8D%E4%BF%A1wp/</link>
+      <link>https://military-axe.github.io/blog/2023-06-30-2023-two-reverse-crackme-writeup/</link>
       <pubDate>Fri, 30 Jun 2023 17:05:32 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/%E5%A4%A9%E8%9E%8D%E4%BF%A1wp/</guid>
+      <guid>https://military-axe.github.io/blog/2023-06-30-2023-two-reverse-crackme-writeup/</guid>
       <description>&lt;p&gt;前几天打了一个应该是天融信的比赛，题目不难，简单记录一下。&lt;/p&gt;&#xA;&lt;p&gt;一道是花指令+rc4，一道是mov混淆&lt;/p&gt;</description>
     </item>
     <item>
       <title>2023 XCTF GotYouKey Write Up</title>
-      <link>https://military-axe.github.io/post/gotyoukey/</link>
+      <link>https://military-axe.github.io/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</link>
       <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/gotyoukey/</guid>
+      <guid>https://military-axe.github.io/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</guid>
       <description>&lt;p&gt;前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。&lt;/p&gt;</description>
     </item>
   </channel>

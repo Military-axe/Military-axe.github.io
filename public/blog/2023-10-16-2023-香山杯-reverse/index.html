@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  <title>2023 香山杯 Reverse</title><link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe"><meta name="generator" content="Hugo 0.153.2">
+
+</head>
+<body><header role="banner"><hgroup><h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header><nav role="navigation"><fieldset class="mobile-nav"><select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://military-axe.github.io/">» Blog</option>
+      
+        <option value="https://military-axe.github.io/categories">» Categories</option>
+      
+        <option value="https://military-axe.github.io/tags">» Tags</option>
+      
+  </select>
+</fieldset><ul class="main-navigation">
+    
+      <li><a href="https://military-axe.github.io/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="https://military-axe.github.io/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="https://military-axe.github.io/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://military-axe.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://military-axe.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        <header>
+  <p class="meta">Oct 16, 2023
+     - 3 minute read - <a class="label" href="https://military-axe.github.io/categories/reverse/">Reverse </a>
+    
+  </p>
+  <h1 class="entry-title">
+     2023 香山杯 Reverse 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#url从哪儿来">URL从哪儿来</a></li>
+        <li><a href="#hello_py">hello_py</a></li>
+        <li><a href="#nesting">nesting</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+          
+          <p>香山杯初赛的3到逆向的WP，不是很难的题，但是有一些新的东西，chaquopy框架，这个框架完成了一套sdk，可以安卓调用python代码也可以python调用java代码。可惜的是python是源码存储，还有研究的空间</p>
+<h2 id="url从哪儿来">URL从哪儿来</h2>
+<p>题目说明：小A收到一个样本，很轻松就完成了任务：找到样本外联C2。但小A非常好奇的是，他并不能直接在样本中搜到C2，C2是如何被解密的呢？</p>
+<p>题目链接：https://github.com/Military-axe/ctf/tree/master/2023/2023%E9%A6%99%E5%B1%B1%E6%9D%AF%E5%88%9D%E8%B5%9B</p>
+<p>分析，发现有一个程序会导出一个临时文件，临时文件<code>ou.exe</code>才是真正的逻辑所在</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">__cdecl</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  HMODULE ModuleHandleW; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  HMODULE v4; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  HMODULE v5; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  _BYTE <span style="color:#719e07">*</span>v7; <span style="color:#586e75">// [esp+4h] [ebp-28Ch]
+</span></span></span><span style="display:flex;"><span>  HGLOBAL hResData; <span style="color:#586e75">// [esp+8h] [ebp-288h]
+</span></span></span><span style="display:flex;"><span>  HRSRC hResInfo; <span style="color:#586e75">// [esp+Ch] [ebp-284h]
+</span></span></span><span style="display:flex;"><span>  _BYTE <span style="color:#719e07">*</span>lpAddress; <span style="color:#586e75">// [esp+10h] [ebp-280h]
+</span></span></span><span style="display:flex;"><span>  FILE <span style="color:#719e07">*</span>Stream; <span style="color:#586e75">// [esp+1Ch] [ebp-274h]
+</span></span></span><span style="display:flex;"><span>  DWORD dwSize; <span style="color:#586e75">// [esp+20h] [ebp-270h]
+</span></span></span><span style="display:flex;"><span>  DWORD i; <span style="color:#586e75">// [esp+28h] [ebp-268h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#719e07">struct</span> _PROCESS_INFORMATION ProcessInformation; <span style="color:#586e75">// [esp+30h] [ebp-260h] BYREF
+</span></span></span><span style="display:flex;"><span>  <span style="color:#719e07">struct</span> _STARTUPINFOA StartupInfo; <span style="color:#586e75">// [esp+40h] [ebp-250h] BYREF
+</span></span></span><span style="display:flex;"><span>  CHAR Buffer[<span style="color:#2aa198">260</span>]; <span style="color:#586e75">// [esp+84h] [ebp-20Ch] BYREF
+</span></span></span><span style="display:flex;"><span>  CHAR TempFileName[<span style="color:#2aa198">260</span>]; <span style="color:#586e75">// [esp+188h] [ebp-108h] BYREF
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  ModuleHandleW <span style="color:#719e07">=</span> <span style="color:#268bd2">GetModuleHandleW</span>(<span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>  hResInfo <span style="color:#719e07">=</span> <span style="color:#268bd2">FindResourceW</span>(ModuleHandleW, (LPCWSTR)<span style="color:#2aa198">0x65</span>, <span style="color:#2aa198">L</span><span style="color:#2aa198">&#34;e_ou&#34;</span>);
+</span></span><span style="display:flex;"><span>  v4 <span style="color:#719e07">=</span> <span style="color:#268bd2">GetModuleHandleW</span>(<span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>  hResData <span style="color:#719e07">=</span> <span style="color:#268bd2">LoadResource</span>(v4, hResInfo);
+</span></span><span style="display:flex;"><span>  v7 <span style="color:#719e07">=</span> <span style="color:#268bd2">LockResource</span>(hResData);
+</span></span><span style="display:flex;"><span>  v5 <span style="color:#719e07">=</span> <span style="color:#268bd2">GetModuleHandleW</span>(<span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>  dwSize <span style="color:#719e07">=</span> <span style="color:#268bd2">SizeofResource</span>(v5, hResInfo);
+</span></span><span style="display:flex;"><span>  lpAddress <span style="color:#719e07">=</span> <span style="color:#268bd2">VirtualAlloc</span>(<span style="color:#2aa198">0</span>, dwSize, <span style="color:#2aa198">0x1000u</span>, <span style="color:#2aa198">4u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span>lpAddress )
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">for</span> ( i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> dwSize; <span style="color:#719e07">++</span>i )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> ( v7[i] <span style="color:#719e07">&amp;&amp;</span> v7[i] <span style="color:#719e07">!=</span> <span style="color:#2aa198">&#39;x&#39;</span> )
+</span></span><span style="display:flex;"><span>      lpAddress[i] <span style="color:#719e07">=</span> v7[i] <span style="color:#719e07">^</span> <span style="color:#2aa198">&#39;x&#39;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">else</span>
+</span></span><span style="display:flex;"><span>      lpAddress[i] <span style="color:#719e07">=</span> v7[i];
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span><span style="color:#268bd2">GetTempPathA</span>(<span style="color:#2aa198">0x104u</span>, Buffer) )
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span><span style="color:#268bd2">GetTempFileNameA</span>(Buffer, <span style="color:#2aa198">&#34;ou.exe&#34;</span>, <span style="color:#2aa198">0</span>, TempFileName) )
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  Stream <span style="color:#719e07">=</span> <span style="color:#268bd2">fopen</span>(TempFileName, <span style="color:#2aa198">&#34;wb&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#719e07">!</span>Stream )
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#268bd2">fwrite</span>(lpAddress, <span style="color:#2aa198">1u</span>, dwSize, Stream) <span style="color:#719e07">==</span> dwSize )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">fclose</span>(Stream);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">VirtualFree</span>(lpAddress, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0x8000u</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">memset</span>(<span style="color:#719e07">&amp;</span>StartupInfo, <span style="color:#2aa198">0</span>, <span style="color:#719e07">sizeof</span>(StartupInfo));
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">memset</span>(<span style="color:#719e07">&amp;</span>ProcessInformation, <span style="color:#2aa198">0</span>, <span style="color:#719e07">sizeof</span>(ProcessInformation));
+</span></span><span style="display:flex;"><span>    StartupInfo.cb <span style="color:#719e07">=</span> <span style="color:#2aa198">68</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">GetStartupInfoA</span>(<span style="color:#719e07">&amp;</span>StartupInfo);
+</span></span><span style="display:flex;"><span>    StartupInfo.wShowWindow <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">CreateProcessA</span>(TempFileName, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0</span>, <span style="color:#719e07">&amp;</span>StartupInfo, <span style="color:#719e07">&amp;</span>ProcessInformation);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">CloseHandle</span>(ProcessInformation.hProcess);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">CloseHandle</span>(ProcessInformation.hThread);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">DeleteFileA</span>(TempFileName);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">else</span>
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">fclose</span>(Stream);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>idapython</code>提取存储在里面的ou.exe</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">import</span> idc 
+</span></span><span style="display:flex;"><span>s <span style="color:#719e07">=</span> idc<span style="color:#719e07">.</span>get_bytes(<span style="color:#2aa198">0x1550000</span>,<span style="color:#2aa198">0x1a800</span>) 
+</span></span><span style="display:flex;"><span>f<span style="color:#719e07">=</span><span style="color:#b58900">open</span>(<span style="color:#2aa198">&#39;D:/Desktop/1.exe&#39;</span>, <span style="color:#2aa198">&#39;wb&#39;</span>) 
+</span></span><span style="display:flex;"><span>f<span style="color:#719e07">.</span>write(s) 
+</span></span><span style="display:flex;"><span>f<span style="color:#719e07">.</span>close()
+</span></span></code></pre></div><p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310161345760.png" alt="img">、</p>
+<p>分析ou.exe中代码，main函数中这部分代码，得到block的值是一个base64</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310161346427.png" alt="img">flag{6469616e-6369-626f-7169-746170617761}</p>
+<h2 id="hello_py">hello_py</h2>
+<p>题目地址：https://github.com/Military-axe/ctf/tree/master/2023/2023%E9%A6%99%E5%B1%B1%E6%9D%AF%E5%88%9D%E8%B5%9B</p>
+<p>这是一个叫chaquopy框架的题目，框架可以在安卓中调用python和python中调用安卓代码两种方式</p>
+<p>一开始以为这个框架会把python文件编译成so文件，实际上没有，还是把python文件存在APK文件中</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310161346581.png" alt="img">只是改了一下后缀名，改成app.zip，解开来就是hello.py发现只是一个<code>xxtea</code>加密，改都没改，秒了</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">from</span> ctypes <span style="color:#719e07">import</span> <span style="color:#719e07">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">from</span> Crypto.Util.number <span style="color:#719e07">import</span> <span style="color:#719e07">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">MX</span>(z, y, total, key, p, e):
+</span></span><span style="display:flex;"><span>    temp1 <span style="color:#719e07">=</span> (z<span style="color:#719e07">.</span>value<span style="color:#719e07">&gt;&gt;</span><span style="color:#2aa198">5</span> <span style="color:#719e07">^</span> y<span style="color:#719e07">.</span>value<span style="color:#719e07">&lt;&lt;</span><span style="color:#2aa198">2</span>) <span style="color:#719e07">+</span> (y<span style="color:#719e07">.</span>value<span style="color:#719e07">&gt;&gt;</span><span style="color:#2aa198">3</span> <span style="color:#719e07">^</span> z<span style="color:#719e07">.</span>value<span style="color:#719e07">&lt;&lt;</span><span style="color:#2aa198">4</span>)
+</span></span><span style="display:flex;"><span>    temp2 <span style="color:#719e07">=</span> (total<span style="color:#719e07">.</span>value <span style="color:#719e07">^</span> y<span style="color:#719e07">.</span>value) <span style="color:#719e07">+</span> (key[(p<span style="color:#719e07">&amp;</span><span style="color:#2aa198">3</span>) <span style="color:#719e07">^</span> e<span style="color:#719e07">.</span>value] <span style="color:#719e07">^</span> z<span style="color:#719e07">.</span>value)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> c_uint32(temp1 <span style="color:#719e07">^</span> temp2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">decrypt</span>(n, v, key):
+</span></span><span style="display:flex;"><span>    delta <span style="color:#719e07">=</span> <span style="color:#2aa198">0x9e3779b9</span>
+</span></span><span style="display:flex;"><span>    rounds <span style="color:#719e07">=</span> <span style="color:#2aa198">6</span> <span style="color:#719e07">+</span> <span style="color:#2aa198">52</span><span style="color:#719e07">//</span>n 
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    total <span style="color:#719e07">=</span> c_uint32(rounds <span style="color:#719e07">*</span> delta)
+</span></span><span style="display:flex;"><span>    y <span style="color:#719e07">=</span> c_uint32(v[<span style="color:#2aa198">0</span>])
+</span></span><span style="display:flex;"><span>    e <span style="color:#719e07">=</span> c_uint32(<span style="color:#2aa198">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> rounds <span style="color:#719e07">&gt;</span> <span style="color:#2aa198">0</span>:
+</span></span><span style="display:flex;"><span>        e<span style="color:#719e07">.</span>value <span style="color:#719e07">=</span> (total<span style="color:#719e07">.</span>value <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">2</span>) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">3</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">for</span> p <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(n<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#719e07">-</span><span style="color:#2aa198">1</span>):
+</span></span><span style="display:flex;"><span>            z <span style="color:#719e07">=</span> c_uint32(v[p<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>])
+</span></span><span style="display:flex;"><span>            v[p] <span style="color:#719e07">=</span> c_uint32((v[p] <span style="color:#719e07">-</span> MX(z,y,total,key,p,e)<span style="color:#719e07">.</span>value))<span style="color:#719e07">.</span>value
+</span></span><span style="display:flex;"><span>            y<span style="color:#719e07">.</span>value <span style="color:#719e07">=</span> v[p]
+</span></span><span style="display:flex;"><span>        z <span style="color:#719e07">=</span> c_uint32(v[n<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>])  
+</span></span><span style="display:flex;"><span>        v[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> c_uint32(v[<span style="color:#2aa198">0</span>] <span style="color:#719e07">-</span> MX(z,y,total,key,<span style="color:#2aa198">0</span>,e)<span style="color:#719e07">.</span>value)<span style="color:#719e07">.</span>value
+</span></span><span style="display:flex;"><span>        y<span style="color:#719e07">.</span>value <span style="color:#719e07">=</span> v[<span style="color:#2aa198">0</span>]  
+</span></span><span style="display:flex;"><span>        total<span style="color:#719e07">.</span>value <span style="color:#719e07">-=</span> delta
+</span></span><span style="display:flex;"><span>        rounds <span style="color:#719e07">-=</span> <span style="color:#2aa198">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> v 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cipher <span style="color:#719e07">=</span>[<span style="color:#2aa198">689085350</span> ,<span style="color:#2aa198">626885696</span> ,<span style="color:#2aa198">1894439255</span> ,<span style="color:#2aa198">1204672445</span> ,<span style="color:#2aa198">1869189675</span> ,<span style="color:#2aa198">475967424</span> ,<span style="color:#2aa198">1932042439</span> ,<span style="color:#2aa198">1280104741</span> ,<span style="color:#2aa198">2808893494</span> ]
+</span></span><span style="display:flex;"><span>key <span style="color:#719e07">=</span> [<span style="color:#2aa198">12345678</span> ,<span style="color:#2aa198">12398712</span> ,<span style="color:#2aa198">91283904</span> ,<span style="color:#2aa198">12378192</span> ]
+</span></span><span style="display:flex;"><span>n <span style="color:#719e07">=</span> <span style="color:#2aa198">9</span>
+</span></span><span style="display:flex;"><span>res <span style="color:#719e07">=</span> decrypt(n, cipher, key)
+</span></span><span style="display:flex;"><span>flag <span style="color:#719e07">=</span> <span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> res:
+</span></span><span style="display:flex;"><span>    flag<span style="color:#719e07">+=</span>long_to_bytes(i)[::<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(flag)
+</span></span></code></pre></div><p>flag{c1f8ace6-4b46-4931-b25b-a1010a89c592}</p>
+<h2 id="nesting">nesting</h2>
+<p>题目提示：<code>flag{uuid}</code></p>
+<p>题目地址：https://github.com/Military-axe/ctf/tree/master/2023/2023%E9%A6%99%E5%B1%B1%E6%9D%AF%E5%88%9D%E8%B5%9B</p>
+<p>这是一个vm题，vm写的很复杂，实际上用污点分析的思路，下几个内存断点，跟踪一下输入的变化，就会发现只是输入和一组值相异或</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>xor <span style="color:#719e07">=</span> [<span style="color:#2aa198">0x54</span>, <span style="color:#2aa198">0xf6</span>, <span style="color:#2aa198">0xf2</span>, <span style="color:#2aa198">7</span>, <span style="color:#2aa198">0xfb</span>, <span style="color:#2aa198">4</span>, <span style="color:#2aa198">5</span>, <span style="color:#2aa198">0xe</span>, <span style="color:#2aa198">0x5d</span>, <span style="color:#2aa198">0x53</span>, <span style="color:#2aa198">0xc9</span>, <span style="color:#2aa198">0x4e</span>, <span style="color:#2aa198">0x46</span>, <span style="color:#2aa198">0xa</span>, <span style="color:#2aa198">0x13</span>, <span style="color:#2aa198">0x1</span>, <span style="color:#2aa198">0x3</span>, <span style="color:#2aa198">0x38</span>, <span style="color:#2aa198">0xa0</span>, <span style="color:#2aa198">0xbb</span>, <span style="color:#2aa198">0xc7</span>, <span style="color:#2aa198">0x44</span>, <span style="color:#2aa198">0xfa</span>, <span style="color:#2aa198">0xbc</span>, <span style="color:#2aa198">0x3</span>, <span style="color:#2aa198">0x44</span>, <span style="color:#2aa198">0x2c</span>, <span style="color:#2aa198">0x9a</span>, <span style="color:#2aa198">0x6d</span>, <span style="color:#2aa198">0x98</span>, <span style="color:#2aa198">0x35</span>, <span style="color:#2aa198">0x4f</span>, <span style="color:#2aa198">0x4a</span>, <span style="color:#2aa198">0x10</span>, <span style="color:#2aa198">0xc4</span>, <span style="color:#2aa198">0x17</span>, <span style="color:#2aa198">0x9</span>, <span style="color:#2aa198">0x61</span>, <span style="color:#2aa198">0x6</span>, <span style="color:#2aa198">0xe1</span>, <span style="color:#2aa198">0x8d</span>, <span style="color:#2aa198">0x75</span>]
+</span></span><span style="display:flex;"><span>c <span style="color:#719e07">=</span> [<span style="color:#2aa198">50</span>, <span style="color:#2aa198">154</span>, <span style="color:#2aa198">147</span>, <span style="color:#2aa198">96</span>, <span style="color:#2aa198">128</span>, <span style="color:#2aa198">54</span>, <span style="color:#2aa198">102</span>, <span style="color:#2aa198">57</span>, <span style="color:#2aa198">62</span>, <span style="color:#2aa198">99</span>, <span style="color:#2aa198">240</span>, <span style="color:#2aa198">125</span>, <span style="color:#2aa198">36</span>, <span style="color:#2aa198">39</span>, <span style="color:#2aa198">117</span>, <span style="color:#2aa198">55</span>, <span style="color:#2aa198">55</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">141</span>, <span style="color:#2aa198">138</span>, <span style="color:#2aa198">246</span>, <span style="color:#2aa198">33</span>, <span style="color:#2aa198">158</span>, <span style="color:#2aa198">145</span>, <span style="color:#2aa198">98</span>, <span style="color:#2aa198">115</span>, <span style="color:#2aa198">29</span>, <span style="color:#2aa198">172</span>, <span style="color:#2aa198">64</span>, <span style="color:#2aa198">175</span>, <span style="color:#2aa198">5</span>, <span style="color:#2aa198">126</span>, <span style="color:#2aa198">43</span>, <span style="color:#2aa198">114</span>, <span style="color:#2aa198">252</span>, <span style="color:#2aa198">116</span>, <span style="color:#2aa198">104</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">103</span>, <span style="color:#2aa198">135</span>, <span style="color:#2aa198">232</span>, <span style="color:#2aa198">8</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#b58900">len</span>(xor)):
+</span></span><span style="display:flex;"><span>    c[i] <span style="color:#719e07">^=</span> xor[i]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(<span style="color:#b58900">bytes</span>(c))
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(xor)
+</span></span></code></pre></div>
+        </div>
+        <footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span><time>Oct 16, 2023</time>
+    
+      <span class="categories">
+        Tags:<a class="category" href="https://military-axe.github.io/tags/vm">vm</a>  <a class="category" href="https://military-axe.github.io/tags/%e9%a6%99%e5%b1%b1%e6%9d%af">香山杯</a>  <a class="category" href="https://military-axe.github.io/tags/android">android</a>  <a class="category" href="https://military-axe.github.io/tags/base64">base64</a>  <a class="category" href="https://military-axe.github.io/tags/xor">xor</a>  
+    
+    </span>
+  </p><p class="meta">
+    
+        <a class="basic-alignment left" href="https://military-axe.github.io/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/" title="BiAn: Smart Contract Source Code Obfuscation">BiAn: Smart Contract Source Code Obfuscation</a>
+    
+
+    
+      <a class="basic-alignment right" href="https://military-axe.github.io/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/" title="Rust污点分析调研">Rust污点分析调研</a>
+    
+  </p>
+  
+  
+</footer>
+
+
+      </article>
+    </div>
+    <aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section><ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    </li>
+</ul>
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-25-llvm-base-development-environment-configuration/">llvm base development environment configuration</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">通过修改物理内存实现跨进程内存读写</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/">利用PEB遍历模块链表</a>
+              </li>
+            
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="https://military-axe.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+  </body>
+</html>
+

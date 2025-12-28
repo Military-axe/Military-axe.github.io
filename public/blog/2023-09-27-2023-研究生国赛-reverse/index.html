@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  <title>2023 研究生国赛 Reverse</title><link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+    <link href="https://military-axe.github.io/favicon.png" rel="icon">
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe"><meta name="generator" content="Hugo 0.153.2">
+
+</head>
+<body><header role="banner"><hgroup><h1><a href="https://military-axe.github.io/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header><nav role="navigation"><fieldset class="mobile-nav"><select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="https://military-axe.github.io/">» Blog</option>
+      
+        <option value="https://military-axe.github.io/categories">» Categories</option>
+      
+        <option value="https://military-axe.github.io/tags">» Tags</option>
+      
+  </select>
+</fieldset><ul class="main-navigation">
+    
+      <li><a href="https://military-axe.github.io/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="https://military-axe.github.io/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="https://military-axe.github.io/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="https://military-axe.github.io/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:https://military-axe.github.io/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        <header>
+  <p class="meta">Sep 27, 2023
+     - 13 minute read - <a class="label" href="https://military-axe.github.io/categories/reverse/">Reverse </a>
+    
+  </p>
+  <h1 class="entry-title">
+     2023 研究生国赛 Reverse 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#easy_xor">easy_xor</a></li>
+        <li><a href="#t4ee">T4ee</a>
+          <ul>
+            <li><a href="#part4">part4</a></li>
+            <li><a href="#part5">part5</a></li>
+            <li><a href="#part3">part3</a></li>
+          </ul>
+        </li>
+        <li><a href="#lin">lin</a></li>
+        <li><a href="#robbie-gave-up">Robbie gave up</a></li>
+        <li><a href="#附件">附件</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+          
+          <p>4道题做了3到，都不太方便纯静态，动调倒是都挺简单的. 最后一题unity的游戏没什么经验，不知道怎么下手，CE也没下就放弃了</p>
+<p>更新：又看了一下其实unity还是很简单，只是忘记dnspy该展开那个类了，（我说怎么看不到代码呢</p>
+<h2 id="easy_xor">easy_xor</h2>
+<p>打开ida发现看不全代码</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">__cdecl</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> result; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v4; <span style="color:#586e75">// [esp+0h] [ebp-1CCh]
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;please input your flag:&#34;</span>, v4);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__asm</span> { retn }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>汇编层面发现是利用<code>call $+5</code>，内联了一个没有用的函数，同时加了垃圾指令</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span>.text:00401560 83 <span style="color:#268bd2">C4</span> <span style="color:#2aa198">04</span>                      <span style="color:#cb4b16">add</span>     <span style="color:#cb4b16">esp</span>, <span style="color:#2aa198">4</span>
+</span></span><span style="display:flex;"><span>.text:00401563 55                            <span style="color:#268bd2">push</span>    <span style="color:#cb4b16">ebp</span>
+</span></span><span style="display:flex;"><span>.text:00401564 <span style="color:#268bd2">E8</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span>                <span style="color:#cb4b16">call</span>    <span style="color:#cb4b16">$</span>+<span style="color:#2aa198">5</span>
+</span></span><span style="display:flex;"><span>.text:00401564
+</span></span><span style="display:flex;"><span>.text:00401569
+</span></span><span style="display:flex;"><span>.text:00401569                               loc_401569:                             <span style="color:#586e75">; DATA XREF: _main+2B↓o
+</span></span></span><span style="display:flex;"><span>.text:00401569 5<span style="color:#268bd2">D</span>                            <span style="color:#cb4b16">pop</span>     <span style="color:#cb4b16">ebp</span>
+</span></span><span style="display:flex;"><span>.text:0040156<span style="color:#268bd2">A</span> <span style="color:#2aa198">48</span>                            <span style="color:#cb4b16">dec</span>     <span style="color:#cb4b16">eax</span>
+</span></span><span style="display:flex;"><span>.text:0040156<span style="color:#268bd2">B</span> <span style="color:#2aa198">83</span> <span style="color:#cb4b16">C5</span> <span style="color:#2aa198">08</span>                      <span style="color:#cb4b16">add</span>     <span style="color:#cb4b16">ebp</span>, (<span style="color:#cb4b16">offset</span> <span style="color:#cb4b16">loc_401570</span>+<span style="color:#2aa198">1</span> - <span style="color:#cb4b16">offset</span> <span style="color:#cb4b16">loc_401569</span>)
+</span></span><span style="display:flex;"><span>.text:0040156<span style="color:#268bd2">E</span> <span style="color:#2aa198">55</span>                            <span style="color:#cb4b16">push</span>    <span style="color:#cb4b16">ebp</span>
+</span></span><span style="display:flex;"><span>.text:0040156<span style="color:#268bd2">F</span> <span style="color:#cb4b16">C3</span>                            <span style="color:#cb4b16">retn</span>
+</span></span><span style="display:flex;"><span>.text:0040156<span style="color:#268bd2">F</span>
+</span></span><span style="display:flex;"><span>.text:0040156<span style="color:#268bd2">F</span>                               <span style="color:#cb4b16">_main</span> <span style="color:#cb4b16">endp</span> <span style="color:#586e75">; sp-analysis failed
+</span></span></span><span style="display:flex;"><span>.text:0040156<span style="color:#268bd2">F</span>
+</span></span><span style="display:flex;"><span>.text:00401570                               <span style="color:#586e75">; ---------------------------------------------------------------------------
+</span></span></span><span style="display:flex;"><span>.text:00401570
+</span></span><span style="display:flex;"><span>.text:00401570                               loc_401570:                             <span style="color:#586e75">; DATA XREF: _main+2B↑o
+</span></span></span><span style="display:flex;"><span>.text:00401570 08 5<span style="color:#268bd2">D</span> <span style="color:#2aa198">8</span><span style="color:#cb4b16">D</span>                      <span style="color:#cb4b16">or</span>      [<span style="color:#cb4b16">ebp-73h</span>], <span style="color:#cb4b16">bl</span>
+</span></span></code></pre></div><p>还有一些动态调试的api，我直接从0x401560 nop 到0x4015B8，把无关逻辑的混淆和动态都去掉了。得到的伪代码如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">__cdecl</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> i; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v4; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v6; <span style="color:#586e75">// [esp-8h] [ebp-1D4h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v7; <span style="color:#586e75">// [esp-4h] [ebp-1D0h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v8; <span style="color:#586e75">// [esp+0h] [ebp-1CCh]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> flag[<span style="color:#2aa198">264</span>]; <span style="color:#586e75">// [esp+54h] [ebp-178h] BYREF
+</span></span></span><span style="display:flex;"><span>  __int128 v10[<span style="color:#2aa198">4</span>]; <span style="color:#586e75">// [esp+15Ch] [ebp-70h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v11; <span style="color:#586e75">// [esp+19Ch] [ebp-30h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v12; <span style="color:#586e75">// [esp+1A0h] [ebp-2Ch]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v13; <span style="color:#586e75">// [esp+1A4h] [ebp-28h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v14; <span style="color:#586e75">// [esp+1A8h] [ebp-24h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v15; <span style="color:#586e75">// [esp+1ACh] [ebp-20h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v16; <span style="color:#586e75">// [esp+1B0h] [ebp-1Ch]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v17; <span style="color:#586e75">// [esp+1B4h] [ebp-18h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v18; <span style="color:#586e75">// [esp+1B8h] [ebp-14h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v19[<span style="color:#2aa198">3</span>]; <span style="color:#586e75">// [esp+1BCh] [ebp-10h] BYREF
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;please input your flag:&#34;</span>, v8);
+</span></span><span style="display:flex;"><span>  v11 <span style="color:#719e07">=</span> <span style="color:#2aa198">50462976</span>;
+</span></span><span style="display:flex;"><span>  v12 <span style="color:#719e07">=</span> <span style="color:#2aa198">117835012</span>;
+</span></span><span style="display:flex;"><span>  v13 <span style="color:#719e07">=</span> <span style="color:#2aa198">185207048</span>;
+</span></span><span style="display:flex;"><span>  v14 <span style="color:#719e07">=</span> <span style="color:#2aa198">252579084</span>;
+</span></span><span style="display:flex;"><span>  v15 <span style="color:#719e07">=</span> <span style="color:#2aa198">319951120</span>;
+</span></span><span style="display:flex;"><span>  v16 <span style="color:#719e07">=</span> <span style="color:#2aa198">387323156</span>;
+</span></span><span style="display:flex;"><span>  v17 <span style="color:#719e07">=</span> <span style="color:#2aa198">454695192</span>;
+</span></span><span style="display:flex;"><span>  v18 <span style="color:#719e07">=</span> <span style="color:#2aa198">522067228</span>;
+</span></span><span style="display:flex;"><span>  v19[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  v19[<span style="color:#2aa198">1</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">1241513984</span>;
+</span></span><span style="display:flex;"><span>  v19[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">memset</span>(flag, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0xC8u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;%s&#34;</span>, (<span style="color:#dc322f">char</span>)flag);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#268bd2">strlen</span>(flag) <span style="color:#719e07">==</span> <span style="color:#2aa198">46</span> )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    v10[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)flag;
+</span></span><span style="display:flex;"><span>    v10[<span style="color:#2aa198">1</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>flag[<span style="color:#2aa198">16</span>];
+</span></span><span style="display:flex;"><span>    v10[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>flag[<span style="color:#2aa198">32</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401370</span>(<span style="color:#2aa198">46</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401080</span>(v19);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> ( i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">64</span>; <span style="color:#719e07">++</span>i )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">if</span> ( i <span style="color:#719e07">&gt;=</span> <span style="color:#2aa198">46</span> )
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">*</span>((_BYTE <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>v10[<span style="color:#2aa198">3</span>] <span style="color:#719e07">+</span> i) <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>((_BYTE <span style="color:#719e07">*</span>)v10 <span style="color:#719e07">+</span> i) <span style="color:#719e07">^</span> flag[i <span style="color:#719e07">+</span> <span style="color:#2aa198">200</span>];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    v4 <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> ( <span style="color:#719e07">*</span>((_BYTE <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>v10[<span style="color:#2aa198">3</span>] <span style="color:#719e07">+</span> v4) <span style="color:#719e07">==</span> byte_403114[v4] )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">if</span> ( <span style="color:#719e07">++</span>v4 <span style="color:#719e07">&gt;=</span> <span style="color:#2aa198">46</span> )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;you get your flag,the flag is your input!&#34;</span>, v7);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, v6);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">getchar</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;error</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, v7);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">else</span>
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;length error!&#34;</span>, v7);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>发现奇怪的地方，<code>*((_BYTE *)&amp;v10[3] + i) = *((_BYTE *)v10 + i) ^ flag[i + 200];</code></p>
+<p><code>flag[i+200]</code>是个很怪的地方，问题只能出在<code>sub_401370</code>和<code>sub_401080</code>上</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">void</span> <span style="color:#268bd2">sub_401370</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__asm</span> { retn }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这是也是混淆，nop一下看看</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> __usercall sub_401370@<span style="color:#719e07">&lt;</span>eax<span style="color:#719e07">&gt;</span>(<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span> <span style="color:#719e07">*</span>a1@<span style="color:#719e07">&lt;</span>edx<span style="color:#719e07">&gt;</span>, _DWORD <span style="color:#719e07">*</span>a2@<span style="color:#719e07">&lt;</span>ecx<span style="color:#719e07">&gt;</span>, <span style="color:#dc322f">int</span> a3, <span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span> <span style="color:#719e07">*</span>a4)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v5; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v6; <span style="color:#586e75">// esi
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v7; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v8; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v9; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v10; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v11; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v12; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v13; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v14; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v15; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v16; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v17; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v18; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v19; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v20; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v22; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v23; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v24; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v25; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v26; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> result; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  v5 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">7</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>;
+</span></span><span style="display:flex;"><span>  v6 <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>((<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int16</span> <span style="color:#719e07">*</span>)a1 <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">qmemcpy</span>(a2, <span style="color:#2aa198">&#34;expand 32-byte k&#34;</span>, <span style="color:#2aa198">16</span>);
+</span></span><span style="display:flex;"><span>  v7 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">5</span>] <span style="color:#719e07">|</span> ((a1[<span style="color:#2aa198">6</span>] <span style="color:#719e07">|</span> v5) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">4</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>a1 <span style="color:#719e07">|</span> ((a1[<span style="color:#2aa198">1</span>] <span style="color:#719e07">|</span> (v6 <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v8 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">10</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">5</span>] <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">4</span>] <span style="color:#719e07">|</span> (v7 <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v9 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">8</span>] <span style="color:#719e07">|</span> ((a1[<span style="color:#2aa198">9</span>] <span style="color:#719e07">|</span> ((v8 <span style="color:#719e07">|</span> (a1[<span style="color:#2aa198">11</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v10 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">14</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">6</span>] <span style="color:#719e07">=</span> v9;
+</span></span><span style="display:flex;"><span>  v11 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">12</span>] <span style="color:#719e07">|</span> ((a1[<span style="color:#2aa198">13</span>] <span style="color:#719e07">|</span> ((v10 <span style="color:#719e07">|</span> (a1[<span style="color:#2aa198">15</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v12 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">18</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">7</span>] <span style="color:#719e07">=</span> v11;
+</span></span><span style="display:flex;"><span>  v13 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">16</span>] <span style="color:#719e07">|</span> ((a1[<span style="color:#2aa198">17</span>] <span style="color:#719e07">|</span> ((v12 <span style="color:#719e07">|</span> (a1[<span style="color:#2aa198">19</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v14 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">22</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">8</span>] <span style="color:#719e07">=</span> v13;
+</span></span><span style="display:flex;"><span>  v15 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">20</span>] <span style="color:#719e07">|</span> ((a1[<span style="color:#2aa198">21</span>] <span style="color:#719e07">|</span> ((v14 <span style="color:#719e07">|</span> (a1[<span style="color:#2aa198">23</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v16 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">26</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">9</span>] <span style="color:#719e07">=</span> v15;
+</span></span><span style="display:flex;"><span>  v17 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">24</span>] <span style="color:#719e07">|</span> ((a1[<span style="color:#2aa198">25</span>] <span style="color:#719e07">|</span> ((v16 <span style="color:#719e07">|</span> (a1[<span style="color:#2aa198">27</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v18 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">30</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">10</span>] <span style="color:#719e07">=</span> v17;
+</span></span><span style="display:flex;"><span>  v19 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">29</span>] <span style="color:#719e07">|</span> ((v18 <span style="color:#719e07">|</span> (a1[<span style="color:#2aa198">31</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v20 <span style="color:#719e07">=</span> a1[<span style="color:#2aa198">28</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">11</span>] <span style="color:#719e07">=</span> v20 <span style="color:#719e07">|</span> (v19 <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v22 <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>((<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int16</span> <span style="color:#719e07">*</span>)a4 <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>);
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">12</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">1111</span>;
+</span></span><span style="display:flex;"><span>  v23 <span style="color:#719e07">=</span> a4[<span style="color:#2aa198">6</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">13</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>a4 <span style="color:#719e07">|</span> ((a4[<span style="color:#2aa198">1</span>] <span style="color:#719e07">|</span> (v22 <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v24 <span style="color:#719e07">=</span> a4[<span style="color:#2aa198">4</span>] <span style="color:#719e07">|</span> ((a4[<span style="color:#2aa198">5</span>] <span style="color:#719e07">|</span> ((v23 <span style="color:#719e07">|</span> (a4[<span style="color:#2aa198">7</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  v25 <span style="color:#719e07">=</span> a4[<span style="color:#2aa198">10</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">14</span>] <span style="color:#719e07">=</span> v24;
+</span></span><span style="display:flex;"><span>  v26 <span style="color:#719e07">=</span> a4[<span style="color:#2aa198">9</span>] <span style="color:#719e07">|</span> ((v25 <span style="color:#719e07">|</span> (a4[<span style="color:#2aa198">11</span>] <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>)) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  result <span style="color:#719e07">=</span> a4[<span style="color:#2aa198">8</span>];
+</span></span><span style="display:flex;"><span>  a2[<span style="color:#2aa198">15</span>] <span style="color:#719e07">=</span> result <span style="color:#719e07">|</span> (v26 <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">8</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>很复杂的一个加密函数，但是从调用看和我们的输入无关，可以动调的情况下，这个函数可以不用看了</p>
+<p>另一个函数也是很复杂的，但是去完上一个函数混淆后，回到main函数，重新f5，然后设置类型调整一下就可以看懂了</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">__cdecl</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> i; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v4; <span style="color:#586e75">// ecx
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v6; <span style="color:#586e75">// [esp-8h] [ebp-1D4h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v7; <span style="color:#586e75">// [esp-4h] [ebp-1D0h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v8; <span style="color:#586e75">// [esp+0h] [ebp-1CCh]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__m128i</span> v9[<span style="color:#2aa198">4</span>]; <span style="color:#586e75">// [esp+14h] [ebp-1B8h] BYREF
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> flag[<span style="color:#2aa198">200</span>]; <span style="color:#586e75">// [esp+54h] [ebp-178h] BYREF
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> xor_array[<span style="color:#2aa198">64</span>]; <span style="color:#586e75">// [esp+11Ch] [ebp-B0h] BYREF
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> flag2[<span style="color:#2aa198">64</span>]; <span style="color:#586e75">// [esp+15Ch] [ebp-70h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v13[<span style="color:#2aa198">8</span>]; <span style="color:#586e75">// [esp+19Ch] [ebp-30h] BYREF
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v14[<span style="color:#2aa198">3</span>]; <span style="color:#586e75">// [esp+1BCh] [ebp-10h] BYREF
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;please input your flag:&#34;</span>, v8);
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">50462976</span>;
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">1</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">117835012</span>;
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">185207048</span>;
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">3</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">252579084</span>;
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">4</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">319951120</span>;
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">5</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">387323156</span>;
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">6</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">454695192</span>;
+</span></span><span style="display:flex;"><span>  v13[<span style="color:#2aa198">7</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">522067228</span>;
+</span></span><span style="display:flex;"><span>  v14[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  v14[<span style="color:#2aa198">1</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">1241513984</span>;
+</span></span><span style="display:flex;"><span>  v14[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">memset</span>(flag, <span style="color:#2aa198">0</span>, <span style="color:#719e07">sizeof</span>(flag));
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;%s&#34;</span>, (<span style="color:#dc322f">char</span>)flag);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#268bd2">strlen</span>(flag) <span style="color:#719e07">==</span> <span style="color:#2aa198">46</span> )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)flag2 <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)flag;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>flag2[<span style="color:#2aa198">16</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>flag[<span style="color:#2aa198">16</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>flag2[<span style="color:#2aa198">32</span>] <span style="color:#719e07">=</span> <span style="color:#719e07">*</span>(_OWORD <span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>flag[<span style="color:#2aa198">32</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">init</span>((<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span> <span style="color:#719e07">*</span>)v13, v9, <span style="color:#2aa198">46</span>, (<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span> <span style="color:#719e07">*</span>)v14);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">enc</span>(v9, (<span style="color:#dc322f">int</span>)xor_array);
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> ( i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">64</span>; <span style="color:#719e07">++</span>i )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">if</span> ( i <span style="color:#719e07">&gt;=</span> <span style="color:#2aa198">46</span> )
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">break</span>;
+</span></span><span style="display:flex;"><span>      flag2[i <span style="color:#719e07">+</span> <span style="color:#2aa198">48</span>] <span style="color:#719e07">=</span> flag2[i] <span style="color:#719e07">^</span> xor_array[i];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    v4 <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> ( flag2[v4 <span style="color:#719e07">+</span> <span style="color:#2aa198">48</span>] <span style="color:#719e07">==</span> cipher[v4] )
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#719e07">if</span> ( <span style="color:#719e07">++</span>v4 <span style="color:#719e07">&gt;=</span> <span style="color:#2aa198">46</span> )
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;you get your flag,the flag is your input!&#34;</span>, v7);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, v6);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">getchar</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;error</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, v7);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">else</span>
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">sub_401020</span>(<span style="color:#2aa198">&#34;length error!&#34;</span>, v7);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这就可以看到，init函数和enc函数也就是上面分析的函数，主要是生成<code>xor_array</code>数组，也与输入无关，那么动调可以直接得到。</p>
+<p>主要的加密也就是flag和xor_array异或，直接动调就可以</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272233529.png" alt="image-20230927223323491"></p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>xor_array <span style="color:#719e07">=</span> [<span style="color:#2aa198">0xFF</span>, <span style="color:#2aa198">0x24</span>, <span style="color:#2aa198">0x3F</span>, <span style="color:#2aa198">0xDA</span>, <span style="color:#2aa198">0xBE</span>, <span style="color:#2aa198">0xA9</span>, <span style="color:#2aa198">0xB6</span>, <span style="color:#2aa198">0xF7</span>, <span style="color:#2aa198">0x12</span>, <span style="color:#2aa198">0x8F</span>, <span style="color:#2aa198">0x29</span>, <span style="color:#2aa198">0xD0</span>, <span style="color:#2aa198">0x73</span>, <span style="color:#2aa198">0xF7</span>, <span style="color:#2aa198">0xF7</span>, <span style="color:#2aa198">0xA2</span>, <span style="color:#2aa198">0x83</span>, <span style="color:#2aa198">0xAD</span>, <span style="color:#2aa198">0x5F</span>, <span style="color:#2aa198">0xB0</span>, <span style="color:#2aa198">0x51</span>, <span style="color:#2aa198">0x90</span>, <span style="color:#2aa198">0x3F</span>, <span style="color:#2aa198">0x68</span>, <span style="color:#2aa198">0xF6</span>, <span style="color:#2aa198">0x8C</span>, <span style="color:#2aa198">0xC1</span>, <span style="color:#2aa198">0x0A</span>, <span style="color:#2aa198">0xB7</span>, <span style="color:#2aa198">0xB5</span>, <span style="color:#2aa198">0xBC</span>,
+</span></span><span style="display:flex;"><span>             <span style="color:#2aa198">0x82</span>, <span style="color:#2aa198">0xCC</span>, <span style="color:#2aa198">0xFC</span>, <span style="color:#2aa198">0x67</span>, <span style="color:#2aa198">0xDE</span>, <span style="color:#2aa198">0xE9</span>, <span style="color:#2aa198">0xFF</span>, <span style="color:#2aa198">0x5B</span>, <span style="color:#2aa198">0xCB</span>, <span style="color:#2aa198">0xC9</span>, <span style="color:#2aa198">0x67</span>, <span style="color:#2aa198">0xEA</span>, <span style="color:#2aa198">0xF6</span>, <span style="color:#2aa198">0xA6</span>, <span style="color:#2aa198">0x1A</span>, <span style="color:#2aa198">0x39</span>, <span style="color:#2aa198">0x56</span>, <span style="color:#2aa198">0xCA</span>, <span style="color:#2aa198">0x23</span>, <span style="color:#2aa198">0x46</span>, <span style="color:#2aa198">0xE3</span>, <span style="color:#2aa198">0xC8</span>, <span style="color:#2aa198">0x71</span>, <span style="color:#2aa198">0x43</span>, <span style="color:#2aa198">0x53</span>, <span style="color:#2aa198">0xFF</span>, <span style="color:#2aa198">0x72</span>, <span style="color:#2aa198">0x2F</span>, <span style="color:#2aa198">0xC3</span>, <span style="color:#2aa198">0x5C</span>, <span style="color:#2aa198">0x1C</span>, <span style="color:#2aa198">0x5B</span>, <span style="color:#2aa198">0x94</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cipher <span style="color:#719e07">=</span> [<span style="color:#2aa198">0x99</span>, <span style="color:#2aa198">0x48</span>, <span style="color:#2aa198">0x5E</span>, <span style="color:#2aa198">0xBD</span>, <span style="color:#2aa198">0xC5</span>, <span style="color:#2aa198">0x9B</span>, <span style="color:#2aa198">0x85</span>, <span style="color:#2aa198">0x96</span>, <span style="color:#2aa198">0x20</span>, <span style="color:#2aa198">0xFC</span>, <span style="color:#2aa198">0x18</span>, <span style="color:#2aa198">0xB2</span>, <span style="color:#2aa198">0x00</span>, <span style="color:#2aa198">0xC5</span>, <span style="color:#2aa198">0xDA</span>, <span style="color:#2aa198">0xC0</span>, <span style="color:#2aa198">0xB1</span>, <span style="color:#2aa198">0xC8</span>, <span style="color:#2aa198">0x6C</span>, <span style="color:#2aa198">0x81</span>, <span style="color:#2aa198">0x63</span>, <span style="color:#2aa198">0xBD</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#2aa198">0x09</span>, <span style="color:#2aa198">0x50</span>, <span style="color:#2aa198">0xC2</span>, <span style="color:#2aa198">0xBB</span>, <span style="color:#2aa198">0xEC</span>, <span style="color:#2aa198">0x33</span>, <span style="color:#2aa198">0xD6</span>, <span style="color:#2aa198">0xD7</span>, <span style="color:#2aa198">0x8F</span>, <span style="color:#2aa198">0xAF</span>, <span style="color:#2aa198">0xAD</span>, <span style="color:#2aa198">0xCE</span>, <span style="color:#2aa198">0x14</span>, <span style="color:#2aa198">0xED</span>, <span style="color:#2aa198">0x8C</span>, <span style="color:#2aa198">0xCE</span>, <span style="color:#2aa198">0x6F</span>, <span style="color:#2aa198">0xA9</span>, <span style="color:#2aa198">0xA8</span>, <span style="color:#2aa198">0x02</span>, <span style="color:#2aa198">0x8C</span>, <span style="color:#2aa198">0x90</span>, <span style="color:#2aa198">0x94</span>, <span style="color:#2aa198">0x67</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#b58900">len</span>(cipher)):
+</span></span><span style="display:flex;"><span>    cipher[i] <span style="color:#719e07">^=</span> xor_array[i]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(<span style="color:#b58900">bytes</span>(cipher))
+</span></span></code></pre></div><p>flag: <code>flag{23a2s1bs2-b2e312-6847-9ab3-a2s3e14baeff2}</code></p>
+<h2 id="t4ee">T4ee</h2>
+<p>ida打开后分析，发现是将真实的逻辑分割成6个部分</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">__cdecl</span> <span style="color:#268bd2">main_0</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv, <span style="color:#719e07">const</span> <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__CheckForDebuggerJustMyCode</span>(<span style="color:#719e07">&amp;</span>unk_D8E0A7);
+</span></span><span style="display:flex;"><span>  val1[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#268bd2">ret_address</span>((<span style="color:#dc322f">int</span>)j_part_1);         <span style="color:#586e75">// 将函数J_program_start地址传递到val1中
+</span></span></span><span style="display:flex;"><span>                                                <span style="color:#586e75">// 读取flag
+</span></span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_add_address</span>(val1[<span style="color:#2aa198">0</span>], (<span style="color:#dc322f">int</span>)part_2, val2);    <span style="color:#586e75">// 添加part_2地址到val1+4位置
+</span></span></span><span style="display:flex;"><span>                                                <span style="color:#586e75">// flag length
+</span></span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_add_address</span>(val1[<span style="color:#2aa198">0</span>], (<span style="color:#dc322f">int</span>)j_part_3, val3);  <span style="color:#586e75">// 添加part_3地址到val1+8位置
+</span></span></span><span style="display:flex;"><span>                                                <span style="color:#586e75">// arr1 ^= arr2
+</span></span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_add_address</span>(<span style="color:#719e07">*</span>(_DWORD <span style="color:#719e07">*</span>)(val1[<span style="color:#2aa198">0</span>] <span style="color:#719e07">+</span> <span style="color:#2aa198">4</span>), (<span style="color:#dc322f">int</span>)j_part_4, val2);<span style="color:#586e75">// 添加part_4地址到val1+8的位置
+</span></span></span><span style="display:flex;"><span>                                                <span style="color:#586e75">// arr1等于打乱后的flag
+</span></span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_add_address</span>(<span style="color:#719e07">*</span>(_DWORD <span style="color:#719e07">*</span>)(val1[<span style="color:#2aa198">0</span>] <span style="color:#719e07">+</span> <span style="color:#2aa198">4</span>), (<span style="color:#dc322f">int</span>)j_part_5, val3);<span style="color:#586e75">// 添加part_4地址到val1+12的位置
+</span></span></span><span style="display:flex;"><span>                                                <span style="color:#586e75">// rc4 key=GoodLuck
+</span></span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_add_address</span>(<span style="color:#719e07">*</span>(_DWORD <span style="color:#719e07">*</span>)(val1[<span style="color:#2aa198">0</span>] <span style="color:#719e07">+</span> <span style="color:#2aa198">8</span>), (<span style="color:#dc322f">int</span>)part_6, val2);<span style="color:#586e75">// 添加part_4地址到val1+12的位置
+</span></span></span><span style="display:flex;"><span>                                                <span style="color:#586e75">// strcmp(arr1, cipher)
+</span></span></span><span style="display:flex;"><span>  <span style="color:#268bd2">run</span>(val1[<span style="color:#2aa198">0</span>]);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>将6个部分插入到二叉树中，最后run函数是前序遍历，实际上6个部分可以通过各下一个断点，然后运行来调试出执行顺序。但是顺序是val2和val3来控制，所以需要注意这两个变量，通过交叉引用可以查到到这两个变量果然有一个反调试</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">void</span> <span style="color:#719e07">*</span>__thiscall <span style="color:#268bd2">check_debug</span>(<span style="color:#dc322f">void</span> <span style="color:#719e07">*</span>this)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__CheckForDebuggerJustMyCode</span>(<span style="color:#719e07">&amp;</span>unk_D8E0A7);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( <span style="color:#268bd2">sub_D8110E</span>() )                           <span style="color:#586e75">// 判断是否调试
+</span></span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    val2 <span style="color:#719e07">=</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>    val3 <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> this;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>虽然我不知道这个函数到底是哪里调用的，很怪，但是就是会偷偷改调用顺序</p>
+<p>调试可以发现调用顺序是</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>part1
+</span></span><span style="display:flex;"><span>part2
+</span></span><span style="display:flex;"><span>part4
+</span></span><span style="display:flex;"><span>part5
+</span></span><span style="display:flex;"><span>part3
+</span></span><span style="display:flex;"><span>part6
+</span></span></code></pre></div><p>1，2是输入，检查输入长度，6是对比密文，关键就是4，5，3，具体的功能来分析一下</p>
+<h3 id="part4">part4</h3>
+<p>将flag打乱后放到arr1数组中</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">part_4</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> result; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> i; <span style="color:#586e75">// [esp+D0h] [ebp-A0h]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v2[<span style="color:#2aa198">37</span>]; <span style="color:#586e75">// [esp+DCh] [ebp-94h]
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  result <span style="color:#719e07">=</span> <span style="color:#268bd2">__CheckForDebuggerJustMyCode</span>(<span style="color:#719e07">&amp;</span>unk_D8E0A7);
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">0</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">4</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">1</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">19</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">9</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">3</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">35</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">4</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">34</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">5</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">6</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">24</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">7</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">14</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">8</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">5</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">9</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">10</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">18</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">11</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">31</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">12</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">21</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">13</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">16</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">14</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">11</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">15</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">29</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">16</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">12</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">17</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">2</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">18</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">30</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">19</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">13</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">20</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">3</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">21</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">15</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">22</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">8</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">23</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">7</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">24</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">17</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">25</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">32</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">26</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">33</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">27</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">6</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">28</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">25</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">29</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">20</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">30</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">26</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">31</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">10</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">32</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">23</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">33</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">22</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">34</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">27</span>;
+</span></span><span style="display:flex;"><span>  v2[<span style="color:#2aa198">35</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">28</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">for</span> ( i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">34</span>; <span style="color:#719e07">++</span>i )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">*</span>(<span style="color:#719e07">&amp;</span>arr1 <span style="color:#719e07">+</span> i) <span style="color:#719e07">=</span> flag[v2[i]];
+</span></span><span style="display:flex;"><span>    result <span style="color:#719e07">=</span> i <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="part5">part5</h3>
+<p>代码如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">part_5</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">size_t</span> v0; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> Str[<span style="color:#2aa198">128</span>]; <span style="color:#586e75">// [esp+190h] [ebp-29Ch] BYREF
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> v3; <span style="color:#586e75">// [esp+210h] [ebp-21Ch]
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">char</span> v4[<span style="color:#2aa198">264</span>]; <span style="color:#586e75">// [esp+21Ch] [ebp-210h] BYREF
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> key_stream[<span style="color:#2aa198">65</span>]; <span style="color:#586e75">// [esp+324h] [ebp-108h] BYREF
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">__CheckForDebuggerJustMyCode</span>(<span style="color:#719e07">&amp;</span>unk_D8E0A7);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_memset</span>(key_stream, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0x100u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_memset</span>(v4, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0x100u</span>);
+</span></span><span style="display:flex;"><span>  v3 <span style="color:#719e07">=</span> <span style="color:#2aa198">36</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_memset</span>(<span style="color:#719e07">&amp;</span>Str[<span style="color:#2aa198">20</span>], <span style="color:#2aa198">0</span>, <span style="color:#2aa198">0x64u</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">strcpy</span>(Str, <span style="color:#2aa198">&#34;GoodLuck&#34;</span>);
+</span></span><span style="display:flex;"><span>  v0 <span style="color:#719e07">=</span> <span style="color:#268bd2">j_strlen</span>(Str);
+</span></span><span style="display:flex;"><span>  <span style="color:#268bd2">j_rc4_init</span>(key_stream, v4, Str, v0);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#268bd2">rc4_crypt</span>((<span style="color:#dc322f">int</span>)key_stream, (<span style="color:#dc322f">int</span>)<span style="color:#719e07">&amp;</span>arr1, <span style="color:#719e07">&amp;</span>arr1);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>分析后可以知道是rc4加密，密钥是<code>GoodLuck</code></p>
+<h3 id="part3">part3</h3>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">part_3</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> result; <span style="color:#586e75">// eax
+</span></span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> i; <span style="color:#586e75">// [esp+D0h] [ebp-8h]
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  result <span style="color:#719e07">=</span> <span style="color:#268bd2">__CheckForDebuggerJustMyCode</span>(<span style="color:#719e07">&amp;</span>unk_D8E0A7);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">for</span> ( i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">33</span>; <span style="color:#719e07">++</span>i )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">*</span>(<span style="color:#719e07">&amp;</span>arr1 <span style="color:#719e07">+</span> i) <span style="color:#719e07">^=</span> arr2[i];
+</span></span><span style="display:flex;"><span>    result <span style="color:#719e07">=</span> i <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这里的arr2其实就是arr1的下一位</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309272255835.png" alt="image-20230927225546876"></p>
+<p>所以其实这个加密可以写成</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#b58900">len</span>(arr1)<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>):
+</span></span><span style="display:flex;"><span>    arr1[i] <span style="color:#719e07">^=</span> arr1[i <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>]
+</span></span></code></pre></div><p>所以解密就先解密3，再5，再4就可以</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">from</span> Crypto.Cipher <span style="color:#719e07">import</span> ARC4
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>c <span style="color:#719e07">=</span> [<span style="color:#2aa198">0x2C</span>, <span style="color:#2aa198">0x40</span>, <span style="color:#2aa198">0xCE</span>, <span style="color:#2aa198">0x88</span>, <span style="color:#2aa198">0xEA</span>, <span style="color:#2aa198">0xB3</span>, <span style="color:#2aa198">0xA7</span>, <span style="color:#2aa198">0xFA</span>, <span style="color:#2aa198">0xBE</span>, <span style="color:#2aa198">0xE3</span>, <span style="color:#2aa198">0x32</span>, <span style="color:#2aa198">0xD9</span>, <span style="color:#2aa198">0x8B</span>, <span style="color:#2aa198">0xE4</span>, <span style="color:#2aa198">0x1C</span>, <span style="color:#2aa198">0x77</span>, <span style="color:#2aa198">0xFC</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#2aa198">0xD4</span>, <span style="color:#2aa198">0x76</span>, <span style="color:#2aa198">0xAB</span>, <span style="color:#2aa198">0x87</span>, <span style="color:#2aa198">0x41</span>, <span style="color:#2aa198">0xB0</span>, <span style="color:#2aa198">0xCE</span>, <span style="color:#2aa198">0xF5</span>, <span style="color:#2aa198">0x5E</span>, <span style="color:#2aa198">0x61</span>, <span style="color:#2aa198">0x86</span>, <span style="color:#2aa198">0xA8</span>, <span style="color:#2aa198">0xCF</span>, <span style="color:#2aa198">0x71</span>, <span style="color:#2aa198">0x99</span>, <span style="color:#2aa198">0x5C</span>, <span style="color:#2aa198">0xB1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75"># part3</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#b58900">len</span>(c)<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>, <span style="color:#2aa198">0</span>, <span style="color:#719e07">-</span><span style="color:#2aa198">1</span>):
+</span></span><span style="display:flex;"><span>    c[i<span style="color:#719e07">-</span><span style="color:#2aa198">1</span>] <span style="color:#719e07">^=</span> c[i]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75"># part5</span>
+</span></span><span style="display:flex;"><span>key <span style="color:#719e07">=</span> <span style="color:#2aa198">b</span><span style="color:#2aa198">&#39;GoodLuck&#39;</span>
+</span></span><span style="display:flex;"><span>rc4 <span style="color:#719e07">=</span> ARC4<span style="color:#719e07">.</span>new(key<span style="color:#719e07">=</span>key)
+</span></span><span style="display:flex;"><span>c <span style="color:#719e07">=</span> rc4<span style="color:#719e07">.</span>decrypt(<span style="color:#b58900">bytes</span>(c))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75"># part4</span>
+</span></span><span style="display:flex;"><span>box <span style="color:#719e07">=</span> [<span style="color:#2aa198">4</span>, <span style="color:#2aa198">19</span>, <span style="color:#2aa198">9</span>, <span style="color:#2aa198">1</span>, <span style="color:#2aa198">24</span>, <span style="color:#2aa198">14</span>, <span style="color:#2aa198">5</span>, <span style="color:#2aa198">0</span>, <span style="color:#2aa198">18</span>, <span style="color:#2aa198">31</span>, <span style="color:#2aa198">21</span>, <span style="color:#2aa198">16</span>, <span style="color:#2aa198">11</span>, <span style="color:#2aa198">29</span>, <span style="color:#2aa198">12</span>, <span style="color:#2aa198">2</span>, <span style="color:#2aa198">30</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#2aa198">13</span>, <span style="color:#2aa198">3</span>, <span style="color:#2aa198">15</span>, <span style="color:#2aa198">8</span>, <span style="color:#2aa198">7</span>, <span style="color:#2aa198">17</span>, <span style="color:#2aa198">32</span>, <span style="color:#2aa198">33</span>, <span style="color:#2aa198">6</span>, <span style="color:#2aa198">25</span>, <span style="color:#2aa198">20</span>, <span style="color:#2aa198">26</span>, <span style="color:#2aa198">10</span>, <span style="color:#2aa198">23</span>, <span style="color:#2aa198">22</span>, <span style="color:#2aa198">27</span>, <span style="color:#2aa198">28</span>]
+</span></span><span style="display:flex;"><span>flag <span style="color:#719e07">=</span> [<span style="color:#2aa198">0</span>] <span style="color:#719e07">*</span> <span style="color:#2aa198">34</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> <span style="color:#b58900">range</span>(<span style="color:#b58900">len</span>(c)):
+</span></span><span style="display:flex;"><span>    flag[box[i]] <span style="color:#719e07">=</span> c[i]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(<span style="color:#b58900">bytes</span>(flag))
+</span></span></code></pre></div><p>flag: <code>flag{T4ee_Travel_M@kes_me_H@ppy!!}</code></p>
+<h2 id="lin">lin</h2>
+<p>这是一道golang语言编程的题目</p>
+<p>搜索字符串，发现base64字符表，然后在程序中查找base64相关函数，发现在main_thirdChall中有一个base64字符串</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AE0 E8 FB <span style="color:#2aa198">06</span> FE FF                call    encoding_base64___Encoding__EncodeToString
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AE0
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AE5 <span style="color:#2aa198">48</span> <span style="color:#2aa198">83</span> FB <span style="color:#2aa198">28</span>                   cmp     rbx, <span style="color:#2aa198">28</span>h ; <span style="color:#2aa198">&#39;(&#39;</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AE9 <span style="color:#2aa198">75</span> <span style="color:#2aa198">19</span>                         jnz     <span style="color:#dc322f">short</span> loc_3FFB04
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AE9
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AEB <span style="color:#2aa198">48</span> <span style="color:#2aa198">8</span>D <span style="color:#2aa198">1</span>D <span style="color:#2aa198">30</span> <span style="color:#2aa198">49</span> <span style="color:#2aa198">02</span> <span style="color:#2aa198">00</span>          lea     rbx, aReftq1rge2hhc2            ; <span style="color:#2aa198">&#34;REFTQ1RGe2hhc2FraS1wZHR6cHR6LXZ4bmZudX0&#34;</span>...
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AF2 B9 <span style="color:#2aa198">28</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span> <span style="color:#2aa198">00</span>                mov     ecx, <span style="color:#2aa198">28</span>h ; <span style="color:#2aa198">&#39;(&#39;</span>
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AF7 E8 <span style="color:#2aa198">44</span> <span style="color:#2aa198">2</span>D F6 FF                call    runtime_memequal
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AF7
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>AFC <span style="color:#2aa198">0F</span> <span style="color:#2aa198">1F</span> <span style="color:#2aa198">40</span> <span style="color:#2aa198">00</span>                   nop     dword ptr [rax<span style="color:#719e07">+</span><span style="color:#2aa198">00</span>h]
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>B00 <span style="color:#2aa198">84</span> C0                         test    al, al
+</span></span><span style="display:flex;"><span>.text:<span style="color:#2aa198">00000000003FF</span>B02 <span style="color:#2aa198">75</span> <span style="color:#2aa198">61</span>                         jnz     <span style="color:#dc322f">short</span> loc_3FFB65
+</span></span></code></pre></div><p>直接解码上图base64的密文（<code>REFTQ1RGe2hhc2FraS1wZHR6cHR6LXZ4bmZudX0=</code>）得到一个flag<code>DASCTF{hasaki-pdtzptz-vxnfnu}</code></p>
+<p>但是这个flag不对，其实只有中间那部分不对。</p>
+<p>这是main_thirdChall前面还有main_firstChall和main_secondChall</p>
+<p>查看前面的代码，main_firstChall有检查长度的部分</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( v0 <span style="color:#719e07">!=</span> <span style="color:#2aa198">6</span> )
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">fmt_Fprintln</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">main_menu</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">0LL</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>运行程序后，测试多次发现输入<code>DASCTF{hasaki-pdtzptz-vxnfnu}</code>中的第一个部分<code>hasaki</code>可以通过</p>
+<p>实际上看汇编或者动态调试分析main_firstChall是输入6个字符，rot13后和密文对比</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( v4 <span style="color:#719e07">!=</span> <span style="color:#2aa198">6</span> <span style="color:#719e07">||</span> <span style="color:#719e07">*</span>(_DWORD <span style="color:#719e07">*</span>)v3 <span style="color:#719e07">!=</span> &#39;nfnu&#39; <span style="color:#719e07">||</span> <span style="color:#719e07">*</span>(_WORD <span style="color:#719e07">*</span>)(v3 <span style="color:#719e07">+</span> <span style="color:#2aa198">4</span>) <span style="color:#719e07">!=</span> &#39;vx&#39; )<span style="color:#586e75">// unfnxv 调试发现是rot13后的结果
+</span></span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">fmt_Fprintln</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">main_menu</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> v9;
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p><code>unfnxv</code>rot13加密后得到的就是<code>hasaki</code>，所以第一关的输入就是<code>hasaki</code></p>
+<p>然后第二部分测试后发现输入<code>DASCTF{hasaki-pdtzptz-vxnfnu}</code>中的第三个部分<code>vxnfnu</code>可以通过。</p>
+<p>一定要分析的话，下断点到对比密文的地方就可以了，因为不加密输入，而是加密其他数据，然后和输入对比，所以动调就可以得到正确的输入是<code>vxnfnu</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>  <span style="color:#719e07">if</span> ( v8 <span style="color:#719e07">==</span> a1 <span style="color:#719e07">&amp;&amp;</span> (<span style="color:#dc322f">unsigned</span> <span style="color:#268bd2">__int8</span>)<span style="color:#268bd2">runtime_memequal</span>() )<span style="color:#586e75">// vxnfnu
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#268bd2">runtime_slicerunetostring</span>();
+</span></span></code></pre></div><p>然后第三个部分要求输入是29个字符，然后处理输入后base64加密对比密文，可以想到输入就是类似<code>DASCTF{hasaki-pdtzptz-vxnfnu}</code>的形式，只是中间那一段被处理了，我们调试这一部分</p>
+<p>然后下断点到base64加密前，然后开始调试</p>
+<p>前两关就还是输入<code>hasaki</code>,<code>vxnfnu</code>，第三个直接输入错误的flag，通过调试看看差别在哪里</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>欢迎来到小林的世界
+</span></span><span style="display:flex;"><span>请选择您要进行的操作：
+</span></span><span style="display:flex;"><span>1. 自我介绍
+</span></span><span style="display:flex;"><span>2. 开始闯关
+</span></span><span style="display:flex;"><span>3. 关闭程序
+</span></span><span style="display:flex;"><span>请输入操作选项：2
+</span></span><span style="display:flex;"><span>有一天小林发现了一张古老地图，上面标记着一个传说中的宝藏。然而，为了找到宝藏，需要先找到一把铜钥匙。
+</span></span><span style="display:flex;"><span>:: hasaki
+</span></span><span style="display:flex;"><span>恭喜你找到了铜钥匙！
+</span></span><span style="display:flex;"><span>于是他开始沿着地图指示的路径进行探索。经过长时间的跋涉和寻找，他最终来到了一个神秘的洞穴。在洞穴中，他看到了一扇大门，门上有一个锁。他观察了一下锁孔，发现需要一把银钥匙才能打开。
+</span></span><span style="display:flex;"><span>:: vxnfnu
+</span></span><span style="display:flex;"><span>恭喜你找到了银钥匙！
+</span></span><span style="display:flex;"><span>于是他开始四处搜索，但是任何线索都没有找到金钥匙。这时候，他想起了地图上的一些细节，破解了一些谜题，得到了一些提示。这些提示指向了一个古老的祭坛，据说这里曾经有传说中的金钥匙。
+</span></span><span style="display:flex;"><span>:: DASCTF<span style="color:#719e07">{</span>hasaki-pdtzptz-vxnfnu<span style="color:#719e07">}</span>
+</span></span></code></pre></div><p>然后查看内存，可以发现flag中间那段变了</p>
+<pre tabindex="0"><code>000000C0000ABD20  07 00 00 00 00 00 00 00  44 41 53 43 54 46 7B 68  ........DASCTF{h
+000000C0000ABD30  61 73 61 6B 69 2D 75 69  79 65 75 79 65 2D 76 78  asaki-uiyeuye-vx
+000000C0000ABD40  6E 66 6E 75 7D 00 00 00  AE 81 01 00 C0 00 00 00  nfnu}...........
+</code></pre><p>我们输入的是<code>pdtzptz</code>，变成了<code>uiyeuye</code></p>
+<p>像misc一样测试一下偏移，发现每个字符差5，就是凯撒密码，所以解一下cyberchef解一下凯撒可以得到flag</p>
+<pre tabindex="0"><code>欢迎来到小林的世界
+请选择您要进行的操作：
+1. 自我介绍
+2. 开始闯关
+3. 关闭程序
+请输入操作选项：2
+有一天小林发现了一张古老地图，上面标记着一个传说中的宝藏。然而，为了找到宝藏，需要先找到一把铜钥匙。
+:: hasaki
+恭喜你找到了铜钥匙！
+于是他开始沿着地图指示的路径进行探索。经过长时间的跋涉和寻找，他最终来到了一个神秘的洞穴。在洞穴中，他看到了一扇大门，门上有一个锁。他观察了一下锁孔，发现需要一把银钥匙才能打开。
+:: vxnfnu
+恭喜你找到了银钥匙！
+于是他开始四处搜索，但是任何线索都没有找到金钥匙。这时候，他想起了地图上的一些细节，破解了一些谜题，得到了一些提示。这些提示指向了一个古老的祭坛，据说这里曾经有传说中的金钥匙。
+:: DASCTF{hasaki-kyoukou-vxnfnu}
+恭喜你获取到了金钥匙，这就是最终的宝藏！
+</code></pre><p>flag: <code>DASCTF{hasaki-kyoukou-vxnfnu}</code></p>
+<h2 id="robbie-gave-up">Robbie gave up</h2>
+<p>这是一道unity的游戏题目，根据经验（<del>就是上网搜一下</del>），来到<code>Robbie gave up/Robbie gave up_Data/Managed/Assembly-CSharp.dll</code>，使用dnspy打开Assembly-CSharp.dll就可以看到具体的逻辑代码了</p>
+<p>这是一道游戏题目，应该是游戏通关后才会出现flag，所以定位到游戏结束附件，所在类是<code>WinZone</code></p>
+<p>一路观察代码，看下去发现在Robbie类中有一个win方法会被调用到</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span><span style="color:#719e07">using</span> System;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">using</span> System.Reflection;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">using</span> UnityEngine;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// Token: 0x02000014 RID: 20</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#719e07">class</span> <span style="color:#268bd2">Robbie</span> : MonoBehaviour
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#586e75">// Token: 0x0600005C RID: 92 RVA: 0x0001080C File Offset: 0x0000EA0C</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#dc322f">object</span> Win()
+</span></span><span style="display:flex;"><span>	{
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i = GameManager.instance.orbs.Count; i &lt; Robbie.data1.Length; i++)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			Robbie.data2[i] = (<span style="color:#dc322f">byte</span>)(Robbie.data1[i] ^ i);
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		Type type = Assembly.Load(Robbie.data2).GetType(<span style="color:#2aa198">&#34;ClassLibrary1.Class1&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#dc322f">object</span> obj = type.GetConstructor(Type.EmptyTypes).Invoke(<span style="color:#719e07">new</span> <span style="color:#dc322f">object</span>[<span style="color:#2aa198">0</span>]);
+</span></span><span style="display:flex;"><span>		<span style="color:#719e07">return</span> type.GetMethod(<span style="color:#2aa198">&#34;Method&#34;</span>).Invoke(obj, <span style="color:#cb4b16">null</span>).ToString();
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#586e75">// Token: 0x04000084 RID: 132</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#268bd2">private</span> <span style="color:#268bd2">static</span> <span style="color:#dc322f">int</span>[] data1 = <span style="color:#719e07">new</span> <span style="color:#dc322f">int</span>[]
+</span></span><span style="display:flex;"><span>	{
+</span></span><span style="display:flex;"><span>		<span style="color:#2aa198">77</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#2aa198">91</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#2aa198">146</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#2aa198">3</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#2aa198">7</span>,
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>    };
+</span></span></code></pre></div><p>这里调用了data1数据，解密后保存成<code>ClassLibrary1.Class1</code>类，然后调用其中的方法得到flag</p>
+<p>我手动解密一下，保存出来，看到具体代码如下。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span><span style="color:#586e75">// ClassLibrary1.Class1</span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// Token: 0x06000001 RID: 1 RVA: 0x00002130 File Offset: 0x00000330</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">public</span> <span style="color:#268bd2">static</span> <span style="color:#dc322f">string</span> Method()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#dc322f">string</span> x = <span style="color:#2aa198">&#34;はりずめはばぐだすだちずそぬけびせやのぞはとらよはやこらのとほめせだむばのだのぢはやよぢせりにやのばぢ&#34;</span>;
+</span></span><span style="display:flex;"><span>	<span style="color:#719e07">return</span> <span style="color:#719e07">new</span> Crypt().Decode(x);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span><span style="color:#719e07">using</span> System;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">using</span> System.Collections.Generic;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">using</span> System.Text;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">namespace</span> Libraries
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#586e75">// Token: 0x02000003 RID: 3</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#268bd2">public</span> <span style="color:#719e07">class</span> <span style="color:#268bd2">Crypt</span>
+</span></span><span style="display:flex;"><span>	{
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x06000003 RID: 3 RVA: 0x00002058 File Offset: 0x00000258</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">public</span> Crypt()
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">this</span>.T = <span style="color:#719e07">new</span> List&lt;<span style="color:#dc322f">char</span>&gt;();
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">this</span>.K = <span style="color:#2aa198">&#34;あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやよらりるれろわをぐげござじずぞだぢづでばびぶべぱぴぷぺぽ&#34;</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x17000001 RID: 1</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// (get) Token: 0x06000004 RID: 4 RVA: 0x00002076 File Offset: 0x00000276</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// (set) Token: 0x06000005 RID: 5 RVA: 0x00002150 File Offset: 0x00000350</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">public</span> <span style="color:#dc322f">string</span> Token
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">get</span>
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">if</span> (<span style="color:#719e07">this</span>.S != <span style="color:#cb4b16">null</span>)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					<span style="color:#719e07">return</span> <span style="color:#719e07">this</span>.S;
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">return</span> <span style="color:#719e07">this</span>.K;
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">set</span>
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">this</span>.T.Clear();
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">this</span>.S = <span style="color:#719e07">value</span>;
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">if</span> (<span style="color:#719e07">this</span>.S == <span style="color:#cb4b16">null</span>)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					<span style="color:#719e07">foreach</span> (<span style="color:#dc322f">char</span> item <span style="color:#719e07">in</span> <span style="color:#719e07">this</span>.K)
+</span></span><span style="display:flex;"><span>					{
+</span></span><span style="display:flex;"><span>						<span style="color:#719e07">this</span>.T.Add(item);
+</span></span><span style="display:flex;"><span>					}
+</span></span><span style="display:flex;"><span>					<span style="color:#719e07">return</span>;
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">if</span> (<span style="color:#719e07">this</span>.S.Length &lt; <span style="color:#2aa198">64</span>)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					<span style="color:#719e07">foreach</span> (<span style="color:#dc322f">char</span> item2 <span style="color:#719e07">in</span> <span style="color:#719e07">this</span>.S)
+</span></span><span style="display:flex;"><span>					{
+</span></span><span style="display:flex;"><span>						<span style="color:#719e07">this</span>.T.Add(item2);
+</span></span><span style="display:flex;"><span>					}
+</span></span><span style="display:flex;"><span>					<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> j = <span style="color:#2aa198">0</span>; j &lt; <span style="color:#2aa198">64</span> - <span style="color:#719e07">this</span>.S.Length; j++)
+</span></span><span style="display:flex;"><span>					{
+</span></span><span style="display:flex;"><span>						<span style="color:#719e07">this</span>.T.Add(<span style="color:#719e07">this</span>.K[j]);
+</span></span><span style="display:flex;"><span>					}
+</span></span><span style="display:flex;"><span>					<span style="color:#719e07">return</span>;
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> k = <span style="color:#2aa198">0</span>; k &lt; <span style="color:#2aa198">64</span>; k++)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					<span style="color:#719e07">this</span>.T.Add(<span style="color:#719e07">this</span>.S[k]);
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x06000006 RID: 6 RVA: 0x0000208D File Offset: 0x0000028D</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">public</span> <span style="color:#dc322f">string</span> Encode(<span style="color:#dc322f">string</span> x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">if</span> (!<span style="color:#dc322f">string</span>.IsNullOrEmpty(x))
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">return</span> <span style="color:#719e07">this</span>.InternalEncode(Encoding.UTF8.GetBytes(x));
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> x;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x06000007 RID: 7 RVA: 0x000020AA File Offset: 0x000002AA</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">public</span> <span style="color:#dc322f">string</span> Decode(<span style="color:#dc322f">string</span> x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">if</span> (!<span style="color:#dc322f">string</span>.IsNullOrEmpty(x))
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">return</span> Encoding.UTF8.GetString(<span style="color:#719e07">this</span>.InternalDecode(x));
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> x;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x06000008 RID: 8 RVA: 0x000020C7 File Offset: 0x000002C7</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">public</span> <span style="color:#dc322f">byte</span>[] Encode(<span style="color:#dc322f">byte</span>[] x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">if</span> (x != <span style="color:#cb4b16">null</span>)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">return</span> Encoding.UTF8.GetBytes(<span style="color:#719e07">this</span>.InternalEncode(x));
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> <span style="color:#cb4b16">null</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x06000009 RID: 9 RVA: 0x000020DF File Offset: 0x000002DF</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">public</span> <span style="color:#dc322f">byte</span>[] Decode(<span style="color:#dc322f">byte</span>[] x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">if</span> (x != <span style="color:#cb4b16">null</span>)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">return</span> <span style="color:#719e07">this</span>.InternalDecode(Encoding.UTF8.GetString(x));
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> <span style="color:#cb4b16">null</span>;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x0600000A RID: 10 RVA: 0x000020F7 File Offset: 0x000002F7</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#719e07">void</span> CheckToken()
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">if</span> (<span style="color:#719e07">this</span>.T.Count != <span style="color:#2aa198">64</span>)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">this</span>.Token = <span style="color:#719e07">this</span>.K;
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x0600000B RID: 11 RVA: 0x00002240 File Offset: 0x00000440</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#dc322f">byte</span>[] InternalDecode(<span style="color:#dc322f">string</span> x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">this</span>.CheckToken();
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">int</span> num = <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">int</span> num2 = x.Length / <span style="color:#2aa198">4</span>;
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">int</span> num3 = x.Length % <span style="color:#2aa198">4</span>;
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">byte</span>[] array;
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">if</span> (num3 == <span style="color:#2aa198">0</span>)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				array = <span style="color:#719e07">new</span> <span style="color:#dc322f">byte</span>[<span style="color:#2aa198">3</span> * num2];
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">else</span>
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				array = <span style="color:#719e07">new</span> <span style="color:#dc322f">byte</span>[<span style="color:#2aa198">3</span> * num2 + num3 - <span style="color:#2aa198">1</span>];
+</span></span><span style="display:flex;"><span>				<span style="color:#dc322f">string</span> text = <span style="color:#dc322f">string</span>.Empty;
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i = num3; i &gt; <span style="color:#2aa198">0</span>; i--)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					text += <span style="color:#719e07">this</span>.ByteToBin((<span style="color:#dc322f">byte</span>)<span style="color:#719e07">this</span>.T.IndexOf(x[x.Length - i])).Substring(<span style="color:#2aa198">2</span>);
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> j = <span style="color:#2aa198">0</span>; j &lt; num3 - <span style="color:#2aa198">1</span>; j++)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					array[<span style="color:#2aa198">3</span> * num2 + j] = <span style="color:#719e07">this</span>.BinToByte(text.Substring(<span style="color:#2aa198">8</span> * j, <span style="color:#2aa198">8</span>));
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> k = <span style="color:#2aa198">0</span>; k &lt; num2; k++)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#dc322f">string</span> text = <span style="color:#dc322f">string</span>.Empty;
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> l = <span style="color:#2aa198">0</span>; l &lt; <span style="color:#2aa198">4</span>; l++)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					text += <span style="color:#719e07">this</span>.ByteToBin((<span style="color:#dc322f">byte</span>)<span style="color:#719e07">this</span>.T.IndexOf(x[<span style="color:#2aa198">4</span> * k + l])).Substring(<span style="color:#2aa198">2</span>);
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> m = <span style="color:#2aa198">0</span>; m &lt; text.Length / <span style="color:#2aa198">8</span>; m++)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					array[num++] = <span style="color:#719e07">this</span>.BinToByte(text.Substring(<span style="color:#2aa198">8</span> * m, <span style="color:#2aa198">8</span>));
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> array;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x0600000C RID: 12 RVA: 0x00002378 File Offset: 0x00000578</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#dc322f">string</span> InternalEncode(<span style="color:#dc322f">byte</span>[] x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">this</span>.CheckToken();
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">string</span> text = <span style="color:#dc322f">string</span>.Empty;
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">int</span> num = x.Length / <span style="color:#2aa198">3</span>;
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">int</span> num2 = x.Length % <span style="color:#2aa198">3</span>;
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i = <span style="color:#2aa198">0</span>; i &lt; num; i++)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#dc322f">string</span> text2 = <span style="color:#dc322f">string</span>.Empty;
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> j = <span style="color:#2aa198">0</span>; j &lt; <span style="color:#2aa198">3</span>; j++)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					text2 += <span style="color:#719e07">this</span>.ByteToBin(x[<span style="color:#2aa198">3</span> * i + j]);
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				text += <span style="color:#719e07">this</span>.cryptEncode(text2);
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">if</span> (num2 == <span style="color:#2aa198">1</span>)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#dc322f">string</span> text2 = <span style="color:#719e07">this</span>.ByteToBin(x[x.Length - <span style="color:#2aa198">1</span>]).PadRight(<span style="color:#2aa198">12</span>, <span style="color:#2aa198">&#39;0&#39;</span>);
+</span></span><span style="display:flex;"><span>				text += <span style="color:#719e07">this</span>.cryptEncode(text2);
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">else</span> <span style="color:#719e07">if</span> (num2 == <span style="color:#2aa198">2</span>)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				<span style="color:#dc322f">string</span> text2 = <span style="color:#dc322f">string</span>.Empty;
+</span></span><span style="display:flex;"><span>				<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> k = num2; k &gt; <span style="color:#2aa198">0</span>; k--)
+</span></span><span style="display:flex;"><span>				{
+</span></span><span style="display:flex;"><span>					text2 += <span style="color:#719e07">this</span>.ByteToBin(x[x.Length - k]);
+</span></span><span style="display:flex;"><span>				}
+</span></span><span style="display:flex;"><span>				text2 = text2.PadRight(<span style="color:#2aa198">18</span>, <span style="color:#2aa198">&#39;0&#39;</span>);
+</span></span><span style="display:flex;"><span>				text += <span style="color:#719e07">this</span>.cryptEncode(text2);
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> text;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x0600000D RID: 13 RVA: 0x0000245C File Offset: 0x0000065C</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#dc322f">string</span> cryptEncode(<span style="color:#dc322f">string</span> x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#dc322f">string</span> text = <span style="color:#dc322f">string</span>.Empty;
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i = <span style="color:#2aa198">0</span>; i &lt; x.Length / <span style="color:#2aa198">6</span>; i++)
+</span></span><span style="display:flex;"><span>			{
+</span></span><span style="display:flex;"><span>				text += <span style="color:#719e07">this</span>.T[(<span style="color:#dc322f">int</span>)<span style="color:#719e07">this</span>.BinToByte(x.Substring(<span style="color:#2aa198">6</span> * i, <span style="color:#2aa198">6</span>))].ToString();
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> text;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x0600000E RID: 14 RVA: 0x00002114 File Offset: 0x00000314</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#dc322f">string</span> ByteToBin(<span style="color:#dc322f">byte</span> x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> Convert.ToString(x, <span style="color:#2aa198">2</span>).PadLeft(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#39;0&#39;</span>);
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x0600000F RID: 15 RVA: 0x00002125 File Offset: 0x00000325</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#dc322f">byte</span> BinToByte(<span style="color:#dc322f">string</span> x)
+</span></span><span style="display:flex;"><span>		{
+</span></span><span style="display:flex;"><span>			<span style="color:#719e07">return</span> Convert.ToByte(x, <span style="color:#2aa198">2</span>);
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x04000001 RID: 1</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#dc322f">string</span> S;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x04000002 RID: 2</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> <span style="color:#dc322f">string</span> K;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#586e75">// Token: 0x04000003 RID: 3</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#268bd2">private</span> List&lt;<span style="color:#dc322f">char</span>&gt; T;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>稍微看一下很复杂，仔细看一眼，就是<strong>base64换表</strong>，直接cyberchef秒了</p>
+<p>表：<code>あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやよらりるれろわをぐげござじずぞだぢづでばびぶべぱぴぷぺぽ</code></p>
+<p>密文: <code>はりずめはばぐだすだちずそぬけびせやのぞはとらよはやこらのとほめせだむばのだのぢはやよぢせりにやのばぢ</code></p>
+<p>flag: <code>flag{33419b8662e9df2ea7a787c64f946ecc}</code></p>
+<h2 id="附件">附件</h2>
+<p>
+<a href="https://github.com/Military-axe/ctf/tree/master/2023/2023%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B%E5%88%9D%E8%B5%9B" target="_blank" rel="noopener">https://github.com/Military-axe/ctf/tree/master/2023/2023%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B%E5%88%9D%E8%B5%9B</a></p>
+        </div>
+        <footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span><time>Sep 27, 2023</time>
+    
+      <span class="categories">
+        Tags:<a class="category" href="https://military-axe.github.io/tags/%e5%8f%8d%e8%b0%83%e8%af%95">反调试</a>  <a class="category" href="https://military-axe.github.io/tags/rc4">rc4</a>  
+    
+    </span>
+  </p><p class="meta">
+    
+        <a class="basic-alignment left" href="https://military-axe.github.io/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/" title="2023 羊城杯 Reverse">2023 羊城杯 Reverse</a>
+    
+
+    
+      <a class="basic-alignment right" href="https://military-axe.github.io/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/" title="BiAn: Smart Contract Source Code Obfuscation">BiAn: Smart Contract Source Code Obfuscation</a>
+    
+  </p>
+  
+  
+</footer>
+
+
+      </article>
+    </div>
+    <aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section><ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    </li>
+</ul>
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-25-llvm-base-development-environment-configuration/">llvm base development environment configuration</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">通过修改物理内存实现跨进程内存读写</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/">利用PEB遍历模块链表</a>
+              </li>
+            
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="https://military-axe.github.io/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+  </body>
+</html>
+

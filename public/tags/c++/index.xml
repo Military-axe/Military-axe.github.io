@@ -6,28 +6,27 @@
     <description>Recent content in C&#43;&#43; on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>mi1itray.axe copyright.</copyright>
     <lastBuildDate>Sat, 25 Jan 2025 15:28:53 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/tags/c++/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>llvm base development environment configuration</title>
-      <link>https://military-axe.github.io/post/llvm-base-dev/</link>
+      <link>https://military-axe.github.io/blog/2025-01-25-llvm-base-development-environment-configuration/</link>
       <pubDate>Sat, 25 Jan 2025 15:28:53 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/llvm-base-dev/</guid>
+      <guid>https://military-axe.github.io/blog/2025-01-25-llvm-base-development-environment-configuration/</guid>
       <description>&lt;p&gt;之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录&lt;/p&gt;</description>
     </item>
     <item>
       <title>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</title>
-      <link>https://military-axe.github.io/post/c&#43;&#43;-static-polymorphism/</link>
+      <link>https://military-axe.github.io/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</link>
       <pubDate>Fri, 10 Jan 2025 00:40:23 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/c&#43;&#43;-static-polymorphism/</guid>
+      <guid>https://military-axe.github.io/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</guid>
       <description>&lt;p&gt;在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C++多态我都不太熟，于是简单学习一下这个部分（C++真tm难啊&lt;/p&gt;</description>
     </item>
     <item>
       <title>利用PEB遍历模块链表</title>
-      <link>https://military-axe.github.io/post/%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</link>
+      <link>https://military-axe.github.io/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</link>
       <pubDate>Tue, 19 Mar 2024 11:36:56 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</guid>
+      <guid>https://military-axe.github.io/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</guid>
       <description>&lt;p&gt;使用c++, rust实现遍历PEB获取模块信息的代码段. 主要练练rust&lt;/p&gt;</description>
     </item>
   </channel>

@@ -6,28 +6,27 @@
     <description>Recent content in Android on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>mi1itray.axe copyright.</copyright>
     <lastBuildDate>Mon, 16 Oct 2023 14:05:44 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/tags/android/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>2023 香山杯 Reverse</title>
-      <link>https://military-axe.github.io/post/2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/</link>
+      <link>https://military-axe.github.io/blog/2023-10-16-2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/</link>
       <pubDate>Mon, 16 Oct 2023 14:05:44 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/</guid>
+      <guid>https://military-axe.github.io/blog/2023-10-16-2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/</guid>
       <description>&lt;p&gt;香山杯初赛的3到逆向的WP，不是很难的题，但是有一些新的东西，chaquopy框架，这个框架完成了一套sdk，可以安卓调用python代码也可以python调用java代码。可惜的是python是源码存储，还有研究的空间&lt;/p&gt;</description>
     </item>
     <item>
       <title>Frida call java class/method to explode</title>
-      <link>https://military-axe.github.io/post/frida_call_method_to_explode/</link>
+      <link>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</link>
       <pubDate>Fri, 07 Jul 2023 10:01:10 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/frida_call_method_to_explode/</guid>
-      <description>&lt;p&gt;利用Frida去调用java代码中的类，然后爆破。算是一种主动的方法。主要是之前有一道apk题目是爆破的思路，但是我不会写java代码，想起来很难受，冲浪的时候看到&lt;a href=&#34;https://eternalsakura13.com/&#34;&gt;Sakura&lt;/a&gt;的blog有感，就再去试试，并记录在此。然后发现这题原来是adword原题，（其实题目挺简单，只是当时摆），气死✌了。&lt;/p&gt;&#xA;&lt;p&gt;主要是记录Frida主动调用apk中Java中的代码。主动调用可以用于爆破，模拟程序部分执行。&lt;/p&gt;&#xA;&lt;p&gt;需要注意的知识点是在java代码中的static类型数据在爆破过程中需要每次都对这种类型值重新设置。因为static类型在所有实例中都是统一，修改一个实例就会修改所有实例，需要用&lt;code&gt;变量.属性.value = ...&lt;/code&gt;的写法重新设置值。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;var&lt;/span&gt; bvar = b.$new(IntClass.$new(&lt;span style=&#34;color:#b452cd&#34;&gt;2&lt;/span&gt;));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8b008b;font-weight:bold&#34;&gt;for&lt;/span&gt; (...) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    bvar._static_val.value = ...;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+      <guid>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</guid>
+      <description>&lt;p&gt;利用Frida去调用java代码中的类，然后爆破。算是一种主动的方法。主要是之前有一道apk题目是爆破的思路，但是我不会写java代码，想起来很难受，冲浪的时候看到&#xD;&#xA;&lt;a href=&#34;https://eternalsakura13.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Sakura&lt;/a&gt;的blog有感，就再去试试，并记录在此。然后发现这题原来是adword原题，（其实题目挺简单，只是当时摆），气死✌了。&lt;/p&gt;&#xA;&lt;p&gt;主要是记录Frida主动调用apk中Java中的代码。主动调用可以用于爆破，模拟程序部分执行。&lt;/p&gt;&#xA;&lt;p&gt;需要注意的知识点是在java代码中的static类型数据在爆破过程中需要每次都对这种类型值重新设置。因为static类型在所有实例中都是统一，修改一个实例就会修改所有实例，需要用&lt;code&gt;变量.属性.value = ...&lt;/code&gt;的写法重新设置值。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#268bd2&#34;&gt;var&lt;/span&gt; bvar &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; b.$new(IntClass.$new(&lt;span style=&#34;color:#2aa198&#34;&gt;2&lt;/span&gt;));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;for&lt;/span&gt; (...) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    bvar._static_val.value &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; ...;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
     </item>
     <item>
       <title>2023 XCTF GotYouKey Write Up</title>
-      <link>https://military-axe.github.io/post/gotyoukey/</link>
+      <link>https://military-axe.github.io/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</link>
       <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/gotyoukey/</guid>
+      <guid>https://military-axe.github.io/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</guid>
       <description>&lt;p&gt;前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。&lt;/p&gt;</description>
     </item>
   </channel>

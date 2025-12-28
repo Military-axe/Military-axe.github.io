@@ -6,21 +6,20 @@
     <description>Recent content in Llvm on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>mi1itray.axe copyright.</copyright>
     <lastBuildDate>Sat, 25 Jan 2025 15:28:53 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/tags/llvm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>llvm base development environment configuration</title>
-      <link>https://military-axe.github.io/post/llvm-base-dev/</link>
+      <link>https://military-axe.github.io/blog/2025-01-25-llvm-base-development-environment-configuration/</link>
       <pubDate>Sat, 25 Jan 2025 15:28:53 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/llvm-base-dev/</guid>
+      <guid>https://military-axe.github.io/blog/2025-01-25-llvm-base-development-environment-configuration/</guid>
       <description>&lt;p&gt;之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录&lt;/p&gt;</description>
     </item>
     <item>
       <title>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques</title>
-      <link>https://military-axe.github.io/post/khao/</link>
+      <link>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
       <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/khao/</guid>
+      <guid>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
       <description>&lt;p&gt;这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。&lt;/p&gt;&#xA;&lt;p&gt;从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。&lt;/p&gt;</description>
     </item>
   </channel>

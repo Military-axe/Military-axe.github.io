@@ -6,14 +6,13 @@
     <description>Recent content in Python on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>mi1itray.axe copyright.</copyright>
     <lastBuildDate>Sat, 10 Jun 2023 21:12:15 +0800</lastBuildDate>
     <atom:link href="https://military-axe.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation</title>
-      <link>https://military-axe.github.io/post/pyfet/</link>
+      <link>https://military-axe.github.io/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</link>
       <pubDate>Sat, 10 Jun 2023 21:12:15 +0800</pubDate>
-      <guid>https://military-axe.github.io/post/pyfet/</guid>
+      <guid>https://military-axe.github.io/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</guid>
       <description>&lt;p&gt;2023 S&amp;amp;P论文，讲述的是python反编译的研究工作，总结了大量的反编译特征，针对恶意代码分析领域，提供一种新的解决方案。&#xA;从逆向和工程的角度来说，这项工作有很多值得学习的部分。&lt;/p&gt;</description>
     </item>
   </channel>
