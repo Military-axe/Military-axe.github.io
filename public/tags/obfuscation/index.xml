@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Obfuscation on Mi1itray.axe</title>
-    <link>https://military-axe.github.io/tags/obfuscation/</link>
+    <link>http://localhost:1313/tags/obfuscation/</link>
     <description>Recent content in Obfuscation on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 02 Mar 2024 15:52:25 +0800</lastBuildDate>
-    <atom:link href="https://military-axe.github.io/tags/obfuscation/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/obfuscation/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Rust污点分析调研</title>
-      <link>https://military-axe.github.io/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</link>
+      <link>http://localhost:1313/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</link>
       <pubDate>Sat, 02 Mar 2024 15:52:25 +0800</pubDate>
-      <guid>https://military-axe.github.io/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</guid>
+      <guid>http://localhost:1313/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</guid>
       <description>&lt;p&gt;Rust语言污点分析相关的几篇内容&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;SafeDrop: Detecting Memory Deallocation Bugs of Rust Programs via Static Data-flow Analysis.&lt;/li&gt;&#xA;&lt;li&gt;Encapsulated Functions: Fortifying Rust&amp;rsquo;s FFI in Embedded Systems.&lt;/li&gt;&#xA;&lt;li&gt;Demystifying Compiler Unstable Feature Usage and Impacts in the Rust Ecosystem&lt;/li&gt;&#xA;&lt;li&gt;Detecting Cross-language Memory Management Issues in Rust&lt;/li&gt;&#xA;&lt;li&gt;MirChecker: Detecting Bugs in Rust Programs via Static Analysis&lt;/li&gt;&#xA;&lt;li&gt;Static Deadlock Detection for Rust Programs&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
     <item>
       <title>BiAn: Smart Contract Source Code Obfuscation</title>
-      <link>https://military-axe.github.io/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</link>
+      <link>http://localhost:1313/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</link>
       <pubDate>Thu, 12 Oct 2023 14:42:18 +0800</pubDate>
-      <guid>https://military-axe.github.io/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</guid>
+      <guid>http://localhost:1313/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</guid>
       <description>&lt;p&gt;智能合约代码混淆，感觉还是ollvm的影子，还是那三种模式，只是做了相关的适配以及加了很多其他细节，总体思路是没有变的。&lt;/p&gt;&#xA;&lt;p&gt;创新点在于使用改进后的混沌映射来做不透明谓词，增加了一定的混淆程度&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;会议：IEEE Transactions on Software Engineering&lt;/p&gt;&#xA;&lt;p&gt;等级：CCF-A&lt;/p&gt;&#xA;&lt;/blockquote&gt;</description>
     </item>
     <item>
       <title>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques</title>
-      <link>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
+      <link>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
       <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
-      <guid>https://military-axe.github.io/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
+      <guid>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
       <description>&lt;p&gt;这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。&lt;/p&gt;&#xA;&lt;p&gt;从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。&lt;/p&gt;</description>
     </item>
   </channel>

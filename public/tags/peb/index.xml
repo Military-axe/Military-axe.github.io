@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Peb on Mi1itray.axe</title>
-    <link>https://military-axe.github.io/tags/peb/</link>
+    <link>http://localhost:1313/tags/peb/</link>
     <description>Recent content in Peb on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 19 Mar 2024 11:36:56 +0800</lastBuildDate>
-    <atom:link href="https://military-axe.github.io/tags/peb/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/peb/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>利用PEB遍历模块链表</title>
-      <link>https://military-axe.github.io/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</link>
+      <link>http://localhost:1313/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</link>
       <pubDate>Tue, 19 Mar 2024 11:36:56 +0800</pubDate>
-      <guid>https://military-axe.github.io/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</guid>
+      <guid>http://localhost:1313/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</guid>
       <description>&lt;p&gt;使用c++, rust实现遍历PEB获取模块信息的代码段. 主要练练rust&lt;/p&gt;</description>
     </item>
   </channel>
