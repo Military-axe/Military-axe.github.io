@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>句柄降权 on Mi1itray.axe</title>
-    <link>http://localhost:1313/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/</link>
+    <link>https://military-axe.github.io/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/</link>
     <description>Recent content in 句柄降权 on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 29 Apr 2024 22:01:29 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://military-axe.github.io/tags/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>句柄降权绕过CallBacks检查</title>
-      <link>http://localhost:1313/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/</link>
+      <link>https://military-axe.github.io/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/</link>
       <pubDate>Mon, 29 Apr 2024 22:01:29 +0800</pubDate>
-      <guid>http://localhost:1313/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/</guid>
+      <guid>https://military-axe.github.io/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/</guid>
       <description>&lt;p&gt;ObRegistyCallBacks保护指定进程，可以让攻击程序OpenProcess打开指定进程后获取的句柄权限是我们指定的权限范围, 比如不能读取进程内存, 不能终止进程。&lt;/p&gt;&#xA;&lt;p&gt;如何绕过这种保护，可以使用句柄降权/提权的方法，就可以对提高已经获取到的句柄权限。&lt;/p&gt;</description>
     </item>
   </channel>

@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Polymorphism on Mi1itray.axe</title>
-    <link>http://localhost:1313/tags/polymorphism/</link>
+    <link>https://military-axe.github.io/tags/polymorphism/</link>
     <description>Recent content in Polymorphism on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 10 Jan 2025 00:40:23 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/polymorphism/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://military-axe.github.io/tags/polymorphism/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</title>
-      <link>http://localhost:1313/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</link>
+      <link>https://military-axe.github.io/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</link>
       <pubDate>Fri, 10 Jan 2025 00:40:23 +0800</pubDate>
-      <guid>http://localhost:1313/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</guid>
+      <guid>https://military-axe.github.io/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</guid>
       <description>&lt;p&gt;在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C++多态我都不太熟，于是简单学习一下这个部分（C++真tm难啊&lt;/p&gt;</description>
     </item>
   </channel>

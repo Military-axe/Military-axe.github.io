@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on Mi1itray.axe</title>
-    <link>http://localhost:1313/categories/</link>
+    <link>https://military-axe.github.io/categories/</link>
     <description>Recent content in Categories on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 25 Jan 2025 15:28:53 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://military-axe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>C&#43;&#43;</title>
-      <link>http://localhost:1313/categories/c&#43;&#43;/</link>
+      <link>https://military-axe.github.io/categories/c&#43;&#43;/</link>
       <pubDate>Sat, 25 Jan 2025 15:28:53 +0800</pubDate>
-      <guid>http://localhost:1313/categories/c&#43;&#43;/</guid>
+      <guid>https://military-axe.github.io/categories/c&#43;&#43;/</guid>
       <description></description>
     </item>
     <item>
       <title>Driver</title>
-      <link>http://localhost:1313/categories/driver/</link>
+      <link>https://military-axe.github.io/categories/driver/</link>
       <pubDate>Thu, 30 May 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/categories/driver/</guid>
+      <guid>https://military-axe.github.io/categories/driver/</guid>
       <description></description>
     </item>
     <item>
       <title>Reverse</title>
-      <link>http://localhost:1313/categories/reverse/</link>
+      <link>https://military-axe.github.io/categories/reverse/</link>
       <pubDate>Mon, 29 Apr 2024 22:01:29 +0800</pubDate>
-      <guid>http://localhost:1313/categories/reverse/</guid>
+      <guid>https://military-axe.github.io/categories/reverse/</guid>
       <description></description>
     </item>
     <item>
       <title>Paper</title>
-      <link>http://localhost:1313/categories/paper/</link>
+      <link>https://military-axe.github.io/categories/paper/</link>
       <pubDate>Sat, 02 Mar 2024 15:52:25 +0800</pubDate>
-      <guid>http://localhost:1313/categories/paper/</guid>
+      <guid>https://military-axe.github.io/categories/paper/</guid>
       <description></description>
     </item>
     <item>
       <title>Develop</title>
-      <link>http://localhost:1313/categories/develop/</link>
+      <link>https://military-axe.github.io/categories/develop/</link>
       <pubDate>Fri, 01 Sep 2023 16:15:57 +0800</pubDate>
-      <guid>http://localhost:1313/categories/develop/</guid>
+      <guid>https://military-axe.github.io/categories/develop/</guid>
       <description></description>
     </item>
   </channel>

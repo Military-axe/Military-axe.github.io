@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Frida on Mi1itray.axe</title>
-    <link>http://localhost:1313/tags/frida/</link>
+    <link>https://military-axe.github.io/tags/frida/</link>
     <description>Recent content in Frida on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 07 Jul 2023 10:01:10 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/frida/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://military-axe.github.io/tags/frida/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Frida call java class/method to explode</title>
-      <link>http://localhost:1313/blog/2023-07-07-frida-call-java-class/method-to-explode/</link>
+      <link>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</link>
       <pubDate>Fri, 07 Jul 2023 10:01:10 +0800</pubDate>
-      <guid>http://localhost:1313/blog/2023-07-07-frida-call-java-class/method-to-explode/</guid>
+      <guid>https://military-axe.github.io/blog/2023-07-07-frida-call-java-class/method-to-explode/</guid>
       <description>&lt;p&gt;利用Frida去调用java代码中的类，然后爆破。算是一种主动的方法。主要是之前有一道apk题目是爆破的思路，但是我不会写java代码，想起来很难受，冲浪的时候看到&#xD;&#xA;&lt;a href=&#34;https://eternalsakura13.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Sakura&lt;/a&gt;的blog有感，就再去试试，并记录在此。然后发现这题原来是adword原题，（其实题目挺简单，只是当时摆），气死✌了。&lt;/p&gt;&#xA;&lt;p&gt;主要是记录Frida主动调用apk中Java中的代码。主动调用可以用于爆破，模拟程序部分执行。&lt;/p&gt;&#xA;&lt;p&gt;需要注意的知识点是在java代码中的static类型数据在爆破过程中需要每次都对这种类型值重新设置。因为static类型在所有实例中都是统一，修改一个实例就会修改所有实例，需要用&lt;code&gt;变量.属性.value = ...&lt;/code&gt;的写法重新设置值。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#268bd2&#34;&gt;var&lt;/span&gt; bvar &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; b.$new(IntClass.$new(&lt;span style=&#34;color:#2aa198&#34;&gt;2&lt;/span&gt;));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;for&lt;/span&gt; (...) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    bvar._static_val.value &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; ...;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
     </item>
     <item>
       <title>Frida learn &amp;&amp; sctf 2023 checkFlow</title>
-      <link>http://localhost:1313/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</link>
+      <link>https://military-axe.github.io/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</link>
       <pubDate>Mon, 03 Jul 2023 16:06:30 +0800</pubDate>
-      <guid>http://localhost:1313/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</guid>
+      <guid>https://military-axe.github.io/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</guid>
       <description>&lt;p&gt;没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下&lt;/p&gt;</description>
     </item>
   </channel>

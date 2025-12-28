@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Fuzz on Mi1itray.axe</title>
-    <link>http://localhost:1313/tags/fuzz/</link>
+    <link>https://military-axe.github.io/tags/fuzz/</link>
     <description>Recent content in Fuzz on Mi1itray.axe</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 14 Jun 2023 15:53:46 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/fuzz/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://military-axe.github.io/tags/fuzz/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations</title>
-      <link>http://localhost:1313/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</link>
+      <link>https://military-axe.github.io/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</link>
       <pubDate>Wed, 14 Jun 2023 15:53:46 +0800</pubDate>
-      <guid>http://localhost:1313/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</guid>
+      <guid>https://military-axe.github.io/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</guid>
       <description>&lt;p&gt;来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章&lt;/p&gt;&#xA;&lt;p&gt;讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决&lt;/p&gt;&#xA;&lt;p&gt;通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz&lt;/p&gt;</description>
     </item>
   </channel>
