@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Paper on Mi1itray.axe</title>
+    <link>http://localhost:1313/categories/paper/</link>
+    <description>Recent content in Paper on Mi1itray.axe</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 02 Mar 2024 15:52:25 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Rust污点分析调研</title>
+      <link>http://localhost:1313/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</link>
+      <pubDate>Sat, 02 Mar 2024 15:52:25 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</guid>
+      <description>&lt;p&gt;Rust语言污点分析相关的几篇内容&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;SafeDrop: Detecting Memory Deallocation Bugs of Rust Programs via Static Data-flow Analysis.&lt;/li&gt;&#xA;&lt;li&gt;Encapsulated Functions: Fortifying Rust&amp;rsquo;s FFI in Embedded Systems.&lt;/li&gt;&#xA;&lt;li&gt;Demystifying Compiler Unstable Feature Usage and Impacts in the Rust Ecosystem&lt;/li&gt;&#xA;&lt;li&gt;Detecting Cross-language Memory Management Issues in Rust&lt;/li&gt;&#xA;&lt;li&gt;MirChecker: Detecting Bugs in Rust Programs via Static Analysis&lt;/li&gt;&#xA;&lt;li&gt;Static Deadlock Detection for Rust Programs&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>BiAn: Smart Contract Source Code Obfuscation</title>
+      <link>http://localhost:1313/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</link>
+      <pubDate>Thu, 12 Oct 2023 14:42:18 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</guid>
+      <description>&lt;p&gt;智能合约代码混淆，感觉还是ollvm的影子，还是那三种模式，只是做了相关的适配以及加了很多其他细节，总体思路是没有变的。&lt;/p&gt;&#xA;&lt;p&gt;创新点在于使用改进后的混沌映射来做不透明谓词，增加了一定的混淆程度&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;会议：IEEE Transactions on Software Engineering&lt;/p&gt;&#xA;&lt;p&gt;等级：CCF-A&lt;/p&gt;&#xA;&lt;/blockquote&gt;</description>
+    </item>
+    <item>
+      <title>Binary Diffing</title>
+      <link>http://localhost:1313/blog/2023-08-19-binary-diffing/</link>
+      <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-08-19-binary-diffing/</guid>
+      <description>&lt;p&gt;最近想看看binary diffing的内容，直接从头看看一篇篇翻，涉及到很多机器学习内容，很多不懂的，慢慢来看吧。这里先看了10几篇，很多都只看了一个摘要。&#xA;主要是了解一下思路，看看这个领域的内容的研究历史，Binary Diffing 1暂时只看到2016年的paper，后续继续更新，主要文章引用如下&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Bitshred: feature hashing malware for scalable triage and semantic analysis.&lt;/li&gt;&#xA;&lt;li&gt;Binary function clustering using semantic hashes.&lt;/li&gt;&#xA;&lt;li&gt;Binslayer: accurate comparison of binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Control flow-based malware variant detection.&lt;/li&gt;&#xA;&lt;li&gt;{MutantX-S}: Scalable Malware Clustering Based on Static Features.&lt;/li&gt;&#xA;&lt;li&gt;Semantics-based obfuscation-resilient binary code similarity comparison with applications to software plagiarism detection.&lt;/li&gt;&#xA;&lt;li&gt;Leveraging semantic signatures for bug search in binary programs.&lt;/li&gt;&#xA;&lt;li&gt;Cross-architecture bug search in binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Bingo: Crossarchitecture cross-os binary search.&lt;/li&gt;&#xA;&lt;li&gt;Statistical similarity of binaries.&lt;/li&gt;&#xA;&lt;li&gt;discovRE: Efficient Cross-Architecture Identification of Bugs in Binary Code.&lt;/li&gt;&#xA;&lt;li&gt;Scalable Graph-based Bug Search for Firmware Images.&lt;/li&gt;&#xA;&lt;li&gt;Crossarchitecture binary semantics understanding via similar code comparison.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques</title>
+      <link>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
+      <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
+      <description>&lt;p&gt;这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。&lt;/p&gt;&#xA;&lt;p&gt;从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations</title>
+      <link>http://localhost:1313/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</link>
+      <pubDate>Wed, 14 Jun 2023 15:53:46 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</guid>
+      <description>&lt;p&gt;来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章&lt;/p&gt;&#xA;&lt;p&gt;讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决&lt;/p&gt;&#xA;&lt;p&gt;通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation</title>
+      <link>http://localhost:1313/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</link>
+      <pubDate>Sat, 10 Jun 2023 21:12:15 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</guid>
+      <description>&lt;p&gt;2023 S&amp;amp;P论文，讲述的是python反编译的研究工作，总结了大量的反编译特征，针对恶意代码分析领域，提供一种新的解决方案。&#xA;从逆向和工程的角度来说，这项工作有很多值得学习的部分。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

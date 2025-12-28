@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>2023 Two Reverse CrackMe WriteUp</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/%E5%A4%A9%E8%9E%8D%E4%BF%A1wp/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="2023 Two Reverse CrackMe WriteUp">
+  <meta property="og:description" content="前几天打了一个应该是天融信的比赛，题目不难，简单记录一下。
+一道是花指令&#43;rc4，一道是mov混淆">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-06-30T17:05:32+08:00">
+    <meta property="article:modified_time" content="2023-06-30T17:05:32+08:00">
+    <meta property="article:tag" content="Movfuscator">
+    <meta property="article:tag" content="Junk">
+    <meta property="article:tag" content="Reverse">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2023 Two Reverse CrackMe WriteUp">
+  <meta name="twitter:description" content="前几天打了一个应该是天融信的比赛，题目不难，简单记录一下。
+一道是花指令&#43;rc4，一道是mov混淆">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#junk" class="nav-junk">
+									junk
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#mov" class="nav-mov">
+									mov
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    2023 Two Reverse CrackMe WriteUp
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-06-30 17:05
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/reverse">Reverse</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/movfuscator">movfuscator</a>
+                                &nbsp;
+                            
+                                <a href="/tags/junk">junk</a>
+                                &nbsp;
+                            
+                                <a href="/tags/reverse">reverse</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>前几天打了一个应该是天融信的比赛，题目不难，简单记录一下。</p>
+<p>一道是花指令+rc4，一道是mov混淆</p>
+<h1 id="junk">junk</h1>
+<p>这题是简单的花指令+rc4</p>
+<p>打开题目后看到</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306301617162.png" alt="image-20230630161552079"></p>
+<p>这是经典的<code>jz,jnz</code>的花指令。只需要将第一个跳转指令换成jmp就可以。这里选择用idapython写一个脚本来去花</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">ida_bytes</span> <span style="color:#8b008b;font-weight:bold">import</span> patch_bytes, get_bytes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>address = <span style="color:#b452cd">0x4010C7</span>
+</span></span><span style="display:flex;"><span>length = <span style="color:#b452cd">0x10000</span>
+</span></span><span style="display:flex;"><span>ptr = address
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">while</span> address+length &gt;= ptr:
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> get_bytes(ptr,<span style="color:#b452cd">3</span>) != <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">\x0f\x84\x09</span><span style="color:#cd5555">&#39;</span> <span style="color:#8b008b">or</span> get_bytes(ptr+<span style="color:#b452cd">6</span>, <span style="color:#b452cd">3</span>) != <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">\x0f\x85\x03</span><span style="color:#cd5555">&#39;</span>:
+</span></span><span style="display:flex;"><span>        ptr += <span style="color:#b452cd">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    patch_bytes(ptr, <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">\xeb\x0d\x90\x90\x90</span><span style="color:#cd5555">&#39;</span>)
+</span></span><span style="display:flex;"><span>    ptr += <span style="color:#b452cd">12</span>
+</span></span></code></pre></div><p>然后将所有代码取消定义再重新解析，然后选中main开头到结尾，定义函数。在F5就可以看到代码了</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#8b008b;font-weight:bold">__cdecl</span> <span style="color:#008b45">main</span>(<span style="color:#00688b;font-weight:bold">int</span> argc, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **argv, <span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> **envp)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">char</span> v4; <span style="color:#228b22">// [esp+0h] [ebp-160h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v5[<span style="color:#b452cd">256</span>]; <span style="color:#228b22">// [esp+30h] [ebp-130h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> Buf1; <span style="color:#228b22">// [esp+130h] [ebp-30h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  _BYTE v7[<span style="color:#b452cd">3</span>]; <span style="color:#228b22">// [esp+131h] [ebp-2Fh] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">int</span> v8[<span style="color:#b452cd">2</span>]; <span style="color:#228b22">// [esp+150h] [ebp-10h] BYREF
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>  <span style="color:#00688b;font-weight:bold">char</span> v9; <span style="color:#228b22">// [esp+158h] [ebp-8h]
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">memset</span>(v5, <span style="color:#b452cd">0</span>, <span style="color:#8b008b;font-weight:bold">sizeof</span>(v5));
+</span></span><span style="display:flex;"><span>  v8[<span style="color:#b452cd">0</span>] = -<span style="color:#b452cd">272716322</span>;
+</span></span><span style="display:flex;"><span>  v8[<span style="color:#b452cd">1</span>] = <span style="color:#b452cd">2018915346</span>;
+</span></span><span style="display:flex;"><span>  v9 = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">sub_401050</span>(<span style="color:#cd5555">&#34;%29s&#34;</span>, &amp;Buf1);
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">sub_401080</span>(v5, v8, (<span style="color:#00688b;font-weight:bold">char</span> *)v8 + <span style="color:#008b45">strlen</span>((<span style="color:#8b008b;font-weight:bold">const</span> <span style="color:#00688b;font-weight:bold">char</span> *)v8) + <span style="color:#b452cd">1</span> - ((<span style="color:#00688b;font-weight:bold">char</span> *)v8 + <span style="color:#b452cd">1</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#008b45">sub_4011F0</span>(v5, &amp;Buf1, &amp;v7[<span style="color:#008b45">strlen</span>(&amp;Buf1)] - v7);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> ( !<span style="color:#008b45">memcmp</span>(&amp;Buf1, &amp;unk_404018, <span style="color:#b452cd">0x1Du</span>) )
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">sub_401020</span>(<span style="color:#cd5555">&#34;yes~~~~~~~~~~~~~~~~~</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>, v4);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">sub_401020</span>(<span style="color:#cd5555">&#34;no!!!!!!!!!!!!!!!!!!!!!!!</span><span style="color:#cd5555">\n</span><span style="color:#cd5555">&#34;</span>, v4);
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>去混淆后直接看到是rc4裸的，直接秒了</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">from</span> <span style="color:#008b45;text-decoration:underline">Crypto.Cipher</span> <span style="color:#8b008b;font-weight:bold">import</span> ARC4
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>c = [<span style="color:#b452cd">0x56</span>, <span style="color:#b452cd">0x05</span>, <span style="color:#b452cd">0x03</span>, <span style="color:#b452cd">0x86</span>, <span style="color:#b452cd">0x7D</span>, <span style="color:#b452cd">0xEC</span>, <span style="color:#b452cd">0xF9</span>, <span style="color:#b452cd">0xAB</span>, <span style="color:#b452cd">0x26</span>, <span style="color:#b452cd">0xAA</span>, <span style="color:#b452cd">0x2D</span>, <span style="color:#b452cd">0x10</span>, <span style="color:#b452cd">0xB1</span>, <span style="color:#b452cd">0xD9</span>, <span style="color:#b452cd">0xD5</span>, <span style="color:#b452cd">0x8D</span>, <span style="color:#b452cd">0x0F</span>, <span style="color:#b452cd">0xC6</span>, <span style="color:#b452cd">0x49</span>, <span style="color:#b452cd">0xA7</span>, <span style="color:#b452cd">0xFB</span>, <span style="color:#b452cd">0x9D</span>, <span style="color:#b452cd">0xB1</span>, <span style="color:#b452cd">0xA4</span>, <span style="color:#b452cd">0x4D</span>, <span style="color:#b452cd">0x2D</span>, <span style="color:#b452cd">0x85</span>, <span style="color:#b452cd">0x2F</span>, <span style="color:#b452cd">0x9A</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>key = <span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;</span><span style="color:#cd5555">\xEF\xBE\xAD\xDE</span><span style="color:#cd5555">&#39;</span>[::-<span style="color:#b452cd">1</span>]+<span style="color:#cd5555">b</span><span style="color:#cd5555">&#39;xV4</span><span style="color:#cd5555">\x12</span><span style="color:#cd5555">&#39;</span>[::-<span style="color:#b452cd">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cipher = ARC4.new(key)
+</span></span><span style="display:flex;"><span>m = cipher.decrypt(<span style="color:#658b00">bytes</span>(c))
+</span></span><span style="display:flex;"><span><span style="color:#658b00">print</span>(<span style="color:#658b00">bytes</span>(m))
+</span></span></code></pre></div><p>flag: <code>flag{jUnkc0dE_C0oO00o0oo0ode}</code></p>
+<p>题目链接: <a href="https://github.com/Military-axe/ctf/tree/master/2023/junk">ctf/2023/junk at master · Military-axe/ctf · GitHub</a></p>
+<h1 id="mov">mov</h1>
+<p>这题是mov混淆，也就是所有指令都用mov来替换。先去混淆用demovfuscator</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306301657350.png" alt="image-20230630165707757"></p>
+<p>得到mov.patch。这时候打开ida，查看代码，虽然还是很难看，但是可以找到系统的函数调用了</p>
+<p>然后看到有read和strlen的调用。直接在strlen后找到输入的内存。然后下硬件断点</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202306301658039.png" alt="image-20230630165848973"></p>
+<p>断下来后，单步跟踪发现是讲输入每个先异或0x12再加上0x34</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>c = [<span style="color:#b452cd">0xA8</span>, <span style="color:#b452cd">0xB2</span>, <span style="color:#b452cd">0xA7</span>, <span style="color:#b452cd">0xA9</span>, <span style="color:#b452cd">0x9D</span>, <span style="color:#b452cd">0xB3</span>, <span style="color:#b452cd">0x56</span>, <span style="color:#b452cd">0x98</span>, <span style="color:#b452cd">0xA8</span>, <span style="color:#b452cd">0x9B</span>, <span style="color:#b452cd">0x5B</span>, <span style="color:#b452cd">0xA5</span>, <span style="color:#b452cd">0x5A</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#b452cd">0x9A</span>, <span style="color:#b452cd">0x56</span>, <span style="color:#b452cd">0x94</span>, <span style="color:#b452cd">0x81</span>, <span style="color:#b452cd">0x9E</span>, <span style="color:#b452cd">0xB1</span>, <span style="color:#b452cd">0x94</span>, <span style="color:#b452cd">0x94</span>, <span style="color:#b452cd">0x94</span>, <span style="color:#b452cd">0x94</span>, <span style="color:#b452cd">0x94</span>, <span style="color:#b452cd">0x94</span>, <span style="color:#b452cd">0xA3</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">for</span> i <span style="color:#8b008b">in</span> <span style="color:#658b00">range</span>(<span style="color:#658b00">len</span>(c)):
+</span></span><span style="display:flex;"><span>    c[i] -= <span style="color:#b452cd">0x34</span>
+</span></span><span style="display:flex;"><span>    c[i] ^= <span style="color:#b452cd">0x12</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#658b00">print</span>(<span style="color:#658b00">bytes</span>(c))
+</span></span></code></pre></div><p>flag: <code>flag{m0vfu5c4t0r_xorrrrrr}</code></p>
+<p>题目链接：<a href="https://github.com/Military-axe/ctf/tree/master/2023/move">ctf/2023/move at master · Military-axe/ctf · GitHub</a></p>
+<h1 id="参考">参考</h1>
+<p><a href="https://github.com/xoreaxeaxeax/movfuscator">xoreaxeaxeax/movfuscator: The single instruction C compiler (github.com)</a></p>
+<p><a href="https://github.com/leetonidas/demovfuscator">leetonidas/demovfuscator: A work-in-progress deobfuscator for movfuscated binaries (github.com)</a></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-06-30</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/frida_learn_and_2023_sctf_check_flow/">
+			Next<br>Frida learn &amp;&amp; sctf 2023 checkFlow
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/kextfuzz/">
+			Previous<br>KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#junk" class="nav-junk">
+									junk
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#mov" class="nav-mov">
+									mov
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

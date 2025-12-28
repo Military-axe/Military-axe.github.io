@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>通过修改物理内存实现跨进程内存读写</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="通过修改物理内存实现跨进程内存读写">
+  <meta property="og:description" content="跨进程内存读写有多种方式，这里主要了解一下修改物理内存来实现跨进程内存修改方法。这种方法主要是无痕，对比修改cr3来说要无痕的多。
+后面再试试修改cr3和修改MDL映射来做到跨进程内存读写方式。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2024-05-06T11:17:50+08:00">
+    <meta property="article:modified_time" content="2024-05-06T11:17:50+08:00">
+    <meta property="article:tag" content="Windows">
+    <meta property="article:tag" content="Reverse">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="通过修改物理内存实现跨进程内存读写">
+  <meta name="twitter:description" content="跨进程内存读写有多种方式，这里主要了解一下修改物理内存来实现跨进程内存修改方法。这种方法主要是无痕，对比修改cr3来说要无痕的多。
+后面再试试修改cr3和修改MDL映射来做到跨进程内存读写方式。">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%9f%ba%e7%a1%80" class="nav-基础">
+									基础
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e8%99%9a%e6%8b%9f%e5%9c%b0%e5%9d%80%e8%bd%ac%e7%89%a9%e7%90%86%e5%9c%b0%e5%9d%80" class="nav-虚拟地址转物理地址">
+									虚拟地址转物理地址
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#dirbase%e5%9c%b0%e5%9d%80%e8%8e%b7%e5%8f%96" class="nav-dirbase地址获取">
+									DirBase地址获取
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e6%80%9d%e8%b7%af" class="nav-思路">
+									思路
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%bb%a3%e7%a0%81%e5%ae%9e%e7%8e%b0" class="nav-代码实现">
+									代码实现
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e8%a2%ab%e4%bf%ae%e6%94%b9%e8%bf%9b%e7%a8%8b%e4%bb%a3%e7%a0%81" class="nav-被修改进程代码">
+									被修改进程代码
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e4%bb%a3%e7%a0%81" class="nav-驱动代码">
+									驱动代码
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%93%e6%9e%9c" class="nav-结果">
+									结果
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%99%84%e5%bd%95" class="nav-附录">
+									附录
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e5%85%a8%e9%83%a8%e4%bb%a3%e7%a0%81" class="nav-驱动全部代码">
+									驱动全部代码
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bc%96%e8%af%91%e7%8e%af%e5%a2%83" class="nav-编译环境">
+									编译环境
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    通过修改物理内存实现跨进程内存读写
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2024-05-06 11:17
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/driver">Driver</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/windows">windows</a>
+                                &nbsp;
+                            
+                                <a href="/tags/reverse">reverse</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>跨进程内存读写有多种方式，这里主要了解一下修改物理内存来实现跨进程内存修改方法。这种方法主要是无痕，对比修改cr3来说要无痕的多。</p>
+<p>后面再试试修改cr3和修改MDL映射来做到跨进程内存读写方式。</p>
+<blockquote>
+<p>系统：win10 21h1 x64</p>
+<p>编译环境: vs2022  详情见附录</p></blockquote>
+<h2 id="基础">基础</h2>
+<h3 id="虚拟地址转物理地址">虚拟地址转物理地址</h3>
+<p>虚拟地址也称线性地址，一个<strong>线性地址+进程的DirBase地址</strong>可以转换成物理地址。先来看线性地址的含义</p>
+<blockquote>
+<p>在x64体系中只实现了48位的virtual address，高16位被用作符号扩展，这高16位要么全是0，要么全是1。
+不同于x86体系结构，每级页表寻址长度变成9位，由于在x64体系结构中，普通页大小仍为4KB,然而数据却表示64位长，因此一个4KB页在x64体系结构下只能包含512项内容，所以为了保证页对齐和以页为单位的页表内容换入换出，在x64下每级页表寻址部分长度定位9位。</p></blockquote>
+<p><img src="https://s2.loli.net/2024/05/06/f6qkzauGVBorpm9.png" alt="img"></p>
+<p>从Page Map Level 4(PML4)开始到最后的物理地址，每一个都可以理解成一层页表的索引，索引值就是线性地址上不同的部分，分别缩写是PML4, PDPE, PDE,PTE。</p>
+<blockquote>
+<p>注意，并不是取出来的值就直接指向一下一个页表，个人PC上一般是取值的12-35bit的值，其他置0。具体的后面见代码，或参考<a href="https://bbs.kanxue.com/thread-203391.htm">看雪的文章</a></p></blockquote>
+<p><img src="https://s2.loli.net/2024/05/06/TpDtcOzXIHv3JbN.png" alt="img"></p>
+<p>使用windbg可以先查看进程对应的DirBase地址，然后再使用<code>!vtop Dirbase地址 虚拟地址</code>查看虚拟地址对应的物理地址，如下。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; !process <span style="color:#b452cd">258</span>c <span style="color:#b452cd">0</span>
+</span></span><span style="display:flex;"><span>Searching <span style="color:#8b008b;font-weight:bold">for</span> Process with Cid == <span style="color:#b452cd">258</span>c
+</span></span><span style="display:flex;"><span>PROCESS ffffc40d2ab48340
+</span></span><span style="display:flex;"><span>    SessionId: <span style="color:#b452cd">1</span>  Cid: <span style="color:#b452cd">258</span>c    Peb: a6e35cd000  ParentCid: <span style="color:#b452cd">1250</span>
+</span></span><span style="display:flex;"><span>    DirBase: <span style="color:#b452cd">235</span>ae6000  ObjectTable: ffff998138d4ee00  HandleCount:  <span style="color:#b452cd">38.</span>
+</span></span><span style="display:flex;"><span>    Image: test.exe
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; !vtop <span style="color:#b452cd">235</span>ae6000 <span style="color:#b452cd">0000</span>A6E334FB00
+</span></span><span style="display:flex;"><span>Amd64VtoP: Virt <span style="color:#b452cd">000000</span>a6e334fb00, pagedir <span style="color:#b452cd">0000000235</span>ae6000
+</span></span><span style="display:flex;"><span>Amd64VtoP: PML4E <span style="color:#b452cd">0000000235</span>ae6008
+</span></span><span style="display:flex;"><span>Amd64VtoP: PDPE <span style="color:#b452cd">00000001087f</span>b4d8
+</span></span><span style="display:flex;"><span>Amd64VtoP: PDE <span style="color:#b452cd">000000010f7f</span>c8c8
+</span></span><span style="display:flex;"><span>Amd64VtoP: PTE <span style="color:#b452cd">00000000</span>ad207a78
+</span></span><span style="display:flex;"><span>Amd64VtoP: Mapped phys <span style="color:#b452cd">000000011</span>b10cb00
+</span></span><span style="display:flex;"><span>Virtual address a6e334fb00 translates to physical address <span style="color:#b452cd">11</span>b10cb00.
+</span></span></code></pre></div><p>上面得到DirBase的值是<code>235ae6000</code>，然后需要查看物理地址的虚拟地址是<code>0x0000A6E334FB00</code>，就使用命令</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>!vtop <span style="color:#b452cd">235</span>ae6000 <span style="color:#b452cd">0000</span>A6E334FB00
+</span></span></code></pre></div><p>得到最后对应的物理地址是0x11b10cb00。</p>
+<p>简单例子代码如下：</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;stdio.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;stdlib.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">char</span> flag[] = {<span style="color:#cd5555">&#34;flag{b7285d748dd042a4929d3dbec778e637}&#34;</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;value addr: %p&#34;</span>, flag);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">getchar</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>运行后可以打印出来字符串的虚拟地址<code>0000A6E334FB00</code>，然后通过上述步骤得到物理地址。</p>
+<p>我们尝试看看物理内存中的字符串，现在已经确定物理内存的地址是<code>0xD0000147</code>，使用<code>!db 0xD0000147</code>来查看物理内存，记住要<code>!</code>,没有感叹号的是查看虚拟内存的</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; !db <span style="color:#b452cd">0x11b10cb00</span>
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb00 66 6c 61 67 7b 62 37 32-38 35 64 37 34 38 64 64 flag{b7285d748dd
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb10 30 34 32 61 34 39 32 39-64 33 64 62 65 63 37 37 042a4929d3dbec77
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb20 38 65 36 33 37 7d 00 00-f8 82 20 82 f7 7f 00 00 8e637}.... .....
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb30 00 00 00 00 00 00 00 00-20 13 1f 82 f7 7f 00 00 ........ .......
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb40 00 00 00 00 00 00 00 00-99 13 1f 82 f7 7f 00 00 ................
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb50 00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00 ................
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb60 00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00 ................
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#11b10cb70 00 00 00 00 00 00 00 00-44 73 d3 08 fe 7f 00 00 ........Ds......
+</span></span></span></code></pre></div><p>可以看到物理内存上的字符串内容。</p>
+<h3 id="dirbase地址获取">DirBase地址获取</h3>
+<p>DirBase地址除了通过上述windbg直接得到这个值以外，还可以通过EPROCESS来得到，这个是代码比较需要的</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; dt _eprocess ffffc40d2ab48340
+</span></span><span style="display:flex;"><span>nt!_EPROCESS
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x000</span> Pcb              : _KPROCESS
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x438</span> ProcessLock      : _EX_PUSH_LOCK
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x440</span> UniqueProcessId  : <span style="color:#b452cd">0x00000000</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">000025</span><span style="color:#b452cd">8</span>c Void
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x448</span> ActiveProcessLinks : _LIST_ENTRY [ <span style="color:#b452cd">0xffffc40d</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">2</span>cb43788 - <span style="color:#b452cd">0xffffc40d</span><span style="color:#a61717;background-color:#e3d2d2">`</span><span style="color:#b452cd">2</span>cd444c8 ]
+</span></span><span style="display:flex;"><span>   +<span style="color:#b452cd">0x458</span> RundownProtect   : _EX_RUNDOWN_REF
+</span></span><span style="display:flex;"><span>   .....
+</span></span><span style="display:flex;"><span><span style="color:#b452cd">3</span>: kd&gt; dx -id <span style="color:#b452cd">0</span>,<span style="color:#b452cd">0</span>,ffffc40d23c95040 -<span style="color:#008b45">r1</span> (*((ntkrnlmp!_KPROCESS *)<span style="color:#b452cd">0xffffc40d2ab48340</span>))
+</span></span><span style="display:flex;"><span>(*((ntkrnlmp!_KPROCESS *)<span style="color:#b452cd">0xffffc40d2ab48340</span>))                 [Type: _KPROCESS]
+</span></span><span style="display:flex;"><span>    [+<span style="color:#b452cd">0x000</span>] Header           [Type: _DISPATCHER_HEADER]
+</span></span><span style="display:flex;"><span>    [+<span style="color:#b452cd">0x018</span>] ProfileListHead  [Type: _LIST_ENTRY]
+</span></span><span style="display:flex;"><span>    [+<span style="color:#b452cd">0x028</span>] DirectoryTableBase : <span style="color:#b452cd">0x235ae6000</span> [Type: <span style="color:#00688b;font-weight:bold">unsigned</span> <span style="color:#8b008b;font-weight:bold">__int64</span>]
+</span></span></code></pre></div><p>DirectoryTableBase的值就是DirBase地址了，实际上就是EPROCESS + 0x28的偏移</p>
+<p>还可以通过获取CR3寄存器的值，CR3寄存器中的值就是页目录表的物理地址，也就是DirBase</p>
+<h2 id="思路">思路</h2>
+<p>目的：进程B可以通过修改物理内存的内容来修改进程A内存中的数据</p>
+<p>实验设置：进程A泄露一个变量地址，然后等待进程B修改，修改后再回复执行，打印变量值看是否修改成功</p>
+<p>内核部分思路：</p>
+<ul>
+<li>将R3的虚拟地址转换为物理地址</li>
+<li>使用MmCopyMemory复制物理地址内容</li>
+<li>修改内容</li>
+<li>使用mmMapIoSpaceEx将修改后的内容映射回物理地址</li>
+</ul>
+<h2 id="代码实现">代码实现</h2>
+<h3 id="被修改进程代码">被修改进程代码</h3>
+<p>这里写一个例子来充当被攻击（修改内存）的进程。主要就是打印变量内容和地址，然后暂停程序等待一段时间（等待被驱动修改），然后再打印变量内容，看看是否被驱动修改内存成功。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;stdio.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;stdlib.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">int</span> <span style="color:#008b45">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#00688b;font-weight:bold">char</span> flag[] = {<span style="color:#cd5555">&#34;flag{b7285d748dd042a4929d3dbec778e637}&#34;</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;value addr: %p</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, flag);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;flag data: %s</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, flag);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">getchar</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">printf</span>(<span style="color:#cd5555">&#34;flag data Now: %s</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, flag);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="驱动代码">驱动代码</h3>
+<p>这里就是主要逻辑，通过驱动代码取修改目标进程的内存内容，做到跨进程内存读取，修改。</p>
+<p>定义一个读取物理内存函数</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 读取物理地址的内存内容
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param address 物理地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param buffer 复制内存地址到buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param size 复制大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param BytesTransferred 读取的字节数
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">ReadPhysicalAddress</span>(IN PVOID64 address, OUT PVOID64 buffer,
+</span></span><span style="display:flex;"><span>                             IN SIZE_T size, OUT SIZE_T* BytesTransferred)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    MM_COPY_ADDRESS Read          = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>    Read.PhysicalAddress.QuadPart = (LONG64)address;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">MmCopyMemory</span>(
+</span></span><span style="display:flex;"><span>        buffer, Read, size, MM_COPY_MEMORY_PHYSICAL, BytesTransferred);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>再定义一个写入物理内存的函数</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 写入指定内容到物理内存中
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param address 被写入的物理地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param buffer 需要写入的缓冲区指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param size 需要写入的大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param BytesTransferred 写入成功后的大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">WritePhysicalAddress</span>(IN PVOID64 address, IN PVOID64 buffer,
+</span></span><span style="display:flex;"><span>                              IN SIZE_T size, OUT SIZE_T* BytesTransferred)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PVOID            map;
+</span></span><span style="display:flex;"><span>    PHYSICAL_ADDRESS Write = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!address) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;Address value error. </span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Write.QuadPart = (LONG64)address;
+</span></span><span style="display:flex;"><span>    map            = <span style="color:#008b45">MmMapIoSpaceEx</span>(Write, size, PAGE_READWRITE);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!map) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;Write Memory faild.</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">RtlCopyMemory</span>(map, buffer, size);
+</span></span><span style="display:flex;"><span>    *BytesTransferred = size;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">MmUnmapIoSpace</span>(map, size);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我们需要将虚拟地址转换成物理地址，那么首先需要<strong>线性地址+DirBase</strong>地址，DirBase地址获取是通过PEPROCESS+0x28偏移读取的</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 通过EPROCESS获取DirBase值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pid 进程PID
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pDirbase 一个UINT64指针，获取成功后返回值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">GetDirBaseByEprocess</span>(IN UINT64 pid, OUT PUINT64 pDirbase)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PEPROCESS pEprocess;
+</span></span><span style="display:flex;"><span>    NTSTATUS  status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">PsLookupProcessByProcessId</span>((HANDLE)pid, &amp;pEprocess);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Get Pid=%d _EPROCESS failed!&#34;</span>, pid);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    *pDirbase =
+</span></span><span style="display:flex;"><span>        *(PUINT64)((PUCHAR)pEprocess + WIN10_21H1_EPROCESS2DIRBASE_OFFSET);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] uDirBase ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, *pDirbase);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>得到DirBase后，就可以虚拟地址转换物理地址。</p>
+<p>传入虚拟地址后，取后48bit，然后将这48bit分成4个9bit和最后12bit，分别是PML4，PDPE，PDE，PTE和页内偏移offset。需要注意的是DirBase就已经是物理内存了，所以读取DirBase内容并且一层一层读取都要用自定义函数<strong>ReadPhysicalAddress</strong>。</p>
+<p>每一层都是<strong>基地址+8*偏移</strong>，读取的内容，取<strong>12-35bit</strong>就是下一层的基地址</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入DirBase值和虚拟地址后，回转化成一个物理地址返回
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param DirBase DirBase地址，传入一个UINT64值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param addr 传入一个指向虚拟地址的指针，转化成物理地址后会修改这个指针的值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">TranslateAddress</span>(IN UINT64 DirBase, _Inout_ PUINT64 addr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT16   PML4, PDPE, PDE, PTE, offset;
+</span></span><span style="display:flex;"><span>    UINT64   mask = <span style="color:#b452cd">0x7fffff000</span>;
+</span></span><span style="display:flex;"><span>    UINT64   uTmp;
+</span></span><span style="display:flex;"><span>    SIZE_T   BytesTransferred;
+</span></span><span style="display:flex;"><span>    NTSTATUS status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    offset = *addr &amp; <span style="color:#b452cd">0xfff</span>;
+</span></span><span style="display:flex;"><span>    PTE    = (*addr &gt;&gt; <span style="color:#b452cd">12</span>) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>    PDE    = (*addr &gt;&gt; (<span style="color:#b452cd">12</span> + <span style="color:#b452cd">9</span>)) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>    PDPE   = (*addr &gt;&gt; (<span style="color:#b452cd">9</span> * <span style="color:#b452cd">2</span> + <span style="color:#b452cd">12</span>)) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>    PML4   = (*addr &gt;&gt; (<span style="color:#b452cd">9</span> * <span style="color:#b452cd">3</span> + <span style="color:#b452cd">12</span>)) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(DirBase + PML4 * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PML4(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PML4, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(uTmp + PDPE * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PDPE(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PDPE, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(uTmp + PDE * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PDE(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PDE, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(uTmp + PTE * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PTE(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PTE, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    *addr = uTmp + offset;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] physical address: %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, *addr);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>最后再主函数中定义一下逻辑。这里直接手动指定进程号和目标进程打印出来的变量地址，然后将虚拟地址转化成物理地址，读取物理地址上的内容并打印出来看看是否正确。再修改物理地址上的内容。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">DriverEntry</span>(PDRIVER_OBJECT pDriver, PUNICODE_STRING path)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    NTSTATUS status;
+</span></span><span style="display:flex;"><span>    UINT64   pid, uAddr, uDirBase;
+</span></span><span style="display:flex;"><span>    SIZE_T   BytesTransferred;
+</span></span><span style="display:flex;"><span>    UCHAR    charArry[<span style="color:#b452cd">40</span>] = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>    UCHAR    example[<span style="color:#b452cd">40</span>] = {<span style="color:#cd5555">&#34;Yes I change memory by physical&#34;</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pid   = <span style="color:#b452cd">10276</span>;
+</span></span><span style="display:flex;"><span>    uAddr = <span style="color:#b452cd">0x3629FAFB80</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pDriver-&gt;DriverUnload = DriverUnload;
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 手动指定进程号
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    status = <span style="color:#008b45">GetDirBaseByEprocess</span>(pid, &amp;uDirBase);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Get DirBase address failed!</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 将虚拟地址转化成物理地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    status = <span style="color:#008b45">TranslateAddress</span>(uDirBase, &amp;uAddr);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Translate address failed!</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 读取物理地址内容, 然后修改内容
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#008b45">ReadPhysicalAddress</span>((PVOID64)uAddr, charArry, <span style="color:#b452cd">40</span>, &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] data is %s</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, charArry);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 将example字符串写入物理内存
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#008b45">WritePhysicalAddress</span>((PVOID64)uAddr, example, <span style="color:#b452cd">40</span>, &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] Write end</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="结果">结果</h2>
+<p>目标进程</p>
+<p><img src="https://s2.loli.net/2024/05/06/i1Zj3JrguQNpCKU.png" alt="image-20240505235113447"></p>
+<p>驱动</p>
+<p><img src="https://s2.loli.net/2024/05/06/svozVruQf4e1LZj.png" alt="image-20240505235141011"></p>
+<p>可以看到目标进程的指定内存被修改，同时驱动也跨进程读取，修改内存成功</p>
+<h1 id="参考">参考</h1>
+<p><a href="https://www.pnpon.com/article/detail-607.html">使用CR3切换实现读取指定进程内存数据 | pnpon.com</a></p>
+<p><a href="https://blog.csdn.net/a772336300/article/details/129107452">c/c++/易语言驱动内存无痕读写源码 | csdn.net</a></p>
+<p><a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/debugger/converting-virtual-addresses-to-physical-addresses">将虚拟地址转换为物理地址 | learn.microsoft.com</a></p>
+<p><a href="https://bbs.kanxue.com/thread-203391.htm">X64下的虚拟地址到物理地址的转换 | bbs.kanxue.com</a></p>
+<p><a href="https://myzxcg.com/2024/03/%E5%87%A0%E7%A7%8D%E6%8C%96%E6%8E%98%E4%BB%BB%E6%84%8F%E8%AF%BB%E5%86%99%E9%A9%B1%E5%8A%A8%E7%9A%84%E6%96%B9%E6%B3%95/">几种挖掘任意读写驱动的方法 | myzxcg.com/</a></p>
+<h1 id="附录">附录</h1>
+<h2 id="驱动全部代码">驱动全部代码</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ntifs.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ntddk.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;intrin.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&lt;ntdef.h&gt;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#define WIN10_21H1_EPROCESS2DIRBASE_OFFSET 0x28
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#define kprintf(...) \
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, __VA_ARGS__))
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">GetDirBaseByEprocess</span>(IN UINT64, OUT PUINT64);
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">TranslateAddress</span>(IN UINT64, _Inout_ PUINT64);
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">ReadPhysicalAddress</span>(IN PVOID64, OUT PVOID64, IN SIZE_T, OUT SIZE_T*);
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">WritePhysicalAddress</span>(IN PVOID64, IN PVOID64, IN SIZE_T, OUT SIZE_T*);
+</span></span><span style="display:flex;"><span>NTKERNELAPI PPEB NTAPI  <span style="color:#008b45">PsGetProcessPeb</span>(IN PEPROCESS Process);
+</span></span><span style="display:flex;"><span>NTKERNELAPI PVOID NTAPI <span style="color:#008b45">PsGetProcessWow64Process</span>(IN PEPROCESS Process);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>VOID <span style="color:#008b45">DriverUnload</span>(PDRIVER_OBJECT pDriver)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;驱动已卸载.</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NTSTATUS <span style="color:#008b45">DriverEntry</span>(PDRIVER_OBJECT pDriver, PUNICODE_STRING path)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    NTSTATUS status;
+</span></span><span style="display:flex;"><span>    UINT64   pid, uAddr, uDirBase;
+</span></span><span style="display:flex;"><span>    SIZE_T   BytesTransferred;
+</span></span><span style="display:flex;"><span>    UCHAR    charArry[<span style="color:#b452cd">40</span>] = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>    UCHAR    example[<span style="color:#b452cd">40</span>] = {<span style="color:#cd5555">&#34;Yes I change memory by physical&#34;</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pid   = <span style="color:#b452cd">10276</span>;
+</span></span><span style="display:flex;"><span>    uAddr = <span style="color:#b452cd">0x3629FAFB80</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pDriver-&gt;DriverUnload = DriverUnload;
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 手动指定进程号
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    status = <span style="color:#008b45">GetDirBaseByEprocess</span>(pid, &amp;uDirBase);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Get DirBase address failed!</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 将虚拟地址转化成物理地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    status = <span style="color:#008b45">TranslateAddress</span>(uDirBase, &amp;uAddr);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Translate address failed!</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 读取物理地址内容, 然后修改内容
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#008b45">ReadPhysicalAddress</span>((PVOID64)uAddr, charArry, <span style="color:#b452cd">40</span>, &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] data is %s</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, charArry);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#228b22">// 将example字符串写入物理内存
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>    <span style="color:#008b45">WritePhysicalAddress</span>((PVOID64)uAddr, example, <span style="color:#b452cd">40</span>, &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] Write end</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 读取物理地址的内存内容
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param address 物理地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param buffer 复制内存地址到buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param size 复制大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param BytesTransferred 读取的字节数
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">ReadPhysicalAddress</span>(IN PVOID64 address, OUT PVOID64 buffer,
+</span></span><span style="display:flex;"><span>                             IN SIZE_T size, OUT SIZE_T* BytesTransferred)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    MM_COPY_ADDRESS Read          = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>    Read.PhysicalAddress.QuadPart = (LONG64)address;
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">MmCopyMemory</span>(
+</span></span><span style="display:flex;"><span>        buffer, Read, size, MM_COPY_MEMORY_PHYSICAL, BytesTransferred);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 写入指定内容到物理内存中
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param address 被写入的物理地址
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param buffer 需要写入的缓冲区指针
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param size 需要写入的大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param BytesTransferred 写入成功后的大小
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">WritePhysicalAddress</span>(IN PVOID64 address, IN PVOID64 buffer,
+</span></span><span style="display:flex;"><span>                              IN SIZE_T size, OUT SIZE_T* BytesTransferred)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PVOID            map;
+</span></span><span style="display:flex;"><span>    PHYSICAL_ADDRESS Write = {<span style="color:#b452cd">0</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!address) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;Address value error. </span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Write.QuadPart = (LONG64)address;
+</span></span><span style="display:flex;"><span>    map            = <span style="color:#008b45">MmMapIoSpaceEx</span>(Write, size, PAGE_READWRITE);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!map) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;Write Memory faild.</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">RtlCopyMemory</span>(map, buffer, size);
+</span></span><span style="display:flex;"><span>    *BytesTransferred = size;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">MmUnmapIoSpace</span>(map, size);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 通过EPROCESS获取DirBase值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pid 进程PID
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param pDirbase 一个UINT64指针，获取成功后返回值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">GetDirBaseByEprocess</span>(IN UINT64 pid, OUT PUINT64 pDirbase)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    PEPROCESS pEprocess;
+</span></span><span style="display:flex;"><span>    NTSTATUS  status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">PsLookupProcessByProcessId</span>((HANDLE)pid, &amp;pEprocess);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!<span style="color:#008b45">NT_SUCCESS</span>(status)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[!] Get Pid=%d _EPROCESS failed!&#34;</span>, pid);
+</span></span><span style="display:flex;"><span>        <span style="color:#8b008b;font-weight:bold">return</span> STATUS_UNSUCCESSFUL;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    *pDirbase =
+</span></span><span style="display:flex;"><span>        *(PUINT64)((PUCHAR)pEprocess + WIN10_21H1_EPROCESS2DIRBASE_OFFSET);
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] uDirBase ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, *pDirbase);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/// @brief 传入DirBase值和虚拟地址后，回转化成一个物理地址返回
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param DirBase DirBase地址，传入一个UINT64值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @param addr 传入一个指向虚拟地址的指针，转化成物理地址后会修改这个指针的值
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22">/// @return
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>NTSTATUS <span style="color:#008b45">TranslateAddress</span>(IN UINT64 DirBase, _Inout_ PUINT64 addr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UINT16   PML4, PDPE, PDE, PTE, offset;
+</span></span><span style="display:flex;"><span>    UINT64   mask = <span style="color:#b452cd">0x7fffff000</span>;
+</span></span><span style="display:flex;"><span>    UINT64   uTmp;
+</span></span><span style="display:flex;"><span>    SIZE_T   BytesTransferred;
+</span></span><span style="display:flex;"><span>    NTSTATUS status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    offset = *addr &amp; <span style="color:#b452cd">0xfff</span>;
+</span></span><span style="display:flex;"><span>    PTE    = (*addr &gt;&gt; <span style="color:#b452cd">12</span>) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>    PDE    = (*addr &gt;&gt; (<span style="color:#b452cd">12</span> + <span style="color:#b452cd">9</span>)) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>    PDPE   = (*addr &gt;&gt; (<span style="color:#b452cd">9</span> * <span style="color:#b452cd">2</span> + <span style="color:#b452cd">12</span>)) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>    PML4   = (*addr &gt;&gt; (<span style="color:#b452cd">9</span> * <span style="color:#b452cd">3</span> + <span style="color:#b452cd">12</span>)) &amp; <span style="color:#b452cd">0x1ff</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(DirBase + PML4 * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PML4(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PML4, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(uTmp + PDPE * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PDPE(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PDPE, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(uTmp + PDE * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PDE(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PDE, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    status = <span style="color:#008b45">ReadPhysicalAddress</span>(
+</span></span><span style="display:flex;"><span>        (PVOID64)(uTmp + PTE * <span style="color:#b452cd">8</span>), &amp;uTmp, <span style="color:#8b008b;font-weight:bold">sizeof</span>(uTmp), &amp;BytesTransferred);
+</span></span><span style="display:flex;"><span>    uTmp &amp;= mask;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] PTE(%x) ==&gt; %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, PTE, uTmp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    *addr = uTmp + offset;
+</span></span><span style="display:flex;"><span>    <span style="color:#008b45">kprintf</span>(<span style="color:#cd5555">&#34;[+] physical address: %llx</span><span style="color:#cd5555">\r\n</span><span style="color:#cd5555">&#34;</span>, *addr);
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> STATUS_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="编译环境">编译环境</h2>
+<pre tabindex="0"><code>Microsoft Visual Studio Community 2022
+Version 17.9.6
+VisualStudio.17.Release/17.9.6+34728.123
+Microsoft .NET Framework
+Version 4.8.09032
+
+Installed Version: Community
+
+Visual C++ 2022   00482-90000-00000-AA134
+Microsoft Visual C++ 2022
+
+ASP.NET and Web Tools   17.9.199.22661
+ASP.NET and Web Tools
+
+Azure App Service Tools v3.0.0   17.9.199.22661
+Azure App Service Tools v3.0.0
+
+C# Tools   4.9.0-3.24121.1+a98c90d56455379836dd5c845b35fa932b00cfa3
+C# components used in the IDE. Depending on your project type and settings, a different version of the compiler may be used.
+
+Debugging Tools for Windows   10.0.26090.1
+Integrates the Windows Debugger functionality (http://go.microsoft.com/fwlink/?linkid=223405) in Visual Studio.
+
+Microsoft JVM Debugger   1.0
+Provides support for connecting the Visual Studio debugger to JDWP compatible Java Virtual Machines
+
+NuGet Package Manager   6.9.2
+NuGet Package Manager in Visual Studio. For more information about NuGet, visit https://docs.nuget.org/
+
+Test Adapter for Boost.Test   1.0
+Enables Visual Studio&#39;s testing tools with unit tests written for Boost.Test.  The use terms and Third Party Notices are available in the extension installation directory.
+
+Test Adapter for Google Test   1.0
+Enables Visual Studio&#39;s testing tools with unit tests written for Google Test.  The use terms and Third Party Notices are available in the extension installation directory.
+
+TypeScript Tools   17.0.30103.2001
+TypeScript Tools for Microsoft Visual Studio
+
+Visual Basic Tools   4.9.0-3.24121.1+a98c90d56455379836dd5c845b35fa932b00cfa3
+Visual Basic components used in the IDE. Depending on your project type and settings, a different version of the compiler may be used.
+
+Visual Studio IntelliCode   2.2
+AI-assisted development for Visual Studio.
+
+Windows Driver Kit   10.0.26090.1
+Headers, libraries, and tools needed to develop, debug, and test Windows drivers (msdn.microsoft.com/en-us/windows/hardware/gg487428.aspx)
+</code></pre>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2024-05-06</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">
+			Next<br>Windows进程隐藏初探
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">
+			Previous<br>句柄降权绕过CallBacks检查
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%9f%ba%e7%a1%80" class="nav-基础">
+									基础
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e8%99%9a%e6%8b%9f%e5%9c%b0%e5%9d%80%e8%bd%ac%e7%89%a9%e7%90%86%e5%9c%b0%e5%9d%80" class="nav-虚拟地址转物理地址">
+									虚拟地址转物理地址
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#dirbase%e5%9c%b0%e5%9d%80%e8%8e%b7%e5%8f%96" class="nav-dirbase地址获取">
+									DirBase地址获取
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e6%80%9d%e8%b7%af" class="nav-思路">
+									思路
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%bb%a3%e7%a0%81%e5%ae%9e%e7%8e%b0" class="nav-代码实现">
+									代码实现
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e8%a2%ab%e4%bf%ae%e6%94%b9%e8%bf%9b%e7%a8%8b%e4%bb%a3%e7%a0%81" class="nav-被修改进程代码">
+									被修改进程代码
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e4%bb%a3%e7%a0%81" class="nav-驱动代码">
+									驱动代码
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%93%e6%9e%9c" class="nav-结果">
+									结果
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%99%84%e5%bd%95" class="nav-附录">
+									附录
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e9%a9%b1%e5%8a%a8%e5%85%a8%e9%83%a8%e4%bb%a3%e7%a0%81" class="nav-驱动全部代码">
+									驱动全部代码
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bc%96%e8%af%91%e7%8e%af%e5%a2%83" class="nav-编译环境">
+									编译环境
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

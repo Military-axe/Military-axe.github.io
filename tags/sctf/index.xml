@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Sctf on Mi1itray.axe</title>
+    <link>http://localhost:1313/tags/sctf/</link>
+    <description>Recent content in Sctf on Mi1itray.axe</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 03 Jul 2023 16:06:30 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/sctf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Frida learn &amp;&amp; sctf 2023 checkFlow</title>
+      <link>http://localhost:1313/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</link>
+      <pubDate>Mon, 03 Jul 2023 16:06:30 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</guid>
+      <description>&lt;p&gt;没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

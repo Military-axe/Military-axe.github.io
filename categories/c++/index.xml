@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C&#43;&#43; on Mi1itray.axe</title>
+    <link>http://localhost:1313/categories/c&#43;&#43;/</link>
+    <description>Recent content in C&#43;&#43; on Mi1itray.axe</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 25 Jan 2025 15:28:53 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/c++/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>llvm base development environment configuration</title>
+      <link>http://localhost:1313/blog/2025-01-25-llvm-base-development-environment-configuration/</link>
+      <pubDate>Sat, 25 Jan 2025 15:28:53 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2025-01-25-llvm-base-development-environment-configuration/</guid>
+      <description>&lt;p&gt;之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</title>
+      <link>http://localhost:1313/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</link>
+      <pubDate>Fri, 10 Jan 2025 00:40:23 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</guid>
+      <description>&lt;p&gt;在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C++多态我都不太熟，于是简单学习一下这个部分（C++真tm难啊&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

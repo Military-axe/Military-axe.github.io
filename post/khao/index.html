@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/khao/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques">
+  <meta property="og:description" content="这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。
+从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2023-07-23T21:36:57+08:00">
+    <meta property="article:modified_time" content="2023-07-23T21:36:57+08:00">
+    <meta property="article:tag" content="Llvm">
+    <meta property="article:tag" content="Reverse">
+    <meta property="article:tag" content="Obfuscation">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques">
+  <meta name="twitter:description" content="这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。
+从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%83%8c%e6%99%af" class="nav-背景">
+									背景
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#binary-diffing" class="nav-binary-diffing">
+									binary diffing
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%bd%af%e4%bb%b6%e6%b7%b7%e6%b7%86" class="nav-软件混淆">
+									软件混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#khaos-%e8%ae%be%e8%ae%a1" class="nav-khaos-设计">
+									Khaos 设计
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%9b%b0%e9%9a%be" class="nav-困难">
+									困难
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%88%86%e5%89%b2%e5%bd%a2%e6%88%90sepfunc" class="nav-分割形成sepfunc">
+									分割形成sepFunc
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%95%b0%e6%8d%ae%e6%b5%81%e9%87%8d%e5%bb%ba" class="nav-数据流重建">
+									数据流重建
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e9%87%8d%e5%bb%ba" class="nav-控制流重建">
+									控制流重建
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%9e%8d%e5%90%88%e5%87%bd%e6%95%b0" class="nav-融合函数">
+									融合函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%95%b0%e6%8d%ae%e6%b5%81%e9%87%8d%e5%bb%ba-1" class="nav-数据流重建-1">
+									数据流重建
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e8%bf%98%e5%8e%9f" class="nav-控制流还原">
+									控制流还原
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%b7%b1%e5%ba%a6%e6%b7%b7%e6%b7%86" class="nav-深度混淆">
+									深度混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%a3%82%e5%8f%98%e4%b8%8e%e8%81%9a%e5%8f%98%e7%bb%93%e5%90%88" class="nav-裂变与聚变结合">
+									裂变与聚变结合
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%af%84%e4%bc%b0%e5%ae%9e%e9%aa%8c" class="nav-评估实验">
+									评估实验
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-07-23 21:36
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/paper">Paper</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/llvm">llvm</a>
+                                &nbsp;
+                            
+                                <a href="/tags/reverse">reverse</a>
+                                &nbsp;
+                            
+                                <a href="/tags/obfuscation">obfuscation</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。</p>
+<p>从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。</p>
+<h1 id="背景">背景</h1>
+<h2 id="binary-diffing">binary diffing</h2>
+<p>binary diffing是一种识别两个二进制差异的技术，可以通过识别两个二进制之间差异的技术。它可以给出预定义粒度（如函数）的匹配结果。例如bindiff提取了基本块，控制流边和函数调用数量作为函数的特征，然后它节后控制流图匹配算法搜索相似的函数。</p>
+<p>现有的漏洞挖掘方法中，很常见的一个方法是通过对比新旧版本，找出不同处，这些修改处很可能是以及修补的漏洞。通过binary diffing可以快速定位新旧版本中的修改处，从而进一步分析漏洞。现在这种技术常用在分析1day/nday的情况，是一种高效的分析手法</p>
+<h2 id="软件混淆">软件混淆</h2>
+<p>现在做混淆很多都基于中间指令（IR）来做，比如ollvm的各种魔改。或者做指令虚拟化（VM），但指令虚拟化会导致性能大量损失。所以本文也是对IR做混淆。</p>
+<p>一般现在的IR混淆粒度，都是继承自ollvm的三种粒度。</p>
+<ul>
+<li>指令级：复杂化指令，把一条指令换成多条</li>
+<li>基本块级：设置虚假控制流与基本块</li>
+<li>函数级：通过函数扁平化，把函数结构转化为难以分析的<code>switch-case</code>结构</li>
+</ul>
+<p>随着binary diffing的发展，许多程序内粒度的静态代码重写技术不在有效。主要是程序内代码混淆不会从根本上改变每个函数的语义，而大多数binary diffing都是越来越能提取函数内部特征来理解语义。</p>
+<h1 id="khaos-设计">Khaos 设计</h1>
+<p>Khaos是在IR层面，增加混淆，通过分裂原本的函数，并融合成新的函数。</p>
+<p><code>oriFunc</code>：原始函数。</p>
+<p><code>sepFunc</code>：裂变函数，分裂原始函数形成的裂变函数。</p>
+<p><code>fusFunc</code>：聚变函数，融合后形成的新的函数。</p>
+<p><code>remFunc</code>：剩余函数，剩余代码形成的函数。</p>
+<p>例子：</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307191721665.png" alt="image-20230719172127747"></p>
+<h2 id="困难">困难</h2>
+<p>困难1：选择那些基本块或者函数聚合/分离，平衡开销与混淆效果。</p>
+<p>困难2：如何在转换后完全重建函数间的所有控制流</p>
+<p>困难3：简单融合函数，在编译器优化后，混淆效果有限。</p>
+<h2 id="分割形成sepfunc">分割形成sepFunc</h2>
+<p>对代码区域划分转换成一个图形切割问题，函数的控制流图可视为有向图，边的权重代表执行频率，表示冷/热信息。代码区域划分可以看作图的切割，切割边的权重是性能代价，混淆效果是子图中节点的数量。</p>
+<p>基于上述思想提出区域识别算法，来平衡混淆效果与性能</p>
+<!-- raw HTML omitted -->
+<ul>
+<li>
+<p>首先，我们将对函数的支配树进行分析[40]（第 2 行）。</p>
+</li>
+<li>
+<p>为了避免将整个函数体分离成一个 sepFunc，我们删除了函数本身的支配者树（第 3 行）</p>
+</li>
+<li>
+<p>并从其他树中识别出区域。为了说明裂变对混淆的影响，我们使用树中基本块的数量来表示（第 7 行）。</p>
+</li>
+<li>
+<p>为了说明裂变对性能的影响，我们使用块频率分析法来计算支配者树根节点的执行频率（第 8 行），并使用循环次数（如果区域处于循环中，则对 sepFunc 的调用将增加）作为切割的成本（第 8-12 行）。</p>
+</li>
+<li>
+<p>我们会反复选择性价比最高（即效果和成本之比最大）的支配树进行分离，直到树集为空（第 13-16 行）。</p>
+</li>
+</ul>
+<h3 id="数据流重建">数据流重建</h3>
+<p>除了切割区域作为sepFunc，还需要将函数入口与出口定义出来，也就是这一段带来使用的oriFunc中的局部变量。如果这个变量只有这个sepFunc使用，那么函数参数就可以不要，直接重新在sepFunc中定义局部变量即可。</p>
+<h3 id="控制流重建">控制流重建</h3>
+<p>把sepFunc在oriFunc中的跳转关系改为<code>call-ret</code>的关系，不同的函数出口返回的基本块也不同（这是与正常返回函数效果不同的地方）。</p>
+<p>对于异常处理控制流，把可能触发异常的代码与catch块放到同一个sepFunc来保证不破坏异常处理的逻辑。</p>
+<!-- raw HTML omitted -->
+<h2 id="融合函数">融合函数</h2>
+<p>融合函数理论上可以多个函数融合到一起，但是作者从性能角度考虑，选择两个函数融合到一起，融合主要看函数的返回值参数数量与类型是否一致，遵循下面几条原则</p>
+<ol>
+<li>函数变量不确定的不融和，比如<code>printf(....)</code></li>
+<li>函数返回值类型不兼容的不融合</li>
+<li>直接调用关系的两个函数不融合</li>
+</ol>
+<blockquote>
+<p>前两个主要满足正确性，最后一个是为了性能考虑，否则很容易产生大量递归的fusFuncs。满足上述条件的sepFuncs将随机成对</p></blockquote>
+<h3 id="数据流重建-1">数据流重建</h3>
+<p>选择完两个函数后，可以很直接的将两个函数合并，然后通过一个ctrl变量来控制数据进入fusFunc的那一部分，如图三中所示。</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307221838671.png" alt="图三"></p>
+<p>同时，由于直接合并两个函数会导致参数数量过多，所以会尝试压缩函数的参数，具体就是会将第一部分中所使用的参数同时运用第二部分相同/类似参数处，如图三的c部分，将原本的参数<code>short a, int m</code>转换成<code>int x</code>，在调用<code>short a</code>中的部分直接<code>(short) x</code>来转换成<code>short</code>类型变量。</p>
+<h3 id="控制流还原">控制流还原</h3>
+<p>一旦创建fusFunc，就删除原本的两个oriFunc，同时设置ctrl参数，并在调用处修改参数对应位置与值。</p>
+<p>处理间接函数调用就比较难分析，文章提出标记指针，其实就是类似静态污点分析，从IR层面上的污点分析类似源码层面，所以间接调用的情况能基本全部分析出来。</p>
+<!-- raw HTML omitted -->
+<p>但是除了间接调用，还有跨模块的调用。跨模块调用只有两种情况。一个是一个模块的函数指针是传播到其他模块，另一个是其他模块的模块直接调用导出的函数。</p>
+<p>无论是那种情况，都需要遍历fusFunc中所有涉及的模块，以保证fusFunc被正确调用。但是有的时候是没法遍历所有模块，比如有的模块是没有源码的，只是一个二进制模块。</p>
+<p>文章提出了一种蹦床机制来解决上述问题。首先先识别所有可能的函数指针，然后添加一段蹦床代码并修改这些函数指针跳转到蹦床代码，当调用这些函数指针时，先跳转到蹦床代码，然后蹦床代码函数会帮忙重组函数参数并调用不同的fusFunc。如图4的c部分</p>
+<h3 id="深度混淆">深度混淆</h3>
+<p>文章提出一种进一步提升混淆效果的方法。文章定义经常被使用并且不影响全局功能的基本块叫“<strong>无毒基本块</strong>”。通过将来自不同oriFunc中的无毒基本块聚合在一起，加入到fusFunc中来提升混淆效果。</p>
+<blockquote>
+<p>无害函数定义：1. 只能操作局部遍历。2. 不调用外部函数</p></blockquote>
+<p>如图5中BB3和BB6都是无害基本块，于是在这两个oriFunc合并成fusFunc时，BB3和BB6合并成一个基本块。这样大大增加了两者的混淆度，不再是一个<code>if{...}else{...}</code>包裹两个部分的代码了。</p>
+<blockquote>
+<p>虽然文章这么说，但是怎么区分BB3和BB6的代码呢，毕竟还是执行不同的逻辑？考虑到是从IR层面，那就不涉及到寄存器与变量覆盖的情况，这种思路是可行的。</p></blockquote>
+<!-- raw HTML omitted -->
+<h2 id="裂变与聚变结合">裂变与聚变结合</h2>
+<p>两者结合使用可以增强混淆效果，分三种模式用于测试数据</p>
+<ul>
+<li>FuFi.sep: 只聚变裂变产生的基本块，这种情况不用考虑间接调用情况</li>
+<li>FuFi.ori: 只聚变不需要分裂的oriFunc，比如只有一个基本块的函数。这种情况可以很好的平衡开销</li>
+<li>FuFi.all: 所有基本块都可以均匀聚合，混淆效果好，性能是第二考虑因素</li>
+</ul>
+<h1 id="评估实验">评估实验</h1>
+<p>文章主要评估两个点，一个是开销变了多少，一个是混淆程度，以及两个之间的一个关系。主要选择的对比对象是OLLVM。</p>
+<p><strong>开销增加</strong></p>
+<p>开销如下图，FuFi.all增加开销会大很多，最高可以到75%。而其他开销会小很多，比如裂变和聚变大概平均只增加5%，6%的开销，少数情况还能降低开销</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202307232055816.png" alt="image-20230723205545091"></p>
+<p><strong>OLLVM开销对比</strong></p>
+<p>和OLLVM对比效果如下，OLLVM的sub，Bog模式与khaos消耗差不多，但是OLLVM的Fla会增加大量开销，khaos只有不到10%的开销增加。</p>
+<!-- raw HTML omitted -->
+<blockquote>
+<p>两种混淆方法是不同层面上的混淆，可以用到同样的产品中</p></blockquote>
+<p><strong>抗去混淆能力</strong></p>
+<p>OLLVM模式的Fla全开的话开销过大，这里只启用10%基本块的OLLVM fla模式，来确保开销想同情况下抵抗去混淆能力。</p>
+<p>对比5中binary diffing工具的去混淆结果，这5种程序主要的分析方法如下</p>
+<!-- raw HTML omitted -->
+<p>对比结果如下，可以明显看到，在开销相同的情况下，khao正对binary diffing技术的抵抗能力更强。</p>
+<!-- raw HTML omitted -->
+<h1 id="参考">参考</h1>
+<p>[Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques (arxiv.org)](<a href="https://arxiv.org/abs/2301.11586#:~:text=A">https://arxiv.org/abs/2301.11586#:~:text=A</a> prototype of Khaos is implemented based on,19%)</p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-07-23</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="/post/binary-diffing-1/">
+			Next<br>Binary Diffing
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/obfuscate_hide_string_and_zer0pts/">
+			Previous<br>Obfuscate hide string &amp;&amp; zer0pts
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%83%8c%e6%99%af" class="nav-背景">
+									背景
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#binary-diffing" class="nav-binary-diffing">
+									binary diffing
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e8%bd%af%e4%bb%b6%e6%b7%b7%e6%b7%86" class="nav-软件混淆">
+									软件混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#khaos-%e8%ae%be%e8%ae%a1" class="nav-khaos-设计">
+									Khaos 设计
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%9b%b0%e9%9a%be" class="nav-困难">
+									困难
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%88%86%e5%89%b2%e5%bd%a2%e6%88%90sepfunc" class="nav-分割形成sepfunc">
+									分割形成sepFunc
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%95%b0%e6%8d%ae%e6%b5%81%e9%87%8d%e5%bb%ba" class="nav-数据流重建">
+									数据流重建
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e9%87%8d%e5%bb%ba" class="nav-控制流重建">
+									控制流重建
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%9e%8d%e5%90%88%e5%87%bd%e6%95%b0" class="nav-融合函数">
+									融合函数
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e6%95%b0%e6%8d%ae%e6%b5%81%e9%87%8d%e5%bb%ba-1" class="nav-数据流重建-1">
+									数据流重建
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%8e%a7%e5%88%b6%e6%b5%81%e8%bf%98%e5%8e%9f" class="nav-控制流还原">
+									控制流还原
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%b7%b1%e5%ba%a6%e6%b7%b7%e6%b7%86" class="nav-深度混淆">
+									深度混淆
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%a3%82%e5%8f%98%e4%b8%8e%e8%81%9a%e5%8f%98%e7%bb%93%e5%90%88" class="nav-裂变与聚变结合">
+									裂变与聚变结合
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%af%84%e4%bc%b0%e5%ae%9e%e9%aa%8c" class="nav-评估实验">
+									评估实验
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" class="nav-参考">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

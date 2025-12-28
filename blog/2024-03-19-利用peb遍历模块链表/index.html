@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  <title>利用PEB遍历模块链表</title><link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+    <link href="http://localhost:1313/favicon.png" rel="icon">
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe"><meta name="generator" content="Hugo 0.153.2">
+
+</head>
+<body><header role="banner"><hgroup><h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header><nav role="navigation"><fieldset class="mobile-nav"><select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="http://localhost:1313/">» Blog</option>
+      
+        <option value="http://localhost:1313/categories">» Categories</option>
+      
+        <option value="http://localhost:1313/tags">» Tags</option>
+      
+  </select>
+</fieldset><ul class="main-navigation">
+    
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        <header>
+  <p class="meta">Mar 19, 2024
+     - 9 minute read - <a class="label" href="http://localhost:1313/categories/reverse/">Reverse </a>
+    
+  </p>
+  <h1 class="entry-title">
+     利用PEB遍历模块链表 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#结构体关系">结构体关系</a></li>
+        <li><a href="#遍历模块">遍历模块</a>
+          <ul>
+            <li><a href="#headerh">header.h</a></li>
+            <li><a href="#getpebldrasm">GetPebLdr.asm</a></li>
+            <li><a href="#maincpp">main.cpp</a></li>
+          </ul>
+        </li>
+        <li><a href="#rust实现">Rust实现</a></li>
+        <li><a href="#参考">参考</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+          
+          <p>使用c++, rust实现遍历PEB获取模块信息的代码段. 主要练练rust</p>
+<blockquote>
+<p>测试环境: win11 23h2 desktop</p>
+<p>编译环境:</p>
+<p>Microsoft Visual Studio Community 2022
+版本 17.9.2
+VisualStudio.17.Release/17.9.2+34622.214
+Microsoft .NET Framework
+版本 4.8.09032</p>
+<p>已安装的版本: Community</p>
+<p>Visual C++ 2022   00482-90000-00000-AA003
+Microsoft Visual C++ 2022</p>
+<p>ASP.NET and Web Tools   17.9.197.37128
+ASP.NET and Web Tools</p>
+<p>Azure 应用服务工具 3.0.0 版   17.9.197.37128
+Azure 应用服务工具 3.0.0 版</p>
+<p>C# 工具   4.9.0-3.24121.1+a98c90d56455379836dd5c845b35fa932b00cfa3
+IDE 中使用的 C# 组件。可能使用其他版本的编译器，具体取决于你的项目类型和设置。</p>
+<p>Debugging Tools for Windows   10.0.22621.311
+Integrates the Windows Debugger functionality (
+<a href="http://go.microsoft.com/fwlink/?linkid=223405" target="_blank" rel="noopener">http://go.microsoft.com/fwlink/?linkid=223405</a>) in Visual Studio.</p>
+<p>Microsoft JVM Debugger   1.0
+Provides support for connecting the Visual Studio debugger to JDWP compatible Java Virtual Machines</p>
+<p>NuGet 包管理器   6.9.1
+Visual Studio 中的 NuGet 包管理器。有关 NuGet 的详细信息，请访问 
+<a href="https://docs.nuget.org/" target="_blank" rel="noopener">https://docs.nuget.org/</a></p>
+<p>TypeScript Tools   17.0.30103.2001
+TypeScript Tools for Microsoft Visual Studio</p>
+<p>Visual Basic 工具   4.9.0-3.24121.1+a98c90d56455379836dd5c845b35fa932b00cfa3
+IDE 中使用的 Visual Basic 组件。可能使用其他版本的编译器，具体取决于你的项目类型和设置。</p>
+<p>Visual Studio IntelliCode   2.2
+Visual Studio 的 AI 协助开发。</p>
+<p>Windows Driver Kit   10.0.22621.311
+Headers, libraries, and tools needed to develop, debug, and test Windows drivers (msdn.microsoft.com/en-us/windows/hardware/gg487428.aspx)</p>
+<p>用于 Boost.Test 的测试适配器   1.0
+通过针对 Boost.Test 编写的单元测试启用 Visual Studio 测试工具。扩展安装目录中提供用户条款和第三方通知。</p>
+<p>适用于 Google Test 的测试适配器   1.0
+启用带有针对 Google Test 编写的单元测试的 Visual Studio 测试工具。扩展安装目录中提供了使用条款和第三方通知。</p>
+</blockquote>
+<h2 id="结构体关系">结构体关系</h2>
+<p>这是x86下的神图，x64相差无多</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403191145558.jpeg" alt="img"></p>
+<p>获取模块信息需要从PEB中来获取，PEB的Ldr属性指向的结构体中就存储着该进程所有模块数据的链表。</p>
+<p>思路：通过TEB找到PEB，再遍历LDR里的链表得到所有模块信息</p>
+<pre tabindex="0"><code class="language-mermaid" data-lang="mermaid">graph LR
+	TEB --&gt; PEB --PEB+0xc--&gt; LDR --&gt; 链表
+	
+</code></pre><ul>
+<li>
+<p>x86 下，fs 寄存器指的是 TEB 结构体首地址，fs:[18h]存的是 TEB 地址，fs:[30h]存的是 PEB 地址</p>
+</li>
+<li>
+<p>x64 下，PEB 的位置在 gs:[60h]的位置</p>
+</li>
+</ul>
+<p>下面以x86为例子</p>
+<p><strong>PEB 结构体</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">//0x480 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _PEB
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    UCHAR InheritedAddressSpace;                                            <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    UCHAR ReadImageFileExecOptions;                                         <span style="color:#586e75">//0x1
+</span></span></span><span style="display:flex;"><span>    UCHAR BeingDebugged;                                                    <span style="color:#586e75">//0x2
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        UCHAR BitField;                                                     <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            UCHAR ImageUsesLargePages:<span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>            UCHAR IsProtectedProcess:<span style="color:#2aa198">1</span>;                                     <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>            UCHAR IsImageDynamicallyRelocated:<span style="color:#2aa198">1</span>;                            <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>            UCHAR SkipPatchingUser32Forwarders:<span style="color:#2aa198">1</span>;                           <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>            UCHAR IsPackagedProcess:<span style="color:#2aa198">1</span>;                                      <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>            UCHAR IsAppContainer:<span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>            UCHAR IsProtectedProcessLight:<span style="color:#2aa198">1</span>;                                <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>            UCHAR IsLongPathAwareProcess:<span style="color:#2aa198">1</span>;                                 <span style="color:#586e75">//0x3
+</span></span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> Mutant;                                                           <span style="color:#586e75">//0x4
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ImageBaseAddress;                                                 <span style="color:#586e75">//0x8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _PEB_LDR_DATA<span style="color:#719e07">*</span> Ldr;                                              <span style="color:#586e75">//0xc
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _RTL_USER_PROCESS_PARAMETERS<span style="color:#719e07">*</span> ProcessParameters;                 <span style="color:#586e75">//0x10
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SubSystemData;                                                    <span style="color:#586e75">//0x14
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ProcessHeap;                                                      <span style="color:#586e75">//0x18
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _RTL_CRITICAL_SECTION<span style="color:#719e07">*</span> FastPebLock;                              <span style="color:#586e75">//0x1c
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _SLIST_HEADER<span style="color:#719e07">*</span> <span style="color:#719e07">volatile</span> AtlThunkSListPtr;                         <span style="color:#586e75">//0x20
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> IFEOKey;                                                          <span style="color:#586e75">//0x24
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        ULONG CrossProcessFlags;                                            <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            ULONG ProcessInJob:<span style="color:#2aa198">1</span>;                                           <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessInitializing:<span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessUsingVEH:<span style="color:#2aa198">1</span>;                                        <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessUsingVCH:<span style="color:#2aa198">1</span>;                                        <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessUsingFTH:<span style="color:#2aa198">1</span>;                                        <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessPreviouslyThrottled:<span style="color:#2aa198">1</span>;                             <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessCurrentlyThrottled:<span style="color:#2aa198">1</span>;                              <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessImagesHotPatched:<span style="color:#2aa198">1</span>;                                <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedBits0:<span style="color:#2aa198">24</span>;                                         <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        VOID<span style="color:#719e07">*</span> KernelCallbackTable;                                          <span style="color:#586e75">//0x2c
+</span></span></span><span style="display:flex;"><span>        VOID<span style="color:#719e07">*</span> UserSharedInfoPtr;                                            <span style="color:#586e75">//0x2c
+</span></span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    ULONG SystemReserved;                                                   <span style="color:#586e75">//0x30
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _SLIST_HEADER<span style="color:#719e07">*</span> <span style="color:#719e07">volatile</span> AtlThunkSListPtr32;                       <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ApiSetMap;                                                        <span style="color:#586e75">//0x38
+</span></span></span><span style="display:flex;"><span>    ULONG TlsExpansionCounter;                                              <span style="color:#586e75">//0x3c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> TlsBitmap;                                                        <span style="color:#586e75">//0x40
+</span></span></span><span style="display:flex;"><span>    ULONG TlsBitmapBits[<span style="color:#2aa198">2</span>];                                                 <span style="color:#586e75">//0x44
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ReadOnlySharedMemoryBase;                                         <span style="color:#586e75">//0x4c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SharedData;                                                       <span style="color:#586e75">//0x50
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">**</span> ReadOnlyStaticServerData;                                        <span style="color:#586e75">//0x54
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> AnsiCodePageData;                                                 <span style="color:#586e75">//0x58
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> OemCodePageData;                                                  <span style="color:#586e75">//0x5c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> UnicodeCaseTableData;                                             <span style="color:#586e75">//0x60
+</span></span></span><span style="display:flex;"><span>    ULONG NumberOfProcessors;                                               <span style="color:#586e75">//0x64
+</span></span></span><span style="display:flex;"><span>    ULONG NtGlobalFlag;                                                     <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _LARGE_INTEGER CriticalSectionTimeout;                            <span style="color:#586e75">//0x70
+</span></span></span><span style="display:flex;"><span>    ULONG HeapSegmentReserve;                                               <span style="color:#586e75">//0x78
+</span></span></span><span style="display:flex;"><span>    ULONG HeapSegmentCommit;                                                <span style="color:#586e75">//0x7c
+</span></span></span><span style="display:flex;"><span>    ULONG HeapDeCommitTotalFreeThreshold;                                   <span style="color:#586e75">//0x80
+</span></span></span><span style="display:flex;"><span>    ULONG HeapDeCommitFreeBlockThreshold;                                   <span style="color:#586e75">//0x84
+</span></span></span><span style="display:flex;"><span>    ULONG NumberOfHeaps;                                                    <span style="color:#586e75">//0x88
+</span></span></span><span style="display:flex;"><span>    ULONG MaximumNumberOfHeaps;                                             <span style="color:#586e75">//0x8c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">**</span> ProcessHeaps;                                                    <span style="color:#586e75">//0x90
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> GdiSharedHandleTable;                                             <span style="color:#586e75">//0x94
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ProcessStarterHelper;                                             <span style="color:#586e75">//0x98
+</span></span></span><span style="display:flex;"><span>    ULONG GdiDCAttributeList;                                               <span style="color:#586e75">//0x9c
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _RTL_CRITICAL_SECTION<span style="color:#719e07">*</span> LoaderLock;                               <span style="color:#586e75">//0xa0
+</span></span></span><span style="display:flex;"><span>    ULONG OSMajorVersion;                                                   <span style="color:#586e75">//0xa4
+</span></span></span><span style="display:flex;"><span>    ULONG OSMinorVersion;                                                   <span style="color:#586e75">//0xa8
+</span></span></span><span style="display:flex;"><span>    USHORT OSBuildNumber;                                                   <span style="color:#586e75">//0xac
+</span></span></span><span style="display:flex;"><span>    USHORT OSCSDVersion;                                                    <span style="color:#586e75">//0xae
+</span></span></span><span style="display:flex;"><span>    ULONG OSPlatformId;                                                     <span style="color:#586e75">//0xb0
+</span></span></span><span style="display:flex;"><span>    ULONG ImageSubsystem;                                                   <span style="color:#586e75">//0xb4
+</span></span></span><span style="display:flex;"><span>    ULONG ImageSubsystemMajorVersion;                                       <span style="color:#586e75">//0xb8
+</span></span></span><span style="display:flex;"><span>    ULONG ImageSubsystemMinorVersion;                                       <span style="color:#586e75">//0xbc
+</span></span></span><span style="display:flex;"><span>    ULONG ActiveProcessAffinityMask;                                        <span style="color:#586e75">//0xc0
+</span></span></span><span style="display:flex;"><span>    ULONG GdiHandleBuffer[<span style="color:#2aa198">34</span>];                                              <span style="color:#586e75">//0xc4
+</span></span></span><span style="display:flex;"><span>    <span style="color:#268bd2">VOID</span> (<span style="color:#719e07">*</span>PostProcessInitRoutine)();                                       <span style="color:#586e75">//0x14c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> TlsExpansionBitmap;                                               <span style="color:#586e75">//0x150
+</span></span></span><span style="display:flex;"><span>    ULONG TlsExpansionBitmapBits[<span style="color:#2aa198">32</span>];                                       <span style="color:#586e75">//0x154
+</span></span></span><span style="display:flex;"><span>    ULONG SessionId;                                                        <span style="color:#586e75">//0x1d4
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _ULARGE_INTEGER AppCompatFlags;                                   <span style="color:#586e75">//0x1d8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _ULARGE_INTEGER AppCompatFlagsUser;                               <span style="color:#586e75">//0x1e0
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> pShimData;                                                        <span style="color:#586e75">//0x1e8
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> AppCompatInfo;                                                    <span style="color:#586e75">//0x1ec
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _UNICODE_STRING CSDVersion;                                      <span style="color:#586e75">//0x1f0
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _ACTIVATION_CONTEXT_DATA<span style="color:#719e07">*</span> ActivationContextData;                 <span style="color:#586e75">//0x1f8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _ASSEMBLY_STORAGE_MAP<span style="color:#719e07">*</span> ProcessAssemblyStorageMap;                <span style="color:#586e75">//0x1fc
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _ACTIVATION_CONTEXT_DATA<span style="color:#719e07">*</span> SystemDefaultActivationContextData;    <span style="color:#586e75">//0x200
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _ASSEMBLY_STORAGE_MAP<span style="color:#719e07">*</span> SystemAssemblyStorageMap;                 <span style="color:#586e75">//0x204
+</span></span></span><span style="display:flex;"><span>    ULONG MinimumStackCommit;                                               <span style="color:#586e75">//0x208
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SparePointers[<span style="color:#2aa198">4</span>];                                                 <span style="color:#586e75">//0x20c
+</span></span></span><span style="display:flex;"><span>    ULONG SpareUlongs[<span style="color:#2aa198">5</span>];                                                   <span style="color:#586e75">//0x21c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> WerRegistrationData;                                              <span style="color:#586e75">//0x230
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> WerShipAssertPtr;                                                 <span style="color:#586e75">//0x234
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> pUnused;                                                          <span style="color:#586e75">//0x238
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> pImageHeaderHash;                                                 <span style="color:#586e75">//0x23c
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        ULONG TracingFlags;                                                 <span style="color:#586e75">//0x240
+</span></span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            ULONG HeapTracingEnabled:<span style="color:#2aa198">1</span>;                                     <span style="color:#586e75">//0x240
+</span></span></span><span style="display:flex;"><span>            ULONG CritSecTracingEnabled:<span style="color:#2aa198">1</span>;                                  <span style="color:#586e75">//0x240
+</span></span></span><span style="display:flex;"><span>            ULONG LibLoaderTracingEnabled:<span style="color:#2aa198">1</span>;                                <span style="color:#586e75">//0x240
+</span></span></span><span style="display:flex;"><span>            ULONG SpareTracingBits:<span style="color:#2aa198">29</span>;                                      <span style="color:#586e75">//0x240
+</span></span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    ULONGLONG CsrServerReadOnlySharedMemoryBase;                            <span style="color:#586e75">//0x248
+</span></span></span><span style="display:flex;"><span>    ULONG TppWorkerpListLock;                                               <span style="color:#586e75">//0x250
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY TppWorkerpList;                                      <span style="color:#586e75">//0x254
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> WaitOnAddressHashTable[<span style="color:#2aa198">128</span>];                                      <span style="color:#586e75">//0x25c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> TelemetryCoverageHeader;                                          <span style="color:#586e75">//0x45c
+</span></span></span><span style="display:flex;"><span>    ULONG CloudFileFlags;                                                   <span style="color:#586e75">//0x460
+</span></span></span><span style="display:flex;"><span>    ULONG CloudFileDiagFlags;                                               <span style="color:#586e75">//0x464
+</span></span></span><span style="display:flex;"><span>    CHAR PlaceholderCompatibilityMode;                                      <span style="color:#586e75">//0x468
+</span></span></span><span style="display:flex;"><span>    CHAR PlaceholderCompatibilityModeReserved[<span style="color:#2aa198">7</span>];                           <span style="color:#586e75">//0x469
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LEAP_SECOND_DATA<span style="color:#719e07">*</span> LeapSecondData;                               <span style="color:#586e75">//0x470
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        ULONG LeapSecondFlags;                                              <span style="color:#586e75">//0x474
+</span></span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            ULONG SixtySecondEnabled:<span style="color:#2aa198">1</span>;                                     <span style="color:#586e75">//0x474
+</span></span></span><span style="display:flex;"><span>            ULONG Reserved:<span style="color:#2aa198">31</span>;                                              <span style="color:#586e75">//0x474
+</span></span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    ULONG NtGlobalFlag2;                                                    <span style="color:#586e75">//0x478
+</span></span></span><span style="display:flex;"><span>}; 
+</span></span></code></pre></div><p>偏移为0xc的地方就是Ldr了</p>
+<p><strong>PPEB_LDR_DATA 结构体</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">//0x30 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _PEB_LDR_DATA
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    ULONG Length;                                                           <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    UCHAR Initialized;                                                      <span style="color:#586e75">//0x4
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SsHandle;                                                         <span style="color:#586e75">//0x8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InLoadOrderModuleList;                               <span style="color:#586e75">//0xc
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InMemoryOrderModuleList;                             <span style="color:#586e75">//0x14
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InInitializationOrderModuleList;                     <span style="color:#586e75">//0x1c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> EntryInProgress;                                                  <span style="color:#586e75">//0x24
+</span></span></span><span style="display:flex;"><span>    UCHAR ShutdownInProgress;                                               <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ShutdownThreadId;                                                 <span style="color:#586e75">//0x2c
+</span></span></span><span style="display:flex;"><span>}; 
+</span></span></code></pre></div><p>这里的 0xc 处存着模块链表。里面有3条链表，分别代表的意义是：</p>
+<table>
+  <thead>
+      <tr>
+          <th>名称</th>
+          <th>意义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>InLoadOrderModuleList</code></td>
+          <td>模块链表，以加载顺序排序</td>
+      </tr>
+      <tr>
+          <td><code>InMemoryOrderModuleList</code></td>
+          <td>模块链表，以内存位置排序</td>
+      </tr>
+      <tr>
+          <td><code>InInitializationOrderModuleList</code></td>
+          <td>模块链表，以初始化顺序排序</td>
+      </tr>
+  </tbody>
+</table>
+<p>每个链表的节点都一样，只是顺序不同。</p>
+<p><strong>_LIST_ENTRY 结构体</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">//0x8 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _LIST_ENTRY
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY<span style="color:#719e07">*</span> Flink;                                              <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY<span style="color:#719e07">*</span> Blink;                                              <span style="color:#586e75">//0x4
+</span></span></span><span style="display:flex;"><span>}; 
+</span></span></code></pre></div><p>可以看到这个结构有两个成员，第一个成员<code>Flink</code>指向下一个节点，<code>Blink</code>指向上一个节点。所以这是一个双向链表。接下来的概念很重要：</p>
+<p>当我们从<code>_PEB_LDR_DATA</code>结构中取到<code>InInitializationOrderModuleList</code>结构或其他两个链表时，这个结构中的<code>Flink</code>指向真正的模块链表，这个真正的链表的每个成员都是一个<code>LDR_DATA_TABLE_ENTRY</code>结构。</p>
+<p>之前的<code>_PEB_LDR_DATA</code>只是一个<strong>入口</strong>，这个结构只有一个，它不是链表节点，真正的链表节点结构如下</p>
+<p><strong>_LDR_DATA_TABLE_ENTRY 结构</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">//0xa8 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _LDR_DATA_TABLE_ENTRY
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InLoadOrderLinks;                                    <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InMemoryOrderLinks;                                  <span style="color:#586e75">//0x8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InInitializationOrderLinks;                          <span style="color:#586e75">//0x10
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> DllBase;                                                          <span style="color:#586e75">//0x18
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> EntryPoint;                                                       <span style="color:#586e75">//0x1c
+</span></span></span><span style="display:flex;"><span>    ULONG SizeOfImage;                                                      <span style="color:#586e75">//0x20
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _UNICODE_STRING FullDllName;                                     <span style="color:#586e75">//0x24
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _UNICODE_STRING BaseDllName;                                     <span style="color:#586e75">//0x2c
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        UCHAR FlagGroup[<span style="color:#2aa198">4</span>];                                                 <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>        ULONG Flags;                                                        <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            ULONG PackagedBinary:<span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG MarkedForRemoval:<span style="color:#2aa198">1</span>;                                       <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ImageDll:<span style="color:#2aa198">1</span>;                                               <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG LoadNotificationsSent:<span style="color:#2aa198">1</span>;                                  <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG TelemetryEntryProcessed:<span style="color:#2aa198">1</span>;                                <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessStaticImport:<span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG InLegacyLists:<span style="color:#2aa198">1</span>;                                          <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG InIndexes:<span style="color:#2aa198">1</span>;                                              <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ShimDll:<span style="color:#2aa198">1</span>;                                                <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG InExceptionTable:<span style="color:#2aa198">1</span>;                                       <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags1:<span style="color:#2aa198">2</span>;                                         <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG LoadInProgress:<span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG LoadConfigProcessed:<span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG EntryProcessed:<span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ProtectDelayLoad:<span style="color:#2aa198">1</span>;                                       <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags3:<span style="color:#2aa198">2</span>;                                         <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG DontCallForThreads:<span style="color:#2aa198">1</span>;                                     <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessAttachCalled:<span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessAttachFailed:<span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG CorDeferredValidate:<span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG CorImage:<span style="color:#2aa198">1</span>;                                               <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG DontRelocate:<span style="color:#2aa198">1</span>;                                           <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG CorILOnly:<span style="color:#2aa198">1</span>;                                              <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ChpeImage:<span style="color:#2aa198">1</span>;                                              <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags5:<span style="color:#2aa198">2</span>;                                         <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG Redirected:<span style="color:#2aa198">1</span>;                                             <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags6:<span style="color:#2aa198">2</span>;                                         <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>            ULONG CompatDatabaseProcessed:<span style="color:#2aa198">1</span>;                                <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    USHORT ObsoleteLoadCount;                                               <span style="color:#586e75">//0x38
+</span></span></span><span style="display:flex;"><span>    USHORT TlsIndex;                                                        <span style="color:#586e75">//0x3a
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY HashLinks;                                           <span style="color:#586e75">//0x3c
+</span></span></span><span style="display:flex;"><span>    ULONG TimeDateStamp;                                                    <span style="color:#586e75">//0x44
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _ACTIVATION_CONTEXT<span style="color:#719e07">*</span> EntryPointActivationContext;                <span style="color:#586e75">//0x48
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> Lock;                                                             <span style="color:#586e75">//0x4c
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LDR_DDAG_NODE<span style="color:#719e07">*</span> DdagNode;                                        <span style="color:#586e75">//0x50
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY NodeModuleLink;                                      <span style="color:#586e75">//0x54
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LDRP_LOAD_CONTEXT<span style="color:#719e07">*</span> LoadContext;                                 <span style="color:#586e75">//0x5c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ParentDllBase;                                                    <span style="color:#586e75">//0x60
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SwitchBackContext;                                                <span style="color:#586e75">//0x64
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _RTL_BALANCED_NODE BaseAddressIndexNode;                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _RTL_BALANCED_NODE MappingInfoIndexNode;                         <span style="color:#586e75">//0x74
+</span></span></span><span style="display:flex;"><span>    ULONG OriginalBase;                                                     <span style="color:#586e75">//0x80
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _LARGE_INTEGER LoadTime;                                          <span style="color:#586e75">//0x88
+</span></span></span><span style="display:flex;"><span>    ULONG BaseNameHashValue;                                                <span style="color:#586e75">//0x90
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">enum</span> _LDR_DLL_LOAD_REASON LoadReason;                                   <span style="color:#586e75">//0x94
+</span></span></span><span style="display:flex;"><span>    ULONG ImplicitPathOptions;                                              <span style="color:#586e75">//0x98
+</span></span></span><span style="display:flex;"><span>    ULONG ReferenceCount;                                                   <span style="color:#586e75">//0x9c
+</span></span></span><span style="display:flex;"><span>    ULONG DependentLoadFlags;                                               <span style="color:#586e75">//0xa0
+</span></span></span><span style="display:flex;"><span>    UCHAR SigningLevel;                                                     <span style="color:#586e75">//0xa4
+</span></span></span><span style="display:flex;"><span>}; 
+</span></span></code></pre></div><p>所以PEB中链表的<strong>Flink</strong>指向**_LDR_DATA_TABLE_ENTRY**结构体，结构体中前3个值，才是真的链表</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403181452479.png" alt=""></p>
+<h2 id="遍历模块">遍历模块</h2>
+<p>分为x64和x86两种，借鉴kn0sky的代码写的C++版本，修改成win11 23h2的代码，因为结构体有些许不同，其实不该也一样，因为引用到的偏移都是相同的，还没有使用到不同结构体的地方。不过有些低版本的可能就有差异，具体问题具体分析。</p>
+<h3 id="headerh">header.h</h3>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">#pragma once
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;stdio.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;Windows.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;iostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;process.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#if defined(_WIN64)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">extern</span> <span style="color:#2aa198">&#34;C&#34;</span> PVOID64 _cdecl <span style="color:#268bd2">GetPebLdr</span>(<span style="color:#dc322f">void</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">//0x10 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _UNICODE_STRING
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    USHORT Length;                                                          <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    USHORT MaximumLength;                                                   <span style="color:#586e75">//0x2
+</span></span></span><span style="display:flex;"><span>    USHORT<span style="color:#719e07">*</span> Buffer;                                                         <span style="color:#586e75">//0x8
+</span></span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">//0x58 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _PEB_LDR_DATA64
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    ULONG Length;                                                           <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    UCHAR Initialized;                                                      <span style="color:#586e75">//0x4
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SsHandle;                                                         <span style="color:#586e75">//0x8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> LIST_ENTRY64 InLoadOrderModuleList;                               <span style="color:#586e75">//0x10
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> LIST_ENTRY64 InMemoryOrderModuleList;                             <span style="color:#586e75">//0x20
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> LIST_ENTRY64 InInitializationOrderModuleList;                     <span style="color:#586e75">//0x30
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> EntryInProgress;                                                  <span style="color:#586e75">//0x40
+</span></span></span><span style="display:flex;"><span>    UCHAR ShutdownInProgress;                                               <span style="color:#586e75">//0x48
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ShutdownThreadId;                                                 <span style="color:#586e75">//0x50
+</span></span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">//0x138 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _LDR_DATA_TABLE_ENTRY64
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InLoadOrderLinks;                                    <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InMemoryOrderLinks;                                  <span style="color:#586e75">//0x10
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InInitializationOrderLinks;                          <span style="color:#586e75">//0x20
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> DllBase;                                                          <span style="color:#586e75">//0x30
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> EntryPoint;                                                       <span style="color:#586e75">//0x38
+</span></span></span><span style="display:flex;"><span>    ULONG SizeOfImage;                                                      <span style="color:#586e75">//0x40
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _UNICODE_STRING FullDllName;                                     <span style="color:#586e75">//0x48
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _UNICODE_STRING BaseDllName;                                     <span style="color:#586e75">//0x58
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        UCHAR FlagGroup[<span style="color:#2aa198">4</span>];                                                 <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>        ULONG Flags;                                                        <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            ULONG PackagedBinary : <span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG MarkedForRemoval : <span style="color:#2aa198">1</span>;                                       <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ImageDll : <span style="color:#2aa198">1</span>;                                               <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG LoadNotificationsSent : <span style="color:#2aa198">1</span>;                                  <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG TelemetryEntryProcessed : <span style="color:#2aa198">1</span>;                                <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessStaticImport : <span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG InLegacyLists : <span style="color:#2aa198">1</span>;                                          <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG InIndexes : <span style="color:#2aa198">1</span>;                                              <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ShimDll : <span style="color:#2aa198">1</span>;                                                <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG InExceptionTable : <span style="color:#2aa198">1</span>;                                       <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags1 : <span style="color:#2aa198">2</span>;                                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG LoadInProgress : <span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG LoadConfigProcessed : <span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG EntryProcessed : <span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ProtectDelayLoad : <span style="color:#2aa198">1</span>;                                       <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags3 : <span style="color:#2aa198">2</span>;                                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG DontCallForThreads : <span style="color:#2aa198">1</span>;                                     <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessAttachCalled : <span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ProcessAttachFailed : <span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG CorDeferredValidate : <span style="color:#2aa198">1</span>;                                    <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG CorImage : <span style="color:#2aa198">1</span>;                                               <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG DontRelocate : <span style="color:#2aa198">1</span>;                                           <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG CorILOnly : <span style="color:#2aa198">1</span>;                                              <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ChpeImage : <span style="color:#2aa198">1</span>;                                              <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ChpeEmulatorImage : <span style="color:#2aa198">1</span>;                                      <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags5 : <span style="color:#2aa198">1</span>;                                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG Redirected : <span style="color:#2aa198">1</span>;                                             <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG ReservedFlags6 : <span style="color:#2aa198">2</span>;                                         <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>            ULONG CompatDatabaseProcessed : <span style="color:#2aa198">1</span>;                                <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    USHORT ObsoleteLoadCount;                                               <span style="color:#586e75">//0x6c
+</span></span></span><span style="display:flex;"><span>    USHORT TlsIndex;                                                        <span style="color:#586e75">//0x6e
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY HashLinks;                                           <span style="color:#586e75">//0x70
+</span></span></span><span style="display:flex;"><span>    ULONG TimeDateStamp;                                                    <span style="color:#586e75">//0x80
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _ACTIVATION_CONTEXT<span style="color:#719e07">*</span> EntryPointActivationContext;                <span style="color:#586e75">//0x88
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> Lock;                                                             <span style="color:#586e75">//0x90
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LDR_DDAG_NODE<span style="color:#719e07">*</span> DdagNode;                                        <span style="color:#586e75">//0x98
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY NodeModuleLink;                                      <span style="color:#586e75">//0xa0
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LDRP_LOAD_CONTEXT<span style="color:#719e07">*</span> LoadContext;                                 <span style="color:#586e75">//0xb0
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ParentDllBase;                                                    <span style="color:#586e75">//0xb8
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SwitchBackContext;                                                <span style="color:#586e75">//0xc0
+</span></span></span><span style="display:flex;"><span>    <span style="color:#586e75">// struct _RTL_BALANCED_NODE BaseAddressIndexNode;                         //0xc8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#586e75">// struct _RTL_BALANCED_NODE MappingInfoIndexNode;                         //0xe0
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> BaseAddressIndexNode;<span style="color:#586e75">//0xc8
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> MappingInfoIndexNode;<span style="color:#586e75">//0xe0
+</span></span></span><span style="display:flex;"><span>    ULONGLONG OriginalBase;                                                 <span style="color:#586e75">//0xf8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _LARGE_INTEGER LoadTime;                                          <span style="color:#586e75">//0x100
+</span></span></span><span style="display:flex;"><span>    ULONG BaseNameHashValue;                                                <span style="color:#586e75">//0x108
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">enum</span> _LDR_DLL_LOAD_REASON LoadReason;                                   <span style="color:#586e75">//0x10c
+</span></span></span><span style="display:flex;"><span>    ULONG ImplicitPathOptions;                                              <span style="color:#586e75">//0x110
+</span></span></span><span style="display:flex;"><span>    ULONG ReferenceCount;                                                   <span style="color:#586e75">//0x114
+</span></span></span><span style="display:flex;"><span>    ULONG DependentLoadFlags;                                               <span style="color:#586e75">//0x118
+</span></span></span><span style="display:flex;"><span>    UCHAR SigningLevel;                                                     <span style="color:#586e75">//0x11c
+</span></span></span><span style="display:flex;"><span>    ULONG CheckSum;                                                         <span style="color:#586e75">//0x120
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ActivePatchImageBase;                                             <span style="color:#586e75">//0x128
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">enum</span> _LDR_HOT_PATCH_STATE HotPatchState;                                <span style="color:#586e75">//0x130
+</span></span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#586e75">//0x8 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _UNICODE_STRING
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    USHORT Length;                                                          <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    USHORT MaximumLength;                                                   <span style="color:#586e75">//0x2
+</span></span></span><span style="display:flex;"><span>    USHORT<span style="color:#719e07">*</span> Buffer;                                                         <span style="color:#586e75">//0x4
+</span></span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">//0x30 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _PEB_LDR_DATA
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    ULONG Length;                                                           <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    UCHAR Initialized;                                                      <span style="color:#586e75">//0x4
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> SsHandle;                                                         <span style="color:#586e75">//0x8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InLoadOrderModuleList;                               <span style="color:#586e75">//0xc
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InMemoryOrderModuleList;                             <span style="color:#586e75">//0x14
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InInitializationOrderModuleList;                     <span style="color:#586e75">//0x1c
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> EntryInProgress;                                                  <span style="color:#586e75">//0x24
+</span></span></span><span style="display:flex;"><span>    UCHAR ShutdownInProgress;                                               <span style="color:#586e75">//0x28
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ShutdownThreadId;                                                 <span style="color:#586e75">//0x2c
+</span></span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">//0x78 bytes (sizeof)
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> _LDR_DATA_TABLE_ENTRY
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InLoadOrderLinks;                                    <span style="color:#586e75">//0x0
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InMemoryOrderLinks;                                  <span style="color:#586e75">//0x8
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY InInitializationOrderLinks;                          <span style="color:#586e75">//0x10
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> DllBase;                                                          <span style="color:#586e75">//0x18
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> EntryPoint;                                                       <span style="color:#586e75">//0x1c
+</span></span></span><span style="display:flex;"><span>    ULONG SizeOfImage;                                                      <span style="color:#586e75">//0x20
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _UNICODE_STRING FullDllName;                                     <span style="color:#586e75">//0x24
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _UNICODE_STRING BaseDllName;                                     <span style="color:#586e75">//0x2c
+</span></span></span><span style="display:flex;"><span>    ULONG Flags;                                                            <span style="color:#586e75">//0x34
+</span></span></span><span style="display:flex;"><span>    USHORT LoadCount;                                                       <span style="color:#586e75">//0x38
+</span></span></span><span style="display:flex;"><span>    USHORT TlsIndex;                                                        <span style="color:#586e75">//0x3a
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span> _LIST_ENTRY HashLinks;                                       <span style="color:#586e75">//0x3c
+</span></span></span><span style="display:flex;"><span>        <span style="color:#719e07">struct</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            VOID<span style="color:#719e07">*</span> SectionPointer;                                           <span style="color:#586e75">//0x3c
+</span></span></span><span style="display:flex;"><span>            ULONG CheckSum;                                                 <span style="color:#586e75">//0x40
+</span></span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        ULONG TimeDateStamp;                                                <span style="color:#586e75">//0x44
+</span></span></span><span style="display:flex;"><span>        VOID<span style="color:#719e07">*</span> LoadedImports;                                                <span style="color:#586e75">//0x44
+</span></span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _ACTIVATION_CONTEXT<span style="color:#719e07">*</span> EntryPointActivationContext;                <span style="color:#586e75">//0x48
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> PatchInformation;                                                 <span style="color:#586e75">//0x4c
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY ForwarderLinks;                                      <span style="color:#586e75">//0x50
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY ServiceTagLinks;                                     <span style="color:#586e75">//0x58
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">struct</span> _LIST_ENTRY StaticLinks;                                         <span style="color:#586e75">//0x60
+</span></span></span><span style="display:flex;"><span>    VOID<span style="color:#719e07">*</span> ContextInformation;                                               <span style="color:#586e75">//0x68
+</span></span></span><span style="display:flex;"><span>    ULONG OriginalBase;                                                     <span style="color:#586e75">//0x6c
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">union</span> _LARGE_INTEGER LoadTime;                                          <span style="color:#586e75">//0x70
+</span></span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#endif </span><span style="color:#586e75">// defined(_WIN64)
+</span></span></span></code></pre></div><h3 id="getpebldrasm">GetPebLdr.asm</h3>
+<p>x64不能直接内联汇编，需要设置一下vs，可以查看
+<a href="https://blog.csdn.net/qq_29176323/article/details/129145326" target="_blank" rel="noopener">vs2022编译x64加入汇编 | CSDN</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-asm" data-lang="asm"><span style="display:flex;"><span>.CODE
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">GetPebLdr</span> <span style="color:#cb4b16">PROC</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#268bd2">mov</span> <span style="color:#cb4b16">rax</span>, <span style="color:#cb4b16">gs</span>:[<span style="color:#2aa198">60</span><span style="color:#cb4b16">h</span>]<span style="color:#586e75">;
+</span></span></span><span style="display:flex;"><span>	<span style="color:#268bd2">add</span> <span style="color:#cb4b16">rax</span>, <span style="color:#2aa198">18</span><span style="color:#cb4b16">h</span><span style="color:#586e75">;
+</span></span></span><span style="display:flex;"><span>	<span style="color:#268bd2">mov</span> <span style="color:#cb4b16">rax</span>, [<span style="color:#cb4b16">rax</span>]<span style="color:#586e75">;
+</span></span></span><span style="display:flex;"><span>	<span style="color:#268bd2">ret</span><span style="color:#586e75">;
+</span></span></span><span style="display:flex;"><span><span style="color:#268bd2">GetPebLdr</span> <span style="color:#cb4b16">ENDP</span>
+</span></span><span style="display:flex;"><span><span style="color:#268bd2">END</span>
+</span></span></code></pre></div><h3 id="maincpp">main.cpp</h3>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&#34;header.h&#34;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span>using namespace std;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">void</span> <span style="color:#268bd2">GetModuleInfo</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#if defined(_WIN64)
+</span></span></span><span style="display:flex;"><span>    _PEB_LDR_DATA64<span style="color:#719e07">*</span> pLdr <span style="color:#719e07">=</span> (_PEB_LDR_DATA64<span style="color:#719e07">*</span>)<span style="color:#268bd2">GetPebLdr</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> (pLdr <span style="color:#719e07">==</span> <span style="color:#b58900">NULL</span>) {
+</span></span><span style="display:flex;"><span>        cout <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">&#34;Get Peb Ldr failed&#34;</span> <span style="color:#719e07">&lt;&lt;</span> endl;
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">exit</span>(<span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    PLIST_ENTRY64 pList <span style="color:#719e07">=</span> (PLIST_ENTRY64) <span style="color:#719e07">&amp;</span> (pLdr<span style="color:#719e07">-&gt;</span>InLoadOrderModuleList);
+</span></span><span style="display:flex;"><span>    _LDR_DATA_TABLE_ENTRY64<span style="color:#719e07">*</span> pListData <span style="color:#719e07">=</span> (_LDR_DATA_TABLE_ENTRY64<span style="color:#719e07">*</span>)pList<span style="color:#719e07">-&gt;</span>Flink;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> ((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)pList <span style="color:#719e07">!=</span> (<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)pListData) {
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 获取模块信息 */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;DllModuleName: %ws</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>, pListData<span style="color:#719e07">-&gt;</span>FullDllName.Buffer);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;DllBaseAddr: %#016x</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>, pListData<span style="color:#719e07">-&gt;</span>DllBase);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 链表操作 */</span>
+</span></span><span style="display:flex;"><span>        pListData <span style="color:#719e07">=</span>
+</span></span><span style="display:flex;"><span>            (_LDR_DATA_TABLE_ENTRY64<span style="color:#719e07">*</span>)(pListData<span style="color:#719e07">-&gt;</span>InLoadOrderLinks.Flink);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#else
+</span></span></span><span style="display:flex;"><span>    <span style="color:#586e75">/* 获取LDR地址 */</span>
+</span></span><span style="display:flex;"><span>    _PEB_LDR_DATA<span style="color:#719e07">*</span> pLdr <span style="color:#719e07">=</span> <span style="color:#b58900">NULL</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">__asm</span> {
+</span></span><span style="display:flex;"><span>        mov eax, dword ptr fs:[<span style="color:#2aa198">0x30</span>];
+</span></span><span style="display:flex;"><span>        add eax, <span style="color:#2aa198">0xc</span>;
+</span></span><span style="display:flex;"><span>        mov eax, [eax];
+</span></span><span style="display:flex;"><span>        mov pLdr, eax;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> (pLdr <span style="color:#719e07">==</span> <span style="color:#b58900">NULL</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        cout <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">&#34;Get Peb Ldr failed&#34;</span> <span style="color:#719e07">&lt;&lt;</span> endl;
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">exit</span>(<span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    _LIST_ENTRY<span style="color:#719e07">*</span> pList <span style="color:#719e07">=</span> (_LIST_ENTRY<span style="color:#719e07">*</span>)<span style="color:#719e07">&amp;</span>(pLdr<span style="color:#719e07">-&gt;</span>InLoadOrderModuleList);
+</span></span><span style="display:flex;"><span>    _LDR_DATA_TABLE_ENTRY<span style="color:#719e07">*</span> pListData <span style="color:#719e07">=</span> (_LDR_DATA_TABLE_ENTRY<span style="color:#719e07">*</span>)pList<span style="color:#719e07">-&gt;</span>Flink;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> ((<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)pList <span style="color:#719e07">!=</span> (<span style="color:#dc322f">int</span><span style="color:#719e07">*</span>)pListData) {
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 获取模块信息 */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;DllModuleName: %ws</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>, pListData<span style="color:#719e07">-&gt;</span>FullDllName.Buffer);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;DllBaseAddr: %#08x</span><span style="color:#cb4b16">\r\n</span><span style="color:#2aa198">&#34;</span>, pListData<span style="color:#719e07">-&gt;</span>DllBase);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 链表操作 */</span>
+</span></span><span style="display:flex;"><span>        pListData <span style="color:#719e07">=</span> (_LDR_DATA_TABLE_ENTRY<span style="color:#719e07">*</span>)pListData<span style="color:#719e07">-&gt;</span>InLoadOrderLinks.Flink;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#endif
+</span></span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">GetModuleInfo</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这里我测试发现在我的系统上（还测试了win10虚拟机），如果遍历<code>InMemoryOrderModuleList</code>则只会显示一个节点信息，前后指针的值都为NULL，用其他两个链表则无事</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403181700975.png" alt="image-20240318170028590"></p>
+<h2 id="rust实现">Rust实现</h2>
+<p>思路与c语言思路相同，获取Peb,找到ldr链表,循环遍历链表.下面是一个x64的实现，比较简陋，wchar类型的打印就只简单做了一个例子</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#719e07">use</span> std::arch::asm;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::<span style="color:#dc322f">char</span>;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::ffi::c_void;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::mem;
+</span></span><span style="display:flex;"><span><span style="color:#719e07">use</span> std::slice;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[derive(Debug, Clone, Copy)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[repr(C)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> <span style="color:#268bd2">ListEntry64</span> {
+</span></span><span style="display:flex;"><span>    flink: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> ListEntry64,
+</span></span><span style="display:flex;"><span>    blink: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> ListEntry64,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[derive(Debug, Clone)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[repr(C)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">struct</span> <span style="color:#268bd2">PebLdrData64</span> {
+</span></span><span style="display:flex;"><span>    length: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    initialized: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    ss_handle: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    in_load_order_module_list: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    in_memory_order_module_list: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    in_initialization_order_module_list: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    entry_in_progress: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    shutdown_in_progress: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    shutdown_thread_id: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[derive(Debug, Clone, Copy)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[repr(C)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">pub</span> <span style="color:#719e07">struct</span> <span style="color:#268bd2">UnicodeString</span> {
+</span></span><span style="display:flex;"><span>    length: <span style="color:#dc322f">u16</span>,
+</span></span><span style="display:flex;"><span>    maximum_length: <span style="color:#dc322f">u16</span>,
+</span></span><span style="display:flex;"><span>    buffer: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> <span style="color:#dc322f">u16</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[derive(Debug, Clone, Copy)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">#[repr(C)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">pub</span> <span style="color:#719e07">struct</span> <span style="color:#268bd2">LdrDataTableEntry</span> {
+</span></span><span style="display:flex;"><span>    in_load_order_links: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    in_memory_order_links: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    in_initialization_order_links: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    dll_base: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    entry_point: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    size_of_image: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    full_dll_name: <span style="color:#268bd2">UnicodeString</span>,
+</span></span><span style="display:flex;"><span>    base_dll_name: <span style="color:#268bd2">UnicodeString</span>,
+</span></span><span style="display:flex;"><span>    flags: [<span style="color:#dc322f">u8</span>; <span style="color:#2aa198">4</span>],
+</span></span><span style="display:flex;"><span>    obsolete_load_count: <span style="color:#dc322f">u16</span>,
+</span></span><span style="display:flex;"><span>    tls_index: <span style="color:#dc322f">u16</span>,
+</span></span><span style="display:flex;"><span>    hash_links: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    time_date_stamp: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    entry_point_activation_context: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    lock: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    ddag_node: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    node_module_link: <span style="color:#268bd2">ListEntry64</span>,
+</span></span><span style="display:flex;"><span>    load_context: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    parent_dll_base: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    switch_back_context: <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> c_void,
+</span></span><span style="display:flex;"><span>    base_address_index_node: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    mapping_info_index_node: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    original_base: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    load_time: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    base_name_hash_value: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    load_reason: <span style="color:#dc322f">u64</span>,
+</span></span><span style="display:flex;"><span>    implicit_path_options: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    reference_count: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    dependent_load_flags: <span style="color:#dc322f">u32</span>,
+</span></span><span style="display:flex;"><span>    signing_level: <span style="color:#dc322f">u8</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">fn</span> <span style="color:#268bd2">print_wchar_ptr</span>(ptr: <span style="color:#719e07">*</span><span style="color:#719e07">const</span> <span style="color:#dc322f">u16</span>, length: <span style="color:#dc322f">usize</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// 创建一个 &amp;[u16] 切片
+</span></span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> wchar_slice <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { slice::from_raw_parts(ptr, length) };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// 解码 UTF-16 字符为 Rust 的 Unicode 字符串
+</span></span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> unicode_string: <span style="color:#b58900">String</span> <span style="color:#719e07">=</span> <span style="color:#dc322f">char</span>::decode_utf16(wchar_slice.iter().cloned())
+</span></span><span style="display:flex;"><span>        .map(<span style="color:#719e07">|</span>r<span style="color:#719e07">|</span> r.unwrap_or(<span style="color:#dc322f">char</span>::<span style="color:#cb4b16">REPLACEMENT_CHARACTER</span>))
+</span></span><span style="display:flex;"><span>        .collect();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// 打印 Unicode 字符串
+</span></span></span><span style="display:flex;"><span>    <span style="color:#268bd2">println!</span>(<span style="color:#2aa198">&#34;</span><span style="color:#2aa198">{}</span><span style="color:#2aa198">&#34;</span>, unicode_string);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">fn</span> <span style="color:#268bd2">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> peb_ldr_data64: <span style="color:#dc322f">u64</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">unsafe</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">asm!</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;mov {0}, gs:[0x60]&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;add {0}, 0x18&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#2aa198">&#34;mov {0}, [{0}]&#34;</span>,
+</span></span><span style="display:flex;"><span>            inout(reg) peb_ldr_data64
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">println!</span>(<span style="color:#2aa198">&#34;PEB_LDR addr: </span><span style="color:#2aa198">{:#x}</span><span style="color:#2aa198">&#34;</span>, peb_ldr_data64);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> pldr <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { mem::transmute::<span style="color:#719e07">&lt;</span><span style="color:#dc322f">u64</span>, <span style="color:#719e07">*</span><span style="color:#719e07">const</span> PebLdrData64<span style="color:#719e07">&gt;</span>(peb_ldr_data64) };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> p_list_entry64 <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { <span style="color:#719e07">&amp;</span>(<span style="color:#719e07">*</span>pldr).in_load_order_module_list <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">const</span> ListEntry64 };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">/* 获取下一个节点 */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">let</span> <span style="color:#719e07">mut</span> p_ldr_data <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { (<span style="color:#719e07">*</span>p_list_entry64).flink <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> LdrDataTableEntry };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> p_list_entry64 <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span> <span style="color:#719e07">!=</span> p_ldr_data <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 打印节点信息 */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> addr <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { (<span style="color:#719e07">*</span>p_ldr_data).dll_base <span style="color:#719e07">as</span> <span style="color:#dc322f">u64</span> };
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> buffer <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { (<span style="color:#719e07">*</span>p_ldr_data).full_dll_name.buffer };
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">let</span> buffer_len <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { (<span style="color:#719e07">*</span>p_ldr_data).full_dll_name.length };
+</span></span><span style="display:flex;"><span>        print_wchar_ptr(buffer, (buffer_len <span style="color:#719e07">/</span> <span style="color:#2aa198">2</span>) <span style="color:#719e07">as</span> <span style="color:#dc322f">usize</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#268bd2">println!</span>(<span style="color:#2aa198">&#34;module addr: </span><span style="color:#2aa198">{:#x}</span><span style="color:#2aa198">&#34;</span>, addr);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75">/* 遍历链表 */</span>
+</span></span><span style="display:flex;"><span>        p_ldr_data <span style="color:#719e07">=</span> <span style="color:#719e07">unsafe</span> { (<span style="color:#719e07">*</span>p_ldr_data).in_load_order_links.flink <span style="color:#719e07">as</span> <span style="color:#719e07">*</span><span style="color:#719e07">mut</span> LdrDataTableEntry }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这个代码我测试发现和c语言一样有一个奇怪的问题，只有<code>in_load_order_module_list</code>这条链表能用，其他两条链表都有问题。</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202403191640027.png" alt=""></p>
+<h2 id="参考">参考</h2>
+<p>
+<a href="https://bbs.kanxue.com/thread-266678.htm" target="_blank" rel="noopener">PEB结构：获取模块kernel32基址技术及原理分析 | 看雪</a></p>
+<p>
+<a href="https://www.kn0sky.com/?p=69" target="_blank" rel="noopener">x86x64用户层基于PEB遍历模块信息 | kn0sky</a></p>
+<p>
+<a href="https://www.vergiliusproject.com/" target="_blank" rel="noopener">windows 结构体 | VERGILIUS</a></p>
+<p>
+<a href="https://blog.csdn.net/qq_29176323/article/details/129145326" target="_blank" rel="noopener">vs2022编译x64加入汇编 | CSDN</a></p>
+        </div>
+        <footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span><time>Mar 19, 2024</time>
+    
+      <span class="categories">
+        Tags:<a class="category" href="http://localhost:1313/tags/peb">peb</a>  <a class="category" href="http://localhost:1313/tags/c&#43;&#43;">c&#43;&#43;</a>  
+    
+    </span>
+  </p><p class="meta">
+    
+        <a class="basic-alignment left" href="http://localhost:1313/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/" title="Rust污点分析调研">Rust污点分析调研</a>
+    
+
+    
+      <a class="basic-alignment right" href="http://localhost:1313/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/" title="Rust编写几种hook的方式">Rust编写几种hook的方式</a>
+    
+  </p>
+  
+  
+</footer>
+
+
+      </article>
+    </div>
+    <aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section><ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    </li>
+</ul>
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-25-llvm-base-development-environment-configuration/">llvm base development environment configuration</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">通过修改物理内存实现跨进程内存读写</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/">利用PEB遍历模块链表</a>
+              </li>
+            
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+  </body>
+</html>
+

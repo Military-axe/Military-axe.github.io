@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  <title>2023 羊城杯 Reverse</title><link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+    <link href="http://localhost:1313/favicon.png" rel="icon">
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe"><meta name="generator" content="Hugo 0.153.2">
+
+</head>
+<body><header role="banner"><hgroup><h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header><nav role="navigation"><fieldset class="mobile-nav"><select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="http://localhost:1313/">» Blog</option>
+      
+        <option value="http://localhost:1313/categories">» Categories</option>
+      
+        <option value="http://localhost:1313/tags">» Tags</option>
+      
+  </select>
+</fieldset><ul class="main-navigation">
+    
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        <header>
+  <p class="meta">Sep 6, 2023
+     - 6 minute read - <a class="label" href="http://localhost:1313/categories/reverse/">Reverse </a>
+    
+  </p>
+  <h1 class="entry-title">
+     2023 羊城杯 Reverse 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#csgo">CSGO</a></li>
+    <li><a href="#vm_co">vm_co</a></li>
+    <li><a href="#ez_加密">ez_加密</a></li>
+  </ul>
+</nav>
+          
+          <p>没打，王哥发了我三题，我就看了一下，稍微多花了时间。</p>
+<h1 id="csgo">CSGO</h1>
+<p>这题golang写的，打开看到一个base64表和密文，直接解码不对，估计换表了，然后有反调试。没怎么找，直接就运行后attach上去</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309061732591.png" alt=""></p>
+<p>拿到base表就直接秒了</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309061734310.png" alt=""></p>
+<h1 id="vm_co">vm_co</h1>
+<p>虚拟机题，不是很难，这是赛后看的，就完整翻译了一遍</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>Rip <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">function_17</span>(x, y):
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">global</span> Rip
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> x <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>:
+</span></span><span style="display:flex;"><span>        Rip <span style="color:#719e07">=</span> y
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;cmp x, 0</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198"> jz </span><span style="color:#2aa198">{</span>Rip<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">function_18</span>(x, y):
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">global</span> Rip
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> x:
+</span></span><span style="display:flex;"><span>        Rip <span style="color:#719e07">=</span> y
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;cmp x, 0</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198"> jnz </span><span style="color:#2aa198">{</span>Rip<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">function_19</span>(x, _):
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">global</span> Rip
+</span></span><span style="display:flex;"><span>    Rip <span style="color:#719e07">=</span> x
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;jmp </span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>vm_opcode <span style="color:#719e07">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;0&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;swap(vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">], vm_body[</span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">])&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;1&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] ^= vm_body[</span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;2&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] += </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;3&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] += vm_body[</span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;4&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] -= </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;5&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] -= vm_body[</span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;6&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] *= </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;7&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] *= vm_body[</span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;8&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] = vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] / </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;9&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] = vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] / vm_body[</span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;10&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] = vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] % </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;11&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] = vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] % vm_body[</span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;12&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] &lt;&lt;= </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;13&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] = vm_body[0] &lt;&lt; </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;14&#34;</span>: <span style="color:#719e07">lambda</span> x, _: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[Var1 + 16] = vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">]</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198"> Var1 += 1&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;15&#34;</span>: <span style="color:#719e07">lambda</span> x, _: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;print(vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">])&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;16&#34;</span>: <span style="color:#719e07">lambda</span> _, __: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Var1 -= 1</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">print(vm_body[Var + 16])&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;17&#34;</span>: function_17,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;18&#34;</span>: function_18,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;19&#34;</span>: function_19,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;20&#34;</span>: <span style="color:#719e07">lambda</span> x, _: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;t = vm_body[ vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] ]</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198"> vm_body[Var + 16] = t</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">Var += 1&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;21&#34;</span>: <span style="color:#719e07">lambda</span> _, __: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;Var1 -= 1</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198"> vm_body[0] = vm_body[Var + 16]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;22&#34;</span>: <span style="color:#719e07">lambda</span> x, _: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[Var + 16] = </span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">Var += 1&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;23&#34;</span>: <span style="color:#719e07">lambda</span> _, __: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;if Rip &gt;= 15:</span><span style="color:#cb4b16">\n\t</span><span style="color:#2aa198">break</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">continue&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;24&#34;</span>: <span style="color:#719e07">lambda</span> _, __: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[0] = vm_body[2] | vm_body[1]&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;25&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] = vm_body[0] &gt;&gt; </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">&#34;26&#34;</span>: <span style="color:#719e07">lambda</span> x, y: <span style="color:#2aa198">f</span><span style="color:#2aa198">&#34;vm_body[</span><span style="color:#2aa198">{</span>x<span style="color:#2aa198">}</span><span style="color:#2aa198">] = </span><span style="color:#2aa198">{</span>y<span style="color:#2aa198">}</span><span style="color:#2aa198">&#34;</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">interpre_byte_code</span>(opcodes: <span style="color:#b58900">list</span>, <span style="color:#b58900">len</span>: <span style="color:#b58900">int</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">global</span> Rip
+</span></span><span style="display:flex;"><span>    Rip <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">while</span> Rip <span style="color:#719e07">&lt;</span> <span style="color:#b58900">len</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#586e75"># print(f&#34;rip =&gt; {Rip}&#34;)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#b58900">print</span>(vm_opcode[<span style="color:#b58900">str</span>(opcodes[Rip])](opcodes[Rip <span style="color:#719e07">+</span> <span style="color:#2aa198">1</span>], opcodes[Rip <span style="color:#719e07">+</span> <span style="color:#2aa198">2</span>]))
+</span></span><span style="display:flex;"><span>        Rip <span style="color:#719e07">+=</span> <span style="color:#2aa198">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>opcode1 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x20D01011903001A</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode2 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x300010201180702</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode3 <span style="color:#719e07">=</span> opcode1[:<span style="color:#2aa198">7</span>] <span style="color:#719e07">+</span> opcode2
+</span></span><span style="display:flex;"><span>opcode3[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;flag[i]&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(opcode3)
+</span></span><span style="display:flex;"><span>interpre_byte_code(opcode3, <span style="color:#2aa198">15</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>opcode1 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x20D02011903001A</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode2 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x400010201180602</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode3 <span style="color:#719e07">=</span> opcode1[:<span style="color:#2aa198">7</span>] <span style="color:#719e07">+</span> opcode2
+</span></span><span style="display:flex;"><span>opcode3[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;vm_body[0]&#34;</span>
+</span></span><span style="display:flex;"><span>interpre_byte_code(opcode3, <span style="color:#2aa198">15</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>opcode1 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x20D03011903001A</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode2 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x500010201180502</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode3 <span style="color:#719e07">=</span> opcode1[:<span style="color:#2aa198">7</span>] <span style="color:#719e07">+</span> opcode2
+</span></span><span style="display:flex;"><span>opcode3[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;vm_body[0]&#34;</span>
+</span></span><span style="display:flex;"><span>interpre_byte_code(opcode3, <span style="color:#2aa198">15</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>opcode1 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x20D04011903001A</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode2 <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0x600010201180402</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">8</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>opcode3 <span style="color:#719e07">=</span> opcode1[:<span style="color:#2aa198">7</span>] <span style="color:#719e07">+</span> opcode2
+</span></span><span style="display:flex;"><span>opcode3[<span style="color:#2aa198">2</span>] <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;vm_body[0]&#34;</span>
+</span></span><span style="display:flex;"><span>interpre_byte_code(opcode3, <span style="color:#2aa198">15</span>)
+</span></span></code></pre></div><p>翻译出来的结果</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[26, 0, &#39;flag[i]&#39;, 25, 1, 1, 13, 2, 7, 24, 1, 2, 1, 0, 3]
+</span></span><span style="display:flex;"><span>vm_body[0] = flag[i]
+</span></span><span style="display:flex;"><span>vm_body[1] = vm_body[0] &gt;&gt; 1
+</span></span><span style="display:flex;"><span>vm_body[2] = vm_body[0] &lt;&lt; 7
+</span></span><span style="display:flex;"><span>vm_body[0] = vm_body[2] | vm_body[1]
+</span></span><span style="display:flex;"><span>vm_body[0] ^= vm_body[3]
+</span></span><span style="display:flex;"><span>vm_body[0] = vm_body[0]
+</span></span><span style="display:flex;"><span>vm_body[1] = vm_body[0] &gt;&gt; 2
+</span></span><span style="display:flex;"><span>vm_body[2] = vm_body[0] &lt;&lt; 6
+</span></span><span style="display:flex;"><span>vm_body[0] = vm_body[2] | vm_body[1]
+</span></span><span style="display:flex;"><span>vm_body[0] ^= vm_body[4]
+</span></span><span style="display:flex;"><span>vm_body[0] = vm_body[0]
+</span></span><span style="display:flex;"><span>vm_body[1] = vm_body[0] &gt;&gt; 3
+</span></span><span style="display:flex;"><span>vm_body[2] = vm_body[0] &lt;&lt; 5
+</span></span><span style="display:flex;"><span>vm_body[0] = vm_body[2] | vm_body[1]
+</span></span><span style="display:flex;"><span>vm_body[0] ^= vm_body[5]
+</span></span><span style="display:flex;"><span>vm_body[0] = vm_body[0]
+</span></span><span style="display:flex;"><span>vm_body[1] = vm_body[0] &gt;&gt; 4
+</span></span><span style="display:flex;"><span>vm_body[2] = vm_body[0] &lt;&lt; 4
+</span></span><span style="display:flex;"><span>vm_body[0] = vm_body[2] | vm_body[1]
+</span></span><span style="display:flex;"><span>vm_body[0] ^= vm_body[6]
+</span></span></code></pre></div><p>这是每一个字符单独的加密过程，非常简单，就是字节的bit变换，逆过来就是exp</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>c <span style="color:#719e07">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xDF</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xD5</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xF1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xD1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xFF</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xDB</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xA1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xA5</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x89</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xBD</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xE9</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x95</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xB3</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x9D</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xE9</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xB3</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x85</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x99</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x87</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xBF</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xE9</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xB1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x89</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xE9</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x91</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x89</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x89</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0x8F</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#2aa198">0xAD</span>,
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>d <span style="color:#719e07">=</span> <span style="color:#b58900">list</span>(<span style="color:#2aa198">0xBEEDBEEF</span><span style="color:#719e07">.</span>to_bytes(<span style="color:#2aa198">4</span>, <span style="color:#2aa198">&#34;little&#34;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">enc</span>(x: <span style="color:#b58900">int</span>):
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((x <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">1</span>) <span style="color:#719e07">|</span> (x <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">7</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">0</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">2</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">6</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">1</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">3</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">5</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">2</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">4</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">4</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">3</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">5</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">3</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> t
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">dec</span>(x: <span style="color:#b58900">int</span>):
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((x <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">3</span>) <span style="color:#719e07">|</span> (x <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">5</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">3</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">4</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">4</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">2</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">5</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">3</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">1</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">6</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">2</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">^=</span> d[<span style="color:#2aa198">0</span>]
+</span></span><span style="display:flex;"><span>    t <span style="color:#719e07">=</span> ((t <span style="color:#719e07">&gt;&gt;</span> <span style="color:#2aa198">7</span>) <span style="color:#719e07">|</span> (t <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">1</span>)) <span style="color:#719e07">&amp;</span> <span style="color:#2aa198">0xFF</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> t
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>c <span style="color:#719e07">=</span> [dec(i) <span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> c]
+</span></span><span style="display:flex;"><span><span style="color:#b58900">print</span>(<span style="color:#b58900">bytes</span>(c))
+</span></span></code></pre></div><h1 id="ez_加密">ez_加密</h1>
+<p>中间加了很多混淆，很怪的混淆，我抽象出来大概是这样的一个形式</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#586e75">/* return flag + 1 + input; */</span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">core</span>(<span style="color:#dc322f">int</span> flag, <span style="color:#dc322f">int</span> input)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span> tmp1, mask, tmp2, tmp;
+</span></span><span style="display:flex;"><span>    mask <span style="color:#719e07">=</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">do</span> {
+</span></span><span style="display:flex;"><span>        tmp1 <span style="color:#719e07">=</span> mask;
+</span></span><span style="display:flex;"><span>        tmp2 <span style="color:#719e07">=</span> input;
+</span></span><span style="display:flex;"><span>        tmp  <span style="color:#719e07">=</span> input <span style="color:#719e07">&amp;</span> mask;
+</span></span><span style="display:flex;"><span>        input <span style="color:#719e07">^=</span> mask;
+</span></span><span style="display:flex;"><span>        mask <span style="color:#719e07">=</span> tmp <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#719e07">while</span> (mask);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">do</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (tmp1 <span style="color:#719e07">!=</span> tmp2) {
+</span></span><span style="display:flex;"><span>            mask <span style="color:#719e07">=</span> flag;
+</span></span><span style="display:flex;"><span>            flag <span style="color:#719e07">^=</span> input;
+</span></span><span style="display:flex;"><span>            input <span style="color:#719e07">=</span> (input <span style="color:#719e07">&amp;</span> mask) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    } <span style="color:#719e07">while</span> (input);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> flag;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>实际可以替换成<code>lambda x,y: x + y + 1</code></p>
+<p>实际上这题结构是这样，要求输入code和flag，先检查code和flag的长度与格式</p>
+<p>我照这还原了一下，是code长度6字节，范围0-9，flag长度40，开头结尾是<code>DASCTF{}</code></p>
+<p>直接照着伪代码，抽象写了一下</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;stdint.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;stdio.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;stdlib.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;string.h&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">/* return flag + 1 + input; */</span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">core</span>(<span style="color:#dc322f">int</span> flag, <span style="color:#dc322f">int</span> input)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span> tmp1, mask, tmp2, tmp;
+</span></span><span style="display:flex;"><span>    mask <span style="color:#719e07">=</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">do</span> {
+</span></span><span style="display:flex;"><span>        tmp1 <span style="color:#719e07">=</span> mask;
+</span></span><span style="display:flex;"><span>        tmp2 <span style="color:#719e07">=</span> input;
+</span></span><span style="display:flex;"><span>        tmp  <span style="color:#719e07">=</span> input <span style="color:#719e07">&amp;</span> mask;
+</span></span><span style="display:flex;"><span>        input <span style="color:#719e07">^=</span> mask;
+</span></span><span style="display:flex;"><span>        mask <span style="color:#719e07">=</span> tmp <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#719e07">while</span> (mask);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">do</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (tmp1 <span style="color:#719e07">!=</span> tmp2) {
+</span></span><span style="display:flex;"><span>            mask <span style="color:#719e07">=</span> flag;
+</span></span><span style="display:flex;"><span>            flag <span style="color:#719e07">^=</span> input;
+</span></span><span style="display:flex;"><span>            input <span style="color:#719e07">=</span> (input <span style="color:#719e07">&amp;</span> mask) <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    } <span style="color:#719e07">while</span> (input);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> flag;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">verification_len</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span> x <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;; i<span style="color:#719e07">++</span>) {
+</span></span><span style="display:flex;"><span>        x <span style="color:#719e07">=</span> <span style="color:#268bd2">core</span>(i, <span style="color:#719e07">-</span><span style="color:#2aa198">7</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (x <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> i;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">char</span><span style="color:#719e07">*</span> <span style="color:#268bd2">verification_range</span>(<span style="color:#dc322f">int</span> len)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span>   x;
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">char</span><span style="color:#719e07">*</span> r   <span style="color:#719e07">=</span> <span style="color:#268bd2">calloc</span>(<span style="color:#719e07">sizeof</span>(<span style="color:#dc322f">char</span>), <span style="color:#2aa198">100</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span>   ptr <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">32</span>; i <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">127</span>; i<span style="color:#719e07">++</span>) {
+</span></span><span style="display:flex;"><span>        x <span style="color:#719e07">=</span> <span style="color:#268bd2">core</span>(i, <span style="color:#719e07">-</span><span style="color:#2aa198">49</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (x <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">0xa</span> <span style="color:#719e07">&amp;&amp;</span> x <span style="color:#719e07">&gt;=</span> <span style="color:#2aa198">0</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#586e75">// printf(&#34;%d\n&#34;, i);
+</span></span></span><span style="display:flex;"><span>            r[ptr] <span style="color:#719e07">=</span> i;
+</span></span><span style="display:flex;"><span>            ptr<span style="color:#719e07">++</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> r;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">flag_len</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span> x <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;; i<span style="color:#719e07">++</span>) {
+</span></span><span style="display:flex;"><span>        x <span style="color:#719e07">=</span> <span style="color:#268bd2">core</span>(i, <span style="color:#719e07">-</span><span style="color:#2aa198">41</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">if</span> (x <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">return</span> i;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">char</span><span style="color:#719e07">*</span> <span style="color:#268bd2">flag_part1</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">char</span>  t[] <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;DASCTF{}&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span>   x;
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">char</span><span style="color:#719e07">*</span> r <span style="color:#719e07">=</span> <span style="color:#268bd2">calloc</span>(<span style="color:#719e07">sizeof</span>(<span style="color:#dc322f">char</span>), <span style="color:#2aa198">9</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">8</span>; i<span style="color:#719e07">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#719e07">for</span> (<span style="color:#dc322f">int</span> j <span style="color:#719e07">=</span> <span style="color:#2aa198">32</span>; j <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">127</span>; j<span style="color:#719e07">++</span>) {
+</span></span><span style="display:flex;"><span>            x <span style="color:#719e07">=</span> <span style="color:#268bd2">core</span>(j, <span style="color:#719e07">~</span>t[i]);
+</span></span><span style="display:flex;"><span>            <span style="color:#719e07">if</span> (x <span style="color:#719e07">==</span> <span style="color:#2aa198">0</span>) {
+</span></span><span style="display:flex;"><span>                r[i] <span style="color:#719e07">=</span> j;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> r;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">int</span>      code_len;
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">char</span><span style="color:#719e07">*</span>    ver_code;
+</span></span><span style="display:flex;"><span>    <span style="color:#dc322f">char</span><span style="color:#719e07">*</span>    ver_rang;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    code_len <span style="color:#719e07">=</span> <span style="color:#268bd2">verification_len</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;verification code len: %d</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, code_len);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ver_rang <span style="color:#719e07">=</span> <span style="color:#268bd2">verification_range</span>(code_len);
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;verification range: %s</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, ver_rang);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    code_len <span style="color:#719e07">=</span> <span style="color:#268bd2">flag_len</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;flag len: %d</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, code_len);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ver_code <span style="color:#719e07">=</span> <span style="color:#268bd2">flag_part1</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#268bd2">printf</span>(<span style="color:#2aa198">&#34;flag part1: %s</span><span style="color:#cb4b16">\n</span><span style="color:#2aa198">&#34;</span>, ver_code);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>得到结果是</p>
+<pre tabindex="0"><code>verification code len: 6
+verification range: 0123456789
+flag len: 40
+flag part1: DASCTF{}
+</code></pre><p>然后code经过了一个base64换表的函数，很明显的换表，没什么好说，把6字节的code变成8字节</p>
+<p>然后8字节的code和flag过DES加密，这个DES没改动，加了混淆后很难看，但是DES的表没变，所以很好认出来</p>
+<p>DES加密中间还对密文处理了一下</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309061747578.png" alt=""></p>
+<p>所以整个过程就如下</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202309061748079.png" alt=""></p>
+<p>解密直接爆破code就可以，code6位数，范围0-9，两秒出了</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#719e07">from</span> base64 <span style="color:#719e07">import</span> b64encode
+</span></span><span style="display:flex;"><span><span style="color:#719e07">import</span> itertools
+</span></span><span style="display:flex;"><span><span style="color:#719e07">from</span> string <span style="color:#719e07">import</span> digits
+</span></span><span style="display:flex;"><span><span style="color:#719e07">from</span> Crypto.Cipher <span style="color:#719e07">import</span> DES
+</span></span><span style="display:flex;"><span><span style="color:#719e07">from</span> binascii <span style="color:#719e07">import</span> unhexlify
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">des_descrypt</span>(s, key):
+</span></span><span style="display:flex;"><span>    e <span style="color:#719e07">=</span> DES<span style="color:#719e07">.</span>new(key, DES<span style="color:#719e07">.</span>MODE_ECB)
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> e<span style="color:#719e07">.</span>decrypt(unhexlify(s))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">def</span> <span style="color:#268bd2">base64_encode</span>(text):
+</span></span><span style="display:flex;"><span>    outtab <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&#34;</span>
+</span></span><span style="display:flex;"><span>    intab <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ+/=&#34;</span>
+</span></span><span style="display:flex;"><span>    text <span style="color:#719e07">=</span> b64encode(text)<span style="color:#719e07">.</span>decode()
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> text<span style="color:#719e07">.</span>translate(text<span style="color:#719e07">.</span>maketrans(outtab, intab))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>enc <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;0723105D5C12217DCDC3601F5ECB54DA9CCEC2279F1684A13A0D716D17217F4C9EA85FF1A42795731CA3C55D3A4D7BEA&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">for</span> i <span style="color:#719e07">in</span> itertools<span style="color:#719e07">.</span>product(digits, repeat<span style="color:#719e07">=</span><span style="color:#2aa198">6</span>):
+</span></span><span style="display:flex;"><span>    key <span style="color:#719e07">=</span> <span style="color:#2aa198">&#34;&#34;</span><span style="color:#719e07">.</span>join(i)
+</span></span><span style="display:flex;"><span>    msg <span style="color:#719e07">=</span> base64_encode(key<span style="color:#719e07">.</span>encode())
+</span></span><span style="display:flex;"><span>    s <span style="color:#719e07">=</span> des_descrypt(enc, msg<span style="color:#719e07">.</span>encode())
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">if</span> <span style="color:#2aa198">b</span><span style="color:#2aa198">&#34;DASCTF&#34;</span> <span style="color:#719e07">in</span> s:
+</span></span><span style="display:flex;"><span>        <span style="color:#b58900">print</span>(key)
+</span></span><span style="display:flex;"><span>        <span style="color:#b58900">print</span>(s)
+</span></span></code></pre></div>
+        </div>
+        <footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span><time>Sep 6, 2023</time>
+    
+      <span class="categories">
+        Tags:<a class="category" href="http://localhost:1313/tags/vm">vm</a>  <a class="category" href="http://localhost:1313/tags/%e7%be%8a%e5%9f%8e%e6%9d%af">羊城杯</a>  <a class="category" href="http://localhost:1313/tags/des">DES</a>  <a class="category" href="http://localhost:1313/tags/base64">base64</a>  <a class="category" href="http://localhost:1313/tags/golang">golang</a>  
+    
+    </span>
+  </p><p class="meta">
+    
+        <a class="basic-alignment left" href="http://localhost:1313/blog/2023-09-01-rtag-cli-tools-dev/" title="Rtag cli tools dev">Rtag cli tools dev</a>
+    
+
+    
+      <a class="basic-alignment right" href="http://localhost:1313/blog/2023-09-27-2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/" title="2023 研究生国赛 Reverse">2023 研究生国赛 Reverse</a>
+    
+  </p>
+  
+  
+</footer>
+
+
+      </article>
+    </div>
+    <aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section><ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    </li>
+</ul>
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-25-llvm-base-development-environment-configuration/">llvm base development environment configuration</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">通过修改物理内存实现跨进程内存读写</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/">利用PEB遍历模块链表</a>
+              </li>
+            
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+  </body>
+</html>
+

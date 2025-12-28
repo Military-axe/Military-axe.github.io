@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Mi1itray.axe</title>
+    <link>http://localhost:1313/post/</link>
+    <description>Recent content in Posts on Mi1itray.axe</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 25 Jan 2025 15:28:53 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>llvm base development environment configuration</title>
+      <link>http://localhost:1313/blog/2025-01-25-llvm-base-development-environment-configuration/</link>
+      <pubDate>Sat, 25 Jan 2025 15:28:53 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2025-01-25-llvm-base-development-environment-configuration/</guid>
+      <description>&lt;p&gt;之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</title>
+      <link>http://localhost:1313/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</link>
+      <pubDate>Fri, 10 Jan 2025 00:40:23 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/</guid>
+      <description>&lt;p&gt;在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C++多态我都不太熟，于是简单学习一下这个部分（C++真tm难啊&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Windows进程隐藏初探</title>
+      <link>http://localhost:1313/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/</link>
+      <pubDate>Thu, 30 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>通过修改物理内存实现跨进程内存读写</title>
+      <link>http://localhost:1313/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</link>
+      <pubDate>Mon, 06 May 2024 11:17:50 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/</guid>
+      <description>&lt;p&gt;跨进程内存读写有多种方式，这里主要了解一下修改物理内存来实现跨进程内存修改方法。这种方法主要是无痕，对比修改cr3来说要无痕的多。&lt;/p&gt;&#xA;&lt;p&gt;后面再试试修改cr3和修改MDL映射来做到跨进程内存读写方式。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>句柄降权绕过CallBacks检查</title>
+      <link>http://localhost:1313/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/</link>
+      <pubDate>Mon, 29 Apr 2024 22:01:29 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/</guid>
+      <description>&lt;p&gt;ObRegistyCallBacks保护指定进程，可以让攻击程序OpenProcess打开指定进程后获取的句柄权限是我们指定的权限范围, 比如不能读取进程内存, 不能终止进程。&lt;/p&gt;&#xA;&lt;p&gt;如何绕过这种保护，可以使用句柄降权/提权的方法，就可以对提高已经获取到的句柄权限。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Rust编写几种hook的方式</title>
+      <link>http://localhost:1313/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/</link>
+      <pubDate>Fri, 22 Mar 2024 15:59:44 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/</guid>
+      <description>&lt;p&gt;使用Rust编写几种在windows上常用的hook方式:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;IAT hook&lt;/li&gt;&#xA;&lt;li&gt;Inline hook&lt;/li&gt;&#xA;&lt;li&gt;VMT hook&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;为什么要用rust的不用c++？就是想用，想给自己找麻烦😎&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>利用PEB遍历模块链表</title>
+      <link>http://localhost:1313/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</link>
+      <pubDate>Tue, 19 Mar 2024 11:36:56 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/</guid>
+      <description>&lt;p&gt;使用c++, rust实现遍历PEB获取模块信息的代码段. 主要练练rust&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Rust污点分析调研</title>
+      <link>http://localhost:1313/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</link>
+      <pubDate>Sat, 02 Mar 2024 15:52:25 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2024-03-02-rust%E6%B1%A1%E7%82%B9%E5%88%86%E6%9E%90%E8%B0%83%E7%A0%94/</guid>
+      <description>&lt;p&gt;Rust语言污点分析相关的几篇内容&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;SafeDrop: Detecting Memory Deallocation Bugs of Rust Programs via Static Data-flow Analysis.&lt;/li&gt;&#xA;&lt;li&gt;Encapsulated Functions: Fortifying Rust&amp;rsquo;s FFI in Embedded Systems.&lt;/li&gt;&#xA;&lt;li&gt;Demystifying Compiler Unstable Feature Usage and Impacts in the Rust Ecosystem&lt;/li&gt;&#xA;&lt;li&gt;Detecting Cross-language Memory Management Issues in Rust&lt;/li&gt;&#xA;&lt;li&gt;MirChecker: Detecting Bugs in Rust Programs via Static Analysis&lt;/li&gt;&#xA;&lt;li&gt;Static Deadlock Detection for Rust Programs&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>2023 香山杯 Reverse</title>
+      <link>http://localhost:1313/blog/2023-10-16-2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/</link>
+      <pubDate>Mon, 16 Oct 2023 14:05:44 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-10-16-2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/</guid>
+      <description>&lt;p&gt;香山杯初赛的3到逆向的WP，不是很难的题，但是有一些新的东西，chaquopy框架，这个框架完成了一套sdk，可以安卓调用python代码也可以python调用java代码。可惜的是python是源码存储，还有研究的空间&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>BiAn: Smart Contract Source Code Obfuscation</title>
+      <link>http://localhost:1313/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</link>
+      <pubDate>Thu, 12 Oct 2023 14:42:18 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-10-12-bian-smart-contract-source-code-obfuscation/</guid>
+      <description>&lt;p&gt;智能合约代码混淆，感觉还是ollvm的影子，还是那三种模式，只是做了相关的适配以及加了很多其他细节，总体思路是没有变的。&lt;/p&gt;&#xA;&lt;p&gt;创新点在于使用改进后的混沌映射来做不透明谓词，增加了一定的混淆程度&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;会议：IEEE Transactions on Software Engineering&lt;/p&gt;&#xA;&lt;p&gt;等级：CCF-A&lt;/p&gt;&#xA;&lt;/blockquote&gt;</description>
+    </item>
+    <item>
+      <title>2023 研究生国赛 Reverse</title>
+      <link>http://localhost:1313/blog/2023-09-27-2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/</link>
+      <pubDate>Wed, 27 Sep 2023 23:08:11 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-09-27-2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/</guid>
+      <description>&lt;p&gt;4道题做了3到，都不太方便纯静态，动调倒是都挺简单的. 最后一题unity的游戏没什么经验，不知道怎么下手，CE也没下就放弃了&lt;/p&gt;&#xA;&lt;p&gt;更新：又看了一下其实unity还是很简单，只是忘记dnspy该展开那个类了，（我说怎么看不到代码呢&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2023 羊城杯 Reverse</title>
+      <link>http://localhost:1313/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/</link>
+      <pubDate>Wed, 06 Sep 2023 17:50:41 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-09-06-2023-%E7%BE%8A%E5%9F%8E%E6%9D%AF-reverse/</guid>
+      <description>&lt;p&gt;没打，王哥发了我三题，我就看了一下，稍微多花了时间。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Rtag cli tools dev</title>
+      <link>http://localhost:1313/blog/2023-09-01-rtag-cli-tools-dev/</link>
+      <pubDate>Fri, 01 Sep 2023 16:15:57 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-09-01-rtag-cli-tools-dev/</guid>
+      <description>&lt;p&gt;自己无聊，想开发开发。想着最近需要一个tag管理的系统，我用的是windows的，文件管理是层级管理，不是tag的，想着写一个也不难，就自己写了一下。开发语言用rust，数据库使用mongodb，手很生，写了好几天，累死✌了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Binary Diffing</title>
+      <link>http://localhost:1313/blog/2023-08-19-binary-diffing/</link>
+      <pubDate>Sat, 19 Aug 2023 15:56:52 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-08-19-binary-diffing/</guid>
+      <description>&lt;p&gt;最近想看看binary diffing的内容，直接从头看看一篇篇翻，涉及到很多机器学习内容，很多不懂的，慢慢来看吧。这里先看了10几篇，很多都只看了一个摘要。&#xA;主要是了解一下思路，看看这个领域的内容的研究历史，Binary Diffing 1暂时只看到2016年的paper，后续继续更新，主要文章引用如下&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Bitshred: feature hashing malware for scalable triage and semantic analysis.&lt;/li&gt;&#xA;&lt;li&gt;Binary function clustering using semantic hashes.&lt;/li&gt;&#xA;&lt;li&gt;Binslayer: accurate comparison of binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Control flow-based malware variant detection.&lt;/li&gt;&#xA;&lt;li&gt;{MutantX-S}: Scalable Malware Clustering Based on Static Features.&lt;/li&gt;&#xA;&lt;li&gt;Semantics-based obfuscation-resilient binary code similarity comparison with applications to software plagiarism detection.&lt;/li&gt;&#xA;&lt;li&gt;Leveraging semantic signatures for bug search in binary programs.&lt;/li&gt;&#xA;&lt;li&gt;Cross-architecture bug search in binary executables.&lt;/li&gt;&#xA;&lt;li&gt;Bingo: Crossarchitecture cross-os binary search.&lt;/li&gt;&#xA;&lt;li&gt;Statistical similarity of binaries.&lt;/li&gt;&#xA;&lt;li&gt;discovRE: Efficient Cross-Architecture Identification of Bugs in Binary Code.&lt;/li&gt;&#xA;&lt;li&gt;Scalable Graph-based Bug Search for Firmware Images.&lt;/li&gt;&#xA;&lt;li&gt;Crossarchitecture binary semantics understanding via similar code comparison.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>Khaos: The Impact of Inter-procedural Code Obfuscation on Binary Diffing Techniques</title>
+      <link>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</link>
+      <pubDate>Sun, 23 Jul 2023 21:36:57 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-07-23-khaos-the-impact-of-inter-procedural-code-obfuscation-on-binary-diffing-techniques/</guid>
+      <description>&lt;p&gt;这是一篇CCFB的文章，来自中科大，文章提出了一种新的二进制混淆模式来抵抗binary diffing技术的分析。&lt;/p&gt;&#xA;&lt;p&gt;从混淆角度，它是从IR层面切割函数并融合函数，改变了函数的调用关系。与OLLVM是不冲突的混淆，对抵抗binary diffing有很好的效果，并且也是基于LLVM框架，对混淆技术的发展是有意义的。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Obfuscate hide string &amp;&amp; zer0pts</title>
+      <link>http://localhost:1313/blog/2023-07-17-obfuscate-hide-string-zer0pts/</link>
+      <pubDate>Mon, 17 Jul 2023 15:43:19 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-07-17-obfuscate-hide-string-zer0pts/</guid>
+      <description>&lt;p&gt;Obfuscate项目是用于隐藏字符串，增加分析的难度，但是Obfuscate只能对抗静态的分析。zer0pts比赛中的一题就是利用这个项目，但是它很巧妙，隐藏的是模块的函数名，主要逻辑是调用so文件的模块，它隐藏so中的函数名后，从静态分析是很难看出来调用的逻辑是什么，忽然感觉这个项目就有点用了。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Frida call java class/method to explode</title>
+      <link>http://localhost:1313/blog/2023-07-07-frida-call-java-class/method-to-explode/</link>
+      <pubDate>Fri, 07 Jul 2023 10:01:10 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-07-07-frida-call-java-class/method-to-explode/</guid>
+      <description>&lt;p&gt;利用Frida去调用java代码中的类，然后爆破。算是一种主动的方法。主要是之前有一道apk题目是爆破的思路，但是我不会写java代码，想起来很难受，冲浪的时候看到&#xD;&#xA;&lt;a href=&#34;https://eternalsakura13.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Sakura&lt;/a&gt;的blog有感，就再去试试，并记录在此。然后发现这题原来是adword原题，（其实题目挺简单，只是当时摆），气死✌了。&lt;/p&gt;&#xA;&lt;p&gt;主要是记录Frida主动调用apk中Java中的代码。主动调用可以用于爆破，模拟程序部分执行。&lt;/p&gt;&#xA;&lt;p&gt;需要注意的知识点是在java代码中的static类型数据在爆破过程中需要每次都对这种类型值重新设置。因为static类型在所有实例中都是统一，修改一个实例就会修改所有实例，需要用&lt;code&gt;变量.属性.value = ...&lt;/code&gt;的写法重新设置值。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#268bd2&#34;&gt;var&lt;/span&gt; bvar &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; b.$new(IntClass.$new(&lt;span style=&#34;color:#2aa198&#34;&gt;2&lt;/span&gt;));&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#719e07&#34;&gt;for&lt;/span&gt; (...) {&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    bvar._static_val.value &lt;span style=&#34;color:#719e07&#34;&gt;=&lt;/span&gt; ...;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>Ida Symbolic Recovery</title>
+      <link>http://localhost:1313/blog/2023-07-03-ida-symbolic-recovery/</link>
+      <pubDate>Mon, 03 Jul 2023 21:51:06 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-07-03-ida-symbolic-recovery/</guid>
+      <description>&lt;p&gt;最近发现二进制文件中符号恢复的手段有不少，这里想记录一下几种符号恢复的工具使用与效果对比。&lt;/p&gt;&#xA;&lt;p&gt;Finger，lscan，flair，bindiff&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Frida learn &amp;&amp; sctf 2023 checkFlow</title>
+      <link>http://localhost:1313/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</link>
+      <pubDate>Mon, 03 Jul 2023 16:06:30 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-07-03-frida-learn-sctf-2023-checkflow/</guid>
+      <description>&lt;p&gt;没有打sctf，但是赛后看NU1L wp时，看到checkFlow这题，师傅用frida调用本身函数来爆破。虽然这种爆破要求本身函数状态不受运行的影响，但还是很好的做法。这种做法一直都有，只是我一直没去了解，这次看到这个，就学习一下&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2023 Two Reverse CrackMe WriteUp</title>
+      <link>http://localhost:1313/blog/2023-06-30-2023-two-reverse-crackme-writeup/</link>
+      <pubDate>Fri, 30 Jun 2023 17:05:32 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-06-30-2023-two-reverse-crackme-writeup/</guid>
+      <description>&lt;p&gt;前几天打了一个应该是天融信的比赛，题目不难，简单记录一下。&lt;/p&gt;&#xA;&lt;p&gt;一道是花指令+rc4，一道是mov混淆&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>KextFuzz Fuzzing macOS Kernel EXTensions on Apple Silicon via Exploiting Mitigations</title>
+      <link>http://localhost:1313/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</link>
+      <pubDate>Wed, 14 Jun 2023 15:53:46 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-06-14-kextfuzz-fuzzing-macos-kernel-extensions-on-apple-silicon-via-exploiting-mitigations/</guid>
+      <description>&lt;p&gt;来自清华vul337实验室与蚂蚁基础安全合作的一篇2023年USENIX Security的文章&lt;/p&gt;&#xA;&lt;p&gt;讲述如何针对macOS内核部分的kext进行模糊测试，原本kext是闭源的部分，同时处于内核。这使得插桩难，容易崩溃，黑盒测试效果差。同时苹果本身一些特权代码被保护。文章针对这些问题提出三个机制来解决&lt;/p&gt;&#xA;&lt;p&gt;通过替换arm的PA指令来插桩，做覆盖率统计；通过本地hook特权检查函数来绕过苹果的检查，进一步fuzz特权代码；设计一个污点分析模块，分析macOS内核接口格式，辅助fuzz&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>PyFET: Forensically Equivalent Transformation for Python Binary Decompilation</title>
+      <link>http://localhost:1313/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</link>
+      <pubDate>Sat, 10 Jun 2023 21:12:15 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-06-10-pyfet-forensically-equivalent-transformation-for-python-binary-decompilation/</guid>
+      <description>&lt;p&gt;2023 S&amp;amp;P论文，讲述的是python反编译的研究工作，总结了大量的反编译特征，针对恶意代码分析领域，提供一种新的解决方案。&#xA;从逆向和工程的角度来说，这项工作有很多值得学习的部分。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Driver Development and Debug Config</title>
+      <link>http://localhost:1313/blog/2023-06-08-driver-development-and-debug-config/</link>
+      <pubDate>Thu, 08 Jun 2023 13:58:36 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-06-08-driver-development-and-debug-config/</guid>
+      <description>&lt;p&gt;配置windows驱动开发环境与windbg preview调试技巧，还会记录一下遇到的问题&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2023 XCTF GotYouKey Write Up</title>
+      <link>http://localhost:1313/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</link>
+      <pubDate>Wed, 07 Jun 2023 13:37:53 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2023-06-07-2023-xctf-gotyoukey-write-up/</guid>
+      <description>&lt;p&gt;前些天没做出来的题目，后面再思考后发现了自己忽略so文件中调用java代码，赛后做了出来整理在此。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Inline Hook on Mi1itray.axe</title>
+    <link>http://localhost:1313/tags/inline-hook/</link>
+    <description>Recent content in Inline Hook on Mi1itray.axe</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 22 Mar 2024 15:59:44 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/inline-hook/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Rust编写几种hook的方式</title>
+      <link>http://localhost:1313/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/</link>
+      <pubDate>Fri, 22 Mar 2024 15:59:44 +0800</pubDate>
+      <guid>http://localhost:1313/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/</guid>
+      <description>&lt;p&gt;使用Rust编写几种在windows上常用的hook方式:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;IAT hook&lt;/li&gt;&#xA;&lt;li&gt;Inline hook&lt;/li&gt;&#xA;&lt;li&gt;VMT hook&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;为什么要用rust的不用c++？就是想用，想给自己找麻烦😎&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

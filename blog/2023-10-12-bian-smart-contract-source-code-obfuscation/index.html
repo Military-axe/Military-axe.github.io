@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  <title>BiAn: Smart Contract Source Code Obfuscation</title><link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+    <link href="http://localhost:1313/favicon.png" rel="icon">
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe"><meta name="generator" content="Hugo 0.153.2">
+
+</head>
+<body><header role="banner"><hgroup><h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header><nav role="navigation"><fieldset class="mobile-nav"><select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="http://localhost:1313/">» Blog</option>
+      
+        <option value="http://localhost:1313/categories">» Categories</option>
+      
+        <option value="http://localhost:1313/tags">» Tags</option>
+      
+  </select>
+</fieldset><ul class="main-navigation">
+    
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        <header>
+  <p class="meta">Oct 12, 2023
+     - 1 minute read - <a class="label" href="http://localhost:1313/categories/paper/">Paper </a>
+    
+  </p>
+  <h1 class="entry-title">
+     BiAn: Smart Contract Source Code Obfuscation 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#控制流混淆">控制流混淆</a>
+          <ul>
+            <li><a href="#控制流平坦化">控制流平坦化</a></li>
+            <li><a href="#不透明谓词">不透明谓词</a></li>
+          </ul>
+        </li>
+        <li><a href="#数据流混淆">数据流混淆</a></li>
+        <li><a href="#布局混淆">布局混淆</a></li>
+        <li><a href="#混淆效果">混淆效果</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+          
+          <p>智能合约代码混淆，感觉还是ollvm的影子，还是那三种模式，只是做了相关的适配以及加了很多其他细节，总体思路是没有变的。</p>
+<p>创新点在于使用改进后的混沌映射来做不透明谓词，增加了一定的混淆程度</p>
+<blockquote>
+<p>会议：IEEE Transactions on Software Engineering</p>
+<p>等级：CCF-A</p>
+</blockquote>
+<p>这篇文章聚焦的领域是智能合约代码混淆，首先说说智能合约代码现状的一些问题。</p>
+<p>首先代码是公开的，不容易及时更改的。是很容易可以反编译得到源码的，这增加了漏洞发现的风险。那么现有的智能合约代码安全方面的工作主要集中在源码级别或者字节码级别的漏洞检测，属于静态分析和动态分析</p>
+<p>本文是从另一个角度增加智能合约代码的安全性，通过混淆代码，减少被漏洞挖掘的可能。同时混淆代码还可以用于保护知识产权（比如在源码中插入验证知识产权的代码，混淆后很难被识别出来并删除）</p>
+<p>混淆从三个角度来混淆</p>
+<ul>
+<li>控制流混淆</li>
+<li>数据流混淆</li>
+<li>布局混淆</li>
+</ul>
+<h2 id="控制流混淆">控制流混淆</h2>
+<p>控制流混淆主要有两个部分，不透明谓词和控制流平坦化</p>
+<h3 id="控制流平坦化">控制流平坦化</h3>
+<p>这个是ollvm经典的混淆模式，也是目前在通用领域效果最好的混淆模式之一</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310121439037.png" alt="image-20231012111728772"></p>
+<h3 id="不透明谓词">不透明谓词</h3>
+<p>不透明谓词是生成一些逻辑上永真或者永假效果的复杂表达式，人可以很快分辨出来，但是编译器或者说静态分析器无法推断出这个值，只能在运行时确定。</p>
+<p><code>y &gt; 10 || x * (x + 1) % 2 == 0</code>这是一个永真式</p>
+<p>插入不透明谓词主要的效果是增加一些虚假的控制流。</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310121439830.png" alt="image-20231012112233726"></p>
+<p>本文提出一种构造不透明谓词的CPM混沌映射来提高不透明谓词的质量。CPM混沌映射基于Chebyshev和PWLCM混沌映射改进，保留混沌映射的敏感和随机性的同时提高了性能</p>
+<p>可以理解CPM混沌映射会生成一个伪随机数范围0-1，每次生成都不一样。论文将混沌映射与不透明谓词结合，关键的等式是生成的伪随机数接近1就为真，接近0则为假。这个可以根据项目开发具体的修改来修改</p>
+<h2 id="数据流混淆">数据流混淆</h2>
+<p>主要就是加密程序中的数据部分。</p>
+<p>通过提取AST语法树中的节点，识别出数据在进行混淆，主要混淆有如下几点</p>
+<ul>
+<li>把局部变量转全局变量</li>
+<li>将静态数据转换成动态数据</li>
+<li>将整数常数转换成算数表达式</li>
+<li>拆分布尔变量：如果原本为<code>true</code>则后续接一个 <code>||</code>和后续表达式，<code>false</code>则是<code>&amp;&amp;</code>接后续表达式</li>
+<li>将标量变量转成向量：在结构体中集体声明整数、布尔、地址、字符串和字节等状态变量，并通过结构体调用成员变量。原有状态变量的所有初始化、赋值和使用都将被相应的结构成员变量替换。替换后的变量名和函数名都是用SHA-1生成原本名称的摘要</li>
+</ul>
+<h2 id="布局混淆">布局混淆</h2>
+<p>主要是对代码中的一些标识符和调试信息增加干扰。</p>
+<ul>
+<li>删除注释，打乱布局：使用无意义的字符串来替换</li>
+<li>替换变量名：SHA-1</li>
+</ul>
+<h2 id="混淆效果">混淆效果</h2>
+<p>最后看一下混淆的效果</p>
+<p><img src="https://raw.githubusercontent.com/Military-axe/imgtable/main/202310121439215.png" alt="image-20231012142843126"></p>
+        </div>
+        <footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span><time>Oct 12, 2023</time>
+    
+      <span class="categories">
+        Tags:<a class="category" href="http://localhost:1313/tags/obfuscation">Obfuscation</a>  <a class="category" href="http://localhost:1313/tags/smart-contract">Smart Contract</a>  
+    
+    </span>
+  </p><p class="meta">
+    
+        <a class="basic-alignment left" href="http://localhost:1313/blog/2023-09-27-2023-%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B-reverse/" title="2023 研究生国赛 Reverse">2023 研究生国赛 Reverse</a>
+    
+
+    
+      <a class="basic-alignment right" href="http://localhost:1313/blog/2023-10-16-2023-%E9%A6%99%E5%B1%B1%E6%9D%AF-reverse/" title="2023 香山杯 Reverse">2023 香山杯 Reverse</a>
+    
+  </p>
+  
+  
+</footer>
+
+
+      </article>
+    </div>
+    <aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section><ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    </li>
+</ul>
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-25-llvm-base-development-environment-configuration/">llvm base development environment configuration</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">通过修改物理内存实现跨进程内存读写</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/">利用PEB遍历模块链表</a>
+              </li>
+            
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+  </body>
+</html>
+

@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>llvm base development environment configuration</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="G-XXXXXXXXXX">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=5" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+<meta property="og:url" content="https://military-axe.github.io/post/llvm-base-dev/">
+  <meta property="og:site_name" content="Mi1itray.axe">
+  <meta property="og:title" content="llvm base development environment configuration">
+  <meta property="og:description" content="之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2025-01-25T15:28:53+08:00">
+    <meta property="article:modified_time" content="2025-01-25T15:28:53+08:00">
+    <meta property="article:tag" content="Llvm">
+    <meta property="article:tag" content="C&#43;&#43;">
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="llvm base development environment configuration">
+  <meta name="twitter:description" content="之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录">
+
+
+
+
+
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX');
+        }
+      </script>
+
+
+
+
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "abcdefghzd");
+</script>
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%89%e8%a3%85" class="nav-安装">
+									安装
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#ubuntudebain" class="nav-ubuntudebain">
+									Ubuntu/Debain
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#arch" class="nav-arch">
+									Arch
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#other-os" class="nav-other-os">
+									Other OS
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%89%8b%e5%8a%a8" class="nav-手动">
+									手动
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#windows" class="nav-windows">
+									Windows
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e7%bc%96%e8%af%91pass" class="nav-编译pass">
+									编译Pass
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%91%bd%e4%bb%a4%e8%a1%8c%e7%bc%96%e8%af%91" class="nav-命令行编译">
+									命令行编译
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#cmake%e7%bc%96%e8%af%91" class="nav-cmake编译">
+									CMake编译
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%bf%90%e8%a1%8c" class="nav-运行">
+									运行
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#vscode-cpp--clangd-%e9%85%8d%e7%bd%ae" class="nav-vscode-cpp--clangd-配置">
+									Vscode cpp &amp;&amp; clangd 配置
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#clangd" class="nav-clangd">
+									clangd
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%be%ae%e8%bd%afc%e6%8f%92%e4%bb%b6" class="nav-微软c插件">
+									微软C&#43;&#43;插件
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83%e6%96%87%e6%a1%a3" class="nav-参考文档">
+									参考文档
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://military-axe.github.io/">
+            Mi1itray.axe
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://military-axe.github.io/">
+        <div class="single-column-header-title">Mi1itray.axe</div>
+        
+        <div class="single-column-header-subtitle">mi1itray.axe@gmail.com</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    llvm base development environment configuration
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2025-01-25 15:28
+                        </time>
+                        
+
+                        
+                            <i class="material-icons" style="">folder</i>
+                                <a href="/categories/c&#43;&#43;">C&#43;&#43;</a>
+                                &nbsp;
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/llvm">llvm</a>
+                                &nbsp;
+                            
+                                <a href="/tags/c&#43;&#43;">c&#43;&#43;</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>之前一直以为编译llvm的pass需要编译一整个llvm,然后llvm编译的内存要求要又很高（50G交换空间都不够！然后发现其实完全不需要，安装库就可以，编译参数也可以通过llvm-config来获取。 我这里使用arch,做一下简单的记录</p>
+<h1 id="安装">安装</h1>
+<h2 id="ubuntudebain">Ubuntu/Debain</h2>
+<p>如果是ubuntu/debain就很方便，llvm官方有<a href="https://apt.llvm.org/llvm.sh">安装脚本</a></p>
+<p>可以通过这个脚本安装指定的包，指定的版本。</p>
+<p>安装最新版本</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>bash -c <span style="color:#cd5555">&#34;</span><span style="color:#8b008b;font-weight:bold">$(</span>wget -O - https://apt.llvm.org/llvm.sh<span style="color:#8b008b;font-weight:bold">)</span><span style="color:#cd5555">&#34;</span>
+</span></span></code></pre></div><p>安装指定版本</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>wget https://apt.llvm.org/llvm.sh
+</span></span><span style="display:flex;"><span>chmod +x llvm.sh
+</span></span><span style="display:flex;"><span>sudo ./llvm.sh &lt;version number&gt;
+</span></span></code></pre></div><p>安装所有包</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>wget https://apt.llvm.org/llvm.sh
+</span></span><span style="display:flex;"><span>chmod +x llvm.sh
+</span></span><span style="display:flex;"><span>sudo ./llvm.sh &lt;version number&gt; all
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># or</span>
+</span></span><span style="display:flex;"><span>sudo ./llvm.sh all
+</span></span></code></pre></div><h2 id="arch">Arch</h2>
+<p>Arch就没有这么方便了，不过pacman/yay也可以指定安装llvm的包以及版本，这里以安装llvm18为例</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>yay -Syu llvm18 llvm18-libs
+</span></span></code></pre></div><p>llvm18-libs 是 LLVM 18 runtime库</p>
+<h2 id="other-os">Other OS</h2>
+<p>如果想使用命令安装包，可以参考</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span><span style="color:#228b22"># LLVM</span>
+</span></span><span style="display:flex;"><span>apt-get install libllvm-19-ocaml-dev libllvm19 llvm-19 llvm-19-dev llvm-19-doc llvm-19-examples llvm-19-runtime
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># Clang and co</span>
+</span></span><span style="display:flex;"><span>apt-get install clang-19 clang-tools-19 clang-19-doc libclang-common-19-dev libclang-19-dev libclang1-19 clang-format-19 python3-clang-19 clangd-19 clang-tidy-19
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># compiler-rt</span>
+</span></span><span style="display:flex;"><span>apt-get install libclang-rt-19-dev
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># polly</span>
+</span></span><span style="display:flex;"><span>apt-get install libpolly-19-dev
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># libfuzzer</span>
+</span></span><span style="display:flex;"><span>apt-get install libfuzzer-19-dev
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># lldb</span>
+</span></span><span style="display:flex;"><span>apt-get install lldb-19
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># lld (linker)</span>
+</span></span><span style="display:flex;"><span>apt-get install lld-19
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># libc++</span>
+</span></span><span style="display:flex;"><span>apt-get install libc++-19-dev libc++abi-19-dev
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># OpenMP</span>
+</span></span><span style="display:flex;"><span>apt-get install libomp-19-dev
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># libclc</span>
+</span></span><span style="display:flex;"><span>apt-get install libclc-19-dev
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># libunwind</span>
+</span></span><span style="display:flex;"><span>apt-get install libunwind-19-dev
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># mlir</span>
+</span></span><span style="display:flex;"><span>apt-get install libmlir-19-dev mlir-19-tools
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># bolt</span>
+</span></span><span style="display:flex;"><span>apt-get install libbolt-19-dev bolt-19
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># flang</span>
+</span></span><span style="display:flex;"><span>apt-get install flang-19
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># wasm support</span>
+</span></span><span style="display:flex;"><span>apt-get install libclang-rt-19-dev-wasm32 libclang-rt-19-dev-wasm64 libc++-19-dev-wasm32 libc++abi-19-dev-wasm32 libclang-rt-19-dev-wasm32 libclang-rt-19-dev-wasm64
+</span></span><span style="display:flex;"><span><span style="color:#228b22"># LLVM libc</span>
+</span></span><span style="display:flex;"><span>apt-get install libllvmlibc-19-dev
+</span></span></code></pre></div><h2 id="手动">手动</h2>
+<p>在github/llvm-project的<a href="https://github.com/llvm/llvm-project/releases">releases</a>页面中，可以下载指定系统的llvm包，比如我要下载llvm19在Linux上x64的库，就选择<a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/LLVM-19.1.7-Linux-X64.tar.xz">LLVM-19.1.7-Linux-X64.tar.xz</a></p>
+<p>解压到指定位置后，给bin目录添加权限，并添加进入PATH中，也可以做到相似效果。</p>
+<h2 id="windows">Windows</h2>
+<p>Windows其实就是使用手动的方式，在<a href="https://github.com/llvm/llvm-project/releases">releases</a>页面中下载<a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/clang+llvm-19.1.7-x86_64-pc-windows-msvc.tar.xz">clang+llvm-19.1.7-x86_64-pc-windows-msvc.tar.xz</a></p>
+<p>解压到指定位置后，添加bin目录到环境变量中即可</p>
+<blockquote>
+<p>注意：不要使用<a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/LLVM-19.1.7-win64.exe">LLVM-19.1.7-win64.exe</a>这些图形化来安装，这个不会安装库，只安装了bin目录那些软件</p></blockquote>
+<h1 id="编译pass">编译Pass</h1>
+<p>pass的例子选择llvm/examples/Bye/Bye.cpp，这个例子有NewPassManager和LegacyPassManager版本，都在一个文件中</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;llvm/IR/Function.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;llvm/IR/LegacyPassManager.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;llvm/Pass.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;llvm/Passes/PassBuilder.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;llvm/Passes/PassPlugin.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;llvm/Support/CommandLine.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b">#include</span> <span style="color:#1e889b">&#34;llvm/Support/raw_ostream.h&#34;</span><span style="color:#1e889b">
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">using</span> <span style="color:#8b008b;font-weight:bold">namespace</span> llvm;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">static</span> cl::opt&lt;<span style="color:#00688b;font-weight:bold">bool</span>&gt; Wave(<span style="color:#cd5555">&#34;wave-goodbye&#34;</span>, cl::init(<span style="color:#658b00">false</span>),
+</span></span><span style="display:flex;"><span>                          cl::desc(<span style="color:#cd5555">&#34;wave good bye&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">namespace</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">bool</span> <span style="color:#008b45">runBye</span>(Function &amp;F) {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">if</span> (Wave) {
+</span></span><span style="display:flex;"><span>    errs() &lt;&lt; <span style="color:#cd5555">&#34;Bye: &#34;</span>;
+</span></span><span style="display:flex;"><span>    errs().write_escaped(F.getName()) &lt;&lt; <span style="color:#cd5555">&#39;\n&#39;</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">false</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">struct</span> <span style="color:#008b45;font-weight:bold">LegacyBye</span> : <span style="color:#8b008b;font-weight:bold">public</span> FunctionPass {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">static</span> <span style="color:#00688b;font-weight:bold">char</span> ID;
+</span></span><span style="display:flex;"><span>  LegacyBye() : FunctionPass(ID) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#00688b;font-weight:bold">bool</span> <span style="color:#008b45">runOnFunction</span>(Function &amp;F) <span style="color:#8b008b;font-weight:bold">override</span> { <span style="color:#8b008b;font-weight:bold">return</span> runBye(F); }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">struct</span> <span style="color:#008b45;font-weight:bold">Bye</span> : PassInfoMixin&lt;Bye&gt; {
+</span></span><span style="display:flex;"><span>  PreservedAnalyses <span style="color:#008b45">run</span>(Function &amp;F, FunctionAnalysisManager &amp;) {
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">if</span> (!runBye(F))
+</span></span><span style="display:flex;"><span>      <span style="color:#8b008b;font-weight:bold">return</span> PreservedAnalyses::all();
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">return</span> PreservedAnalyses::none();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>} <span style="color:#228b22">// namespace
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span>
+</span></span><span style="display:flex;"><span><span style="color:#00688b;font-weight:bold">char</span> LegacyBye::ID = <span style="color:#b452cd">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8b008b;font-weight:bold">static</span> RegisterPass&lt;LegacyBye&gt; X(<span style="color:#cd5555">&#34;goodbye&#34;</span>, <span style="color:#cd5555">&#34;Good Bye World Pass&#34;</span>,
+</span></span><span style="display:flex;"><span>                                 <span style="color:#658b00">false</span> <span style="color:#228b22">/* Only looks at CFG */</span>,
+</span></span><span style="display:flex;"><span>                                 <span style="color:#658b00">false</span> <span style="color:#228b22">/* Analysis Pass */</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#228b22">/* New PM Registration */</span>
+</span></span><span style="display:flex;"><span>llvm::PassPluginLibraryInfo getByePluginInfo() {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> {LLVM_PLUGIN_API_VERSION, <span style="color:#cd5555">&#34;Bye&#34;</span>, LLVM_VERSION_STRING,
+</span></span><span style="display:flex;"><span>          [](PassBuilder &amp;PB) {
+</span></span><span style="display:flex;"><span>            PB.registerVectorizerStartEPCallback(
+</span></span><span style="display:flex;"><span>                [](llvm::FunctionPassManager &amp;PM, OptimizationLevel Level) {
+</span></span><span style="display:flex;"><span>                  PM.addPass(Bye());
+</span></span><span style="display:flex;"><span>                });
+</span></span><span style="display:flex;"><span>            PB.registerPipelineParsingCallback(
+</span></span><span style="display:flex;"><span>                [](StringRef Name, llvm::FunctionPassManager &amp;PM,
+</span></span><span style="display:flex;"><span>                   ArrayRef&lt;llvm::PassBuilder::PipelineElement&gt;) {
+</span></span><span style="display:flex;"><span>                  <span style="color:#8b008b;font-weight:bold">if</span> (Name == <span style="color:#cd5555">&#34;goodbye&#34;</span>) {
+</span></span><span style="display:flex;"><span>                    PM.addPass(Bye());
+</span></span><span style="display:flex;"><span>                    <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">true</span>;
+</span></span><span style="display:flex;"><span>                  }
+</span></span><span style="display:flex;"><span>                  <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#658b00">false</span>;
+</span></span><span style="display:flex;"><span>                });
+</span></span><span style="display:flex;"><span>          }};
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#ifndef LLVM_BYE_LINK_INTO_TOOLS
+</span></span></span><span style="display:flex;"><span><span style="color:#1e889b"></span><span style="color:#8b008b;font-weight:bold">extern</span> <span style="color:#cd5555">&#34;C&#34;</span> LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+</span></span><span style="display:flex;"><span>llvmGetPassPluginInfo() {
+</span></span><span style="display:flex;"><span>  <span style="color:#8b008b;font-weight:bold">return</span> <span style="color:#008b45">getByePluginInfo</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#1e889b">#endif
+</span></span></span></code></pre></div><h2 id="命令行编译">命令行编译</h2>
+<p>在bash中，zsh和fish不太行，主要是没有``语法</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>clang++ <span style="color:#cd5555">`</span>llvm-config-18 --cxxflags<span style="color:#cd5555">`</span> -fPIC -shared pass.cpp -o pass.so <span style="color:#cd5555">`</span>llvm-c
+</span></span><span style="display:flex;"><span>onfig-18 --ldflags<span style="color:#cd5555">`</span>
+</span></span></code></pre></div><ul>
+<li><code>llvm-config-18 --cxxflags</code> 输出的实际上是c++编译器标志，主要是llvm头文件的路径。</li>
+<li><code>llvm-config-18 --ldflags</code> 输入的实际上是连接库位置 下面是我环境的输入</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>$ llvm-config-18 --cxxflags
+</span></span><span style="display:flex;"><span>-I/usr/lib/llvm18/include -std=c++17   -fno-exceptions -funwind-tables -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ llvm-config-18 --ldflags
+</span></span><span style="display:flex;"><span>-L/usr/lib/llvm18/lib
+</span></span></code></pre></div><p>所以上面的命令可以拼接起来，就是可以用于脚本</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>clang++ -I/usr/lib/llvm18/include -std=c++17   -fno-exceptions -funwind-tables -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fPIC -shared pass.cpp -o pass.so -L/usr/lib/llvm18/lib
+</span></span></code></pre></div><h2 id="cmake编译">CMake编译</h2>
+<p>其实就是上面的编译命令改成脚本</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-CMake" data-lang="CMake"><span style="display:flex;"><span><span style="color:#658b00">cmake_minimum_required</span>(<span style="color:#cd5555">VERSION</span> <span style="color:#cd5555">3.10</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#658b00">project</span>(<span style="color:#cd5555">MyPass</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#228b22"># Set the C++ standard
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#658b00">set</span>(<span style="color:#cd5555">CMAKE_CXX_STANDARD</span> <span style="color:#cd5555">17</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#658b00">set</span>(<span style="color:#cd5555">CMAKE_CXX_STANDARD_REQUIRED</span> <span style="color:#cd5555">ON</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#658b00">set</span>(<span style="color:#cd5555">CMAKE_CXX_EXTENSIONS</span> <span style="color:#cd5555">OFF</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#228b22"># Set compiler flags
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#658b00">set</span>(<span style="color:#cd5555">CMAKE_CXX_FLAGS</span> <span style="color:#cd5555">&#34;${CMAKE_CXX_FLAGS} -fno-exceptions -funwind-tables -fPIC&#34;</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#228b22"># Add preprocessor definitions
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#658b00">add_definitions</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#cd5555">-D_GNU_SOURCE</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cd5555">-D__STDC_CONSTANT_MACROS</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cd5555">-D__STDC_FORMAT_MACROS</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cd5555">-D__STDC_LIMIT_MACROS</span>
+</span></span><span style="display:flex;"><span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#228b22"># Include directories
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#658b00">include_directories</span>(<span style="color:#cd5555">/usr/lib/llvm18/include</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#228b22"># Link directories
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#658b00">link_directories</span>(<span style="color:#cd5555">/usr/lib/llvm18/lib</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#228b22"># Add the shared library target
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#658b00">add_library</span>(<span style="color:#cd5555">pass</span> <span style="color:#cd5555">SHARED</span> <span style="color:#cd5555">pass.cpp</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2"></span><span style="color:#228b22"># Set the output name for the shared library
+</span></span></span><span style="display:flex;"><span><span style="color:#228b22"></span><span style="color:#658b00">set_target_properties</span>(<span style="color:#cd5555">pass</span> <span style="color:#cd5555">PROPERTIES</span> <span style="color:#cd5555">OUTPUT_NAME</span> <span style="color:#cd5555">&#34;pass.o&#34;</span>)<span style="color:#a61717;background-color:#e3d2d2">
+</span></span></span></code></pre></div><h1 id="运行">运行</h1>
+<p>有两种运行方式</p>
+<ul>
+<li>一种是适合调试时使用的，使用opt加载pass,修改IR</li>
+<li>一种是使用clang加载插件，直接编译成可执行文件</li>
+</ul>
+<p>编译、修改并运行 IR</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Shell" data-lang="Shell"><span style="display:flex;"><span>clang -emit-llvm -S main.c -o main.ll
+</span></span><span style="display:flex;"><span>opt -S -load-pass-plugin=./pass.so -passes=<span style="color:#cd5555">&#34;dynamic-cc&#34;</span> main.ll -o new_main.ll -print-pipeline-passes
+</span></span><span style="display:flex;"><span>cat main.ll
+</span></span><span style="display:flex;"><span>lli ./new_main.ll
+</span></span></code></pre></div><p>clang 方式</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Shell" data-lang="Shell"><span style="display:flex;"><span>clang -Xclang -fpass-plugin=./pass.so main.c -o main.exe
+</span></span><span style="display:flex;"><span>./main.exe
+</span></span></code></pre></div><h1 id="vscode-cpp--clangd-配置">Vscode cpp &amp;&amp; clangd 配置</h1>
+<p>安装了库之后，直接引入头文件，虽然编译可以，但是没有语法提示。这是因为编译我指定了llvm头文件路径，但是语法提示没有指定。</p>
+<p>vscode中c++语法提示一般就两个，一个微软官方出的C++，需要在.vscode中设置。一个是clangd，实际上是封装使用LSP协议的clangd，所以使用clangd的通用配置就可以。</p>
+<p>可以通过llvm-config-18 &ndash;includedir获取头文件目录</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Bash" data-lang="Bash"><span style="display:flex;"><span>$ llvm-config-18 --includedir
+</span></span><span style="display:flex;"><span>/sur/lib/llvm18/include
+</span></span></code></pre></div><h2 id="clangd">clangd</h2>
+<p>可以直接在项目更目录下添加<code>.clangd</code>文件</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Plain" data-lang="Plain"><span style="display:flex;"><span>CompileFlags:
+</span></span><span style="display:flex;"><span>  Add:
+</span></span><span style="display:flex;"><span>    - &#34;-I/usr/lib/llvm18/include&#34; # LLVM头文件路径
+</span></span><span style="display:flex;"><span>    - &#34;-std=c++17&#34;                # 使用C++17标准
+</span></span><span style="display:flex;"><span>    - &#34;-DLLVM_ENABLE_ASSERTIONS&#34;  # 如果需要启用断言
+</span></span></code></pre></div><p>或者在vscode的setting中添加参数，这个就只适用vscode，毕竟每个IDE封装LSP肯定有差异</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JSON" data-lang="JSON"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">&#34;clangd.fallbackFlags&#34;</span>: [
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;-std=c++17&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#cd5555">&#34;-I/usr/lib/llvm18/include&#34;</span>
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="微软c插件">微软C++插件</h2>
+<p>在项目根目录下的<code>.vscode/c_cpp_properties.json</code>中添加库路径</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#eed;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JSON" data-lang="JSON"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">&#34;configurations&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;name&#34;</span>: <span style="color:#cd5555">&#34;Linux&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;includePath&#34;</span>: [
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;${workspaceFolder}/**&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;/usr/lib/llvm18/include/llvm/**&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#cd5555">&#34;/usr/lib/llvm18/include/llvm-c/**&#34;</span>
+</span></span><span style="display:flex;"><span>            ],
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;defines&#34;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;compilerPath&#34;</span>: <span style="color:#cd5555">&#34;/usr/bin/clang&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;cStandard&#34;</span>: <span style="color:#cd5555">&#34;c17&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#8b008b;font-weight:bold">&#34;intelliSenseMode&#34;</span>: <span style="color:#cd5555">&#34;linux-clang-x64&#34;</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    <span style="color:#8b008b;font-weight:bold">&#34;version&#34;</span>: <span style="color:#b452cd">4</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h1 id="参考文档">参考文档</h1>
+<p><a href="https://apt.llvm.org/">LLVM Debian/Ubuntu nightly packages</a></p>
+<p><a href="https://www.less-bug.com/posts/llvm-implement-function-pass-from-scratch/">LLVM 从零开始实现LLVM PASS</a></p>
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2025-01-25</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts">
+			Next<br>No newer posts.
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/post/c&#43;&#43;-static-polymorphism/">
+			Previous<br>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="username/repo"
+        data-repo-id="**************************"
+        data-category="General"
+        data-category-id="*********************"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://military-axe.github.io/">
+    
+        <div class="nav-title">
+            Mi1itray.axe
+        </div>
+        
+        <div class="nav-subtitle">
+            mi1itray.axe@gmail.com
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%ae%89%e8%a3%85" class="nav-安装">
+									安装
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#ubuntudebain" class="nav-ubuntudebain">
+									Ubuntu/Debain
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#arch" class="nav-arch">
+									Arch
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#other-os" class="nav-other-os">
+									Other OS
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e6%89%8b%e5%8a%a8" class="nav-手动">
+									手动
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#windows" class="nav-windows">
+									Windows
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e7%bc%96%e8%af%91pass" class="nav-编译pass">
+									编译Pass
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%91%bd%e4%bb%a4%e8%a1%8c%e7%bc%96%e8%af%91" class="nav-命令行编译">
+									命令行编译
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#cmake%e7%bc%96%e8%af%91" class="nav-cmake编译">
+									CMake编译
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e8%bf%90%e8%a1%8c" class="nav-运行">
+									运行
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#vscode-cpp--clangd-%e9%85%8d%e7%bd%ae" class="nav-vscode-cpp--clangd-配置">
+									Vscode cpp &amp;&amp; clangd 配置
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#clangd" class="nav-clangd">
+									clangd
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%be%ae%e8%bd%afc%e6%8f%92%e4%bb%b6" class="nav-微软c插件">
+									微软C&#43;&#43;插件
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83%e6%96%87%e6%a1%a3" class="nav-参考文档">
+									参考文档
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div>
+
+<div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	mi1itray.axe copyright.
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>

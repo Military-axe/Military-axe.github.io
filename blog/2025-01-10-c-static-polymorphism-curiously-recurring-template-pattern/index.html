@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1">
+
+  
+      <link href="/css/fonts.css" rel="stylesheet" type="text/css">
+    
+  <title>C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</title><link rel="stylesheet" href="/css/hugo-octopress.css">
+
+  
+    <link rel="stylesheet" href="/css/fork-awesome.min.css">
+  
+    <link href="http://localhost:1313/favicon.png" rel="icon">
+  
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="">
+  <meta name="author" content="Mi1itray.axe"><meta name="generator" content="Hugo 0.153.2">
+
+</head>
+<body><header role="banner"><hgroup><h1><a href="http://localhost:1313/">Mi1itray.axe</a></h1>
+    <h2>mi1itray.axe@gmail.com</h2>
+</hgroup></header><nav role="navigation"><fieldset class="mobile-nav"><select onchange="location = this.value;">
+    <option value="">Navigate…</option>
+      
+        <option value="http://localhost:1313/">» Blog</option>
+      
+        <option value="http://localhost:1313/categories">» Categories</option>
+      
+        <option value="http://localhost:1313/tags">» Tags</option>
+      
+  </select>
+</fieldset><ul class="main-navigation">
+    
+      <li><a href="http://localhost:1313/" title="Blog">Blog</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/categories" title="Categories"  target="_blank"  rel="noopener noreferrer">Categories</a></li>
+    
+  
+    
+      <li><a href="http://localhost:1313/tags" title="Tags"  target="_blank"  rel="noopener noreferrer">Tags</a></li>
+    
+  
+</ul>
+
+<ul class="subscription">
+  
+    
+        <a href="http://localhost:1313/index.xml" target="_blank" type="application/rss+xml" title="RSS" rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+    
+  
+</ul>
+
+
+  <form action="https://www.google.com/search" method="get" target="_blank" rel="noopener noreferrer">
+    <fieldset role="search">
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      <input type="hidden" name="q" value="site:http://localhost:1313/" />
+    </fieldset>
+  </form>
+
+</nav>
+
+
+<div id="main">
+  <div id="content">
+    <div>
+      <article class="hentry" role="article">
+
+        
+        <header>
+  <p class="meta">Jan 10, 2025
+     - 5 minute read - <a class="label" href="http://localhost:1313/categories/c&#43;&#43;/">C&#43;&#43; </a>
+    
+  </p>
+  <h1 class="entry-title">
+     C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern 
+  </h1>
+</header>
+
+
+        <div class="entry-content">
+          
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#多态">多态</a>
+      <ul>
+        <li><a href="#动态多态">动态多态</a>
+          <ul>
+            <li><a href="#实现机制">实现机制</a></li>
+            <li><a href="#灵活性和可维护性">灵活性和可维护性</a></li>
+            <li><a href="#性能">性能</a></li>
+            <li><a href="#常见动态多态">常见动态多态</a></li>
+          </ul>
+        </li>
+        <li><a href="#静态多态">静态多态</a>
+          <ul>
+            <li><a href="#实现机制-1">实现机制</a></li>
+            <li><a href="#灵活性和可维护性-1">灵活性和可维护性</a></li>
+            <li><a href="#性能-1">性能</a></li>
+            <li><a href="#常见静态多态">常见静态多态</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#curiously-recurring-template-pattern">Curiously recurring template pattern</a>
+      <ul>
+        <li><a href="#实现机制与原理">实现机制与原理</a></li>
+        <li><a href="#汇编对比">汇编对比</a></li>
+        <li><a href="#优势">优势</a></li>
+      </ul>
+    </li>
+    <li><a href="#对象计数器">对象计数器</a></li>
+    <li><a href="#多态链">多态链</a></li>
+    <li><a href="#多态克隆函数">多态克隆函数</a></li>
+    <li><a href="#参考文档">参考文档</a></li>
+  </ul>
+</nav>
+          
+          <p>在看llvm新旧版pass manager的时候，看到其中一个设计是使用CRTP这种模式，对我来说还是很陌生的。或者说C++多态我都不太熟，于是简单学习一下这个部分（C++真tm难啊</p>
+<h1 id="多态">多态</h1>
+<p>多态（Polymorphism）是面向对象编程（Object - Oriented Programming，OOP）中的一个重要概念。它指的是同一个操作作用于不同的对象，可以有不同的解释，产生不同的执行结果。简单来说，多态允许使用统一的接口来处理多种不同类型的对象。</p>
+<p>在C++中多态分为两种，静态多态和动态多态。</p>
+<p>动态多态的优势是灵活性，能在运行时才确定具体类型。静态多态相对应的则是在性能上比动态多态更具备优势。动态多态是需要使用虚表来查找具体的函数实现，再通过函数指针间接调用函数，会造成性能的损失。</p>
+<h2 id="动态多态">动态多态</h2>
+<h3 id="实现机制">实现机制</h3>
+<p>依赖于虚函数表（v-table）。当一个类包含虚函数时，编译器会为这个类创建一个虚函数表，虚函数表中存储了虚函数的地址。每个含有虚函数的类对象内部会有一个指针（v-pointer），这个指针指向所属类的虚函数表。在运行时，当通过基类指针或引用调用虚函数时，就会根据对象的 v-pointer 找到对应的虚函数表，然后根据虚函数在表中的位置调用正确的函数。这种机制有一定的运行时开销，因为需要通过额外的指针查找来确定函数调用。</p>
+<h3 id="灵活性和可维护性">灵活性和可维护性</h3>
+<p>提供了高度的灵活性，特别是在处理具有层次结构的对象集合时。可以方便地添加新的派生类，只要遵循基类的虚函数接口规范，就可以在不修改原有代码（通过基类指针或引用调用虚函数的代码）的基础上，实现新的功能。例如，在一个图形绘制系统中，有<code>Shape</code>基类和<code>Circle</code>、<code>Rectangle</code>等派生类。如果要添加一个新的图形类型（如<code>Triangle</code>），只需要从<code>Shape</code>类派生，并重写<code>draw</code>等虚函数，而不用修改绘制图形的主程序代码（只要主程序是通过<code>Shape*</code>或<code>Shape&amp;</code>来调用<code>draw</code>函数的）。不过，动态多态的代码调试可能会稍微复杂一些，因为函数调用的实际路径是在运行时确定的。</p>
+<h3 id="性能">性能</h3>
+<p>由于运行时需要查找虚函数表来确定函数调用，会有一定的性能开销。每次通过基类指针或引用调用虚函数时，都需要进行间接的内存访问来获取虚函数表指针，然后再查找函数地址。在对性能要求极高的场景下，这种开销可能需要考虑。不过，现代编译器和处理器在优化方面也做了很多工作，在一定程度上减轻了这种性能损失。</p>
+<h3 id="常见动态多态">常见动态多态</h3>
+<p>常见的动态多态是通过虚函数来实现的</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;iostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;ostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;string&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;vector&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">constexpr</span> <span style="color:#dc322f">double</span> PI <span style="color:#719e07">=</span> <span style="color:#2aa198">3.14159</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Shape</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">virtual</span> <span style="color:#dc322f">double</span> area() <span style="color:#719e07">const</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Circle</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Shape {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> radius;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  Circle(<span style="color:#dc322f">double</span> r) <span style="color:#719e07">:</span> radius(r) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> <span style="color:#268bd2">area</span>() <span style="color:#719e07">const</span> <span style="color:#719e07">override</span> { <span style="color:#719e07">return</span> PI <span style="color:#719e07">*</span> radius <span style="color:#719e07">*</span> radius; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Bracket</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Shape {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> edge;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  Bracket(<span style="color:#dc322f">double</span> e) <span style="color:#719e07">:</span> edge(e) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> <span style="color:#268bd2">area</span>() <span style="color:#719e07">const</span> <span style="color:#719e07">override</span> { <span style="color:#719e07">return</span> edge <span style="color:#719e07">*</span> edge; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">double</span> <span style="color:#268bd2">sum_all_shape</span>(std<span style="color:#719e07">::</span>vector<span style="color:#719e07">&lt;</span>Shape<span style="color:#719e07">*&gt;</span> vec <span style="color:#719e07">=</span> {}) {
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> sum(<span style="color:#2aa198">0</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">for</span> (<span style="color:#719e07">auto</span> s : vec) {
+</span></span><span style="display:flex;"><span>    sum <span style="color:#719e07">+=</span> s<span style="color:#719e07">-&gt;</span>area();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> sum;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv) {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> (argc <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">-</span><span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Circle circle(std<span style="color:#719e07">::</span>stod(argv[<span style="color:#2aa198">1</span>]));
+</span></span><span style="display:flex;"><span>  Bracket bracket(std<span style="color:#719e07">::</span>stod(argv[<span style="color:#2aa198">2</span>]));
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>vector<span style="color:#719e07">&lt;</span>Shape <span style="color:#719e07">*&gt;</span> vec <span style="color:#719e07">=</span> {<span style="color:#719e07">&amp;</span>circle, <span style="color:#719e07">&amp;</span>bracket};
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>cout <span style="color:#719e07">&lt;&lt;</span> sum_all_shape(vec) <span style="color:#719e07">&lt;&lt;</span> std<span style="color:#719e07">::</span>endl;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="静态多态">静态多态</h2>
+<h3 id="实现机制-1">实现机制</h3>
+<p>函数重载是基于编译器对函数签名（包括函数名、参数类型、参数个数、参数顺序等）的匹配。编译器在编译阶段扫描代码，根据函数调用的实参情况，在符号表中查找匹配的函数定义。对于模板，编译器会在编译时根据模板参数进行模板实例化。它根据模板的定义和调用时提供的模板实参，生成具体的函数或类代码。相比动态多态，静态多态在编译时就确定了调用关系，没有运行时查找虚函数表的开销。</p>
+<h3 id="灵活性和可维护性-1">灵活性和可维护性</h3>
+<p>函数重载的灵活性相对较低。当需要增加新的功能，可能需要修改函数的参数列表或者添加新的重载函数，这可能会导致代码的膨胀和维护成本的增加。但是，由于函数调用是在编译时确定的，所以调试相对容易，编译器能够在编译阶段发现一些错误，如参数类型不匹配等。模板的灵活性较高，它可以用于创建通用的代码结构，适用于多种数据类型。不过，模板代码的编译错误信息可能比较复杂，而且模板的实例化过程可能会导致代码膨胀（生成了多个针对不同类型的函数或类版本）</p>
+<h3 id="性能-1">性能</h3>
+<p>因为函数调用是在编译时确定的，没有运行时查找虚函数表的开销，所以在性能上通常比动态多态要好。特别是对于一些对性能敏感的代码，如底层的数值计算库等，静态多态可以提供更好的性能。但是，模板的实例化可能会导致代码体积增大，这可能会对程序的加载时间和内存占用等方面产生一定的影响。</p>
+<h3 id="常见静态多态">常见静态多态</h3>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">add</span>(<span style="color:#dc322f">int</span> a, <span style="color:#dc322f">int</span> b) {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> a <span style="color:#719e07">+</span> b;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">double</span> <span style="color:#268bd2">add</span>(<span style="color:#dc322f">double</span> a, <span style="color:#dc322f">double</span> b) {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> a <span style="color:#719e07">+</span> b;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> result1 <span style="color:#719e07">=</span> add(<span style="color:#2aa198">3</span>, <span style="color:#2aa198">4</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> result2 <span style="color:#719e07">=</span> add(<span style="color:#2aa198">3.5</span>, <span style="color:#2aa198">4.5</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>模板也是实现静态多态的一种方式。例如函数模板</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#719e07">template</span><span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> T<span style="color:#719e07">&gt;</span>T max(T a, T b) {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> (a <span style="color:#719e07">&gt;</span> b)<span style="color:#719e07">?</span> a : b;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">int</span> result1 <span style="color:#719e07">=</span> max(<span style="color:#2aa198">3</span>, <span style="color:#2aa198">4</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> result2 <span style="color:#719e07">=</span> max(<span style="color:#2aa198">3.5</span>, <span style="color:#2aa198">4.5</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">return</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h1 id="curiously-recurring-template-pattern">Curiously recurring template pattern</h1>
+<p>Curiously Recurring Template Pattern（CRTP），即奇异递归模板模式，是一种 C++ 编程中的设计模式。它是一种基于模板的技术，用于在编译时实现静态多态性。这种模式的特点是将派生类作为模板参数传递给基类。</p>
+<p>使用这种方式来实现常规动态多态的例子</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;iostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;ostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;string&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">constexpr</span> <span style="color:#dc322f">double</span> PI <span style="color:#719e07">=</span> <span style="color:#2aa198">3.14159</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">class</span> <span style="color:#268bd2">T</span><span style="color:#719e07">&gt;</span> <span style="color:#719e07">class</span> <span style="color:#268bd2">Shape</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> area() { <span style="color:#719e07">return</span> <span style="color:#719e07">static_cast</span><span style="color:#719e07">&lt;</span>T <span style="color:#719e07">*&gt;</span>(<span style="color:#719e07">this</span>)<span style="color:#719e07">-&gt;</span>area_impl(); }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Circle</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Shape<span style="color:#719e07">&lt;</span>Circle<span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> radius;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  Circle(<span style="color:#dc322f">double</span> r) <span style="color:#719e07">:</span> radius(r) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> <span style="color:#268bd2">area_impl</span>() { <span style="color:#719e07">return</span> PI <span style="color:#719e07">*</span> radius <span style="color:#719e07">*</span> radius; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Bracket</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Shape<span style="color:#719e07">&lt;</span>Bracket<span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> edge;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  Bracket(<span style="color:#dc322f">double</span> e) <span style="color:#719e07">:</span> edge(e) {}
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> <span style="color:#268bd2">area_impl</span>() { <span style="color:#719e07">return</span> edge <span style="color:#719e07">*</span> edge; }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv) {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> (argc <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">-</span><span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  Circle circle(std<span style="color:#719e07">::</span>stod(argv[<span style="color:#2aa198">1</span>]));
+</span></span><span style="display:flex;"><span>  Bracket bracket(std<span style="color:#719e07">::</span>stod(argv[<span style="color:#2aa198">2</span>]));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">double</span> sum <span style="color:#719e07">=</span> circle.area() <span style="color:#719e07">+</span> bracket.area();
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>cout <span style="color:#719e07">&lt;&lt;</span> sum <span style="color:#719e07">&lt;&lt;</span> std<span style="color:#719e07">::</span>endl;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="实现机制与原理">实现机制与原理</h2>
+<ul>
+<li>
+<p>编译时多态性：CRTP 主要利用了模板在编译时实例化的特性。当编译器遇到<code>Shape&lt;T&gt;</code>这种模板实例化的代码时，它会在编译时生成具体的代码。在<code>Shape</code>类的<code>area</code>函数中，通过<code>static_cast</code>强制转换<code>this</code>指针，编译器能够确定转换后的类型是<code>T*</code>，因为<code>T</code>类在继承<code>Shape</code>类时明确了自己作为模板参数。这种在编译时确定的函数调用关系体现了静态多态性。</p>
+</li>
+<li>
+<p>代码生成与继承关系：由于<code>T</code>类继承自<code>Shape&lt;T&gt;</code>，<code>T</code>类中的成员函数（如<code>aera_impl</code>）可以访问<code>T</code>类中的成员（通过<code>static_cast</code>转换后的<code>this</code>指针）。编译器在生成代码时，会根据<code>T</code>类的实际定义来确定<code>aera_impl</code>函数的具体实现。例如，如果<code>T</code>类的<code>area_impl</code>函数有不同的实现逻辑，那么在不同的<code>T</code>类实例中，<code>Shape</code>类的<code>area</code>函数调用<code>aera_impl</code>函数时会产生不同的行为，这类似于多态性，但这种多态是在编译时确定的。</p>
+</li>
+</ul>
+<h2 id="汇编对比">汇编对比</h2>
+<p>使用静态多态，在编译时就确定了调用的函数</p>
+<pre tabindex="0"><code class="language-Assembly" data-lang="Assembly">lea     rcx, [rbp+40h+var_28]
+call    j_?area@?$Shape@VCircle@@@@QEAANXZ ; Shape&lt;Circle&gt;::area(void)
+movsd   [rbp+40h+var_A0], xmm0
+lea     rcx, [rbp+40h+var_50]
+</code></pre><p>对应的就是</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>v5 <span style="color:#719e07">=</span> Shape<span style="color:#719e07">&lt;</span>Circle<span style="color:#719e07">&gt;::</span>area();    
+</span></span></code></pre></div><p>而动态多态则需要在查询虚表获取函数指针</p>
+<pre tabindex="0"><code class="language-Assembly" data-lang="Assembly">mov     rax, [rax]
+mov     [rbp+var_38], rax
+mov     rcx, [rbp+var_38]
+mov     rax, [rcx]
+mov     rax, [rax]
+loc_14000C0E4:                          ; DATA XREF: .rdata:000000014010E5C4↓o
+try {
+  call    rax  
+} // starts at 14000C0E4
+loc_14000C0E6:                          ; DATA XREF: .rdata:000000014010E5CC↓o
+movsd   [rbp+var_48], xmm0
+jmp     $+5
+</code></pre><p>对应的c++代码是</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>v4 <span style="color:#719e07">=</span> (<span style="color:#719e07">*</span>v1)<span style="color:#719e07">-&gt;</span>area(<span style="color:#719e07">*</span>v1);
+</span></span></code></pre></div><h2 id="优势">优势</h2>
+<p>除了静态多态的固有优势外，这种模拟多态绑定的模式，可以方便的实现代码复用。虽然无法做到运行时多态那么灵活，但是也可以在一些场景中方便的做代码复用</p>
+<p>接下来介绍几种CRTP有优势场景</p>
+<h1 id="对象计数器">对象计数器</h1>
+<p>对象计数器的主要用途是检索给定类的对象创建和销毁统计数据，使用CRTP可以很简单的解决</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;cstdint&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;iostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;memory&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;string&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;vector&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> T<span style="color:#719e07">&gt;</span> <span style="color:#719e07">struct</span> <span style="color:#268bd2">counter</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">static</span> <span style="color:#268bd2">inline</span> <span style="color:#dc322f">int</span> objects_created <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">static</span> <span style="color:#268bd2">inline</span> <span style="color:#dc322f">int</span> objects_alive <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  counter() {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">++</span>objects_created;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">++</span>objects_alive;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  counter(<span style="color:#719e07">const</span> counter <span style="color:#719e07">&amp;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">++</span>objects_created;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">++</span>objects_alive;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">protected</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">~</span>counter() <span style="color:#586e75">// objects should never be removed through pointers of this type
+</span></span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">--</span>objects_alive;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">X</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> counter<span style="color:#719e07">&lt;</span>X<span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">uint32_t</span> x;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  X(<span style="color:#dc322f">uint32_t</span> val) <span style="color:#719e07">:</span> x(val) {}
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Y</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> counter<span style="color:#719e07">&lt;</span>Y<span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#dc322f">uint32_t</span> y;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  Y(<span style="color:#dc322f">uint32_t</span> val) <span style="color:#719e07">:</span> y(val) {}
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#dc322f">int</span> <span style="color:#268bd2">main</span>(<span style="color:#dc322f">int</span> argc, <span style="color:#dc322f">char</span> <span style="color:#719e07">**</span>argv) {
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">if</span> (argc <span style="color:#719e07">&lt;</span> <span style="color:#2aa198">3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">-</span><span style="color:#2aa198">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>vector<span style="color:#719e07">&lt;</span>std<span style="color:#719e07">::</span>unique_ptr<span style="color:#719e07">&lt;</span>X<span style="color:#719e07">&gt;&gt;</span> x_arr;
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>vector<span style="color:#719e07">&lt;</span>std<span style="color:#719e07">::</span>unique_ptr<span style="color:#719e07">&lt;</span>Y<span style="color:#719e07">&gt;&gt;</span> y_arr;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">for</span> (<span style="color:#719e07">auto</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> std<span style="color:#719e07">::</span>stoul(argv[<span style="color:#2aa198">1</span>]); <span style="color:#719e07">++</span>i) {
+</span></span><span style="display:flex;"><span>    x_arr.push_back(std<span style="color:#719e07">::</span>make_unique<span style="color:#719e07">&lt;</span>X<span style="color:#719e07">&gt;</span>(i));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">for</span> (<span style="color:#719e07">auto</span> i <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>; i <span style="color:#719e07">&lt;</span> std<span style="color:#719e07">::</span>stoul(argv[<span style="color:#2aa198">2</span>]); <span style="color:#719e07">++</span>i) {
+</span></span><span style="display:flex;"><span>    y_arr.push_back(std<span style="color:#719e07">::</span>make_unique<span style="color:#719e07">&lt;</span>Y<span style="color:#719e07">&gt;</span>(i));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>cout <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">&#34;object x num: &#34;</span> <span style="color:#719e07">&lt;&lt;</span> X<span style="color:#719e07">::</span>objects_alive <span style="color:#719e07">&lt;&lt;</span> std<span style="color:#719e07">::</span>endl;
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>cout <span style="color:#719e07">&lt;&lt;</span> <span style="color:#2aa198">&#34;object y num: &#34;</span> <span style="color:#719e07">&lt;&lt;</span> Y<span style="color:#719e07">::</span>objects_alive <span style="color:#719e07">&lt;&lt;</span> std<span style="color:#719e07">::</span>endl;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>每次创建 X 类对象时，都会调用计数器<X>的构造函数，使创建计数和存活计数递增。 每次销毁 X 类对象时，存活计数都会递减。</p>
+<p>需要注意的是，counter<X> 和 counter<Y> 是两个不同的类，这就是它们分别保存 X 和 Y 的计数的原因。 在 CRTP 的这个示例中，类的这种区别是模板参数（counter<T> 中的 T）的唯一用途，也是我们不能使用简单的非模板基类的原因。</p>
+<h1 id="多态链">多态链</h1>
+<p>方法链又称命名参数习语，是面向对象编程语言中调用多个方法的常用语法。 每个方法都会返回一个对象，这样就可以在一条语句中将这些调用串联起来，而无需使用变量来存储中间结果。</p>
+<p>多态链就是使用多态来实现方法链。先来看一个失败的例子，在未使用多态的情况下，链条可能会中断，无法连续调用。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;iostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;ostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">enum</span> <span style="color:#268bd2">Color</span> {
+</span></span><span style="display:flex;"><span>  Red,
+</span></span><span style="display:flex;"><span>  Blue,
+</span></span><span style="display:flex;"><span>  Green,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Printer</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  Printer(std<span style="color:#719e07">::</span>ostream <span style="color:#719e07">&amp;</span>pstream) <span style="color:#719e07">:</span> m_stream(pstream) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> T<span style="color:#719e07">&gt;</span> Printer <span style="color:#719e07">&amp;</span>print(T <span style="color:#719e07">&amp;&amp;</span>t) {
+</span></span><span style="display:flex;"><span>    m_stream <span style="color:#719e07">&lt;&lt;</span> t;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">*</span><span style="color:#719e07">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> T<span style="color:#719e07">&gt;</span> Printer <span style="color:#719e07">&amp;</span>println(T <span style="color:#719e07">&amp;&amp;</span>t) {
+</span></span><span style="display:flex;"><span>    m_stream <span style="color:#719e07">&lt;&lt;</span> t <span style="color:#719e07">&lt;&lt;</span> std<span style="color:#719e07">::</span>endl;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">*</span><span style="color:#719e07">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>ostream <span style="color:#719e07">&amp;</span>m_stream;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">CoutPrinter</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Printer {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  CoutPrinter() <span style="color:#719e07">:</span> Printer(std<span style="color:#719e07">::</span>cout) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  CoutPrinter <span style="color:#719e07">&amp;</span>SetConsoleColor(Color c) {
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// ...
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">*</span><span style="color:#719e07">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>上面的两个类，可以使用如下的链来打印</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>Printer(myStream).println(<span style="color:#2aa198">&#34;hello&#34;</span>).println(<span style="color:#2aa198">500</span>);
+</span></span></code></pre></div><p>但是如果使用父类的调用子类函数就会失败，哪怕链条最开始是由子类对象调用</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#586e75">//                           v----- we have a &#39;Printer&#39; here, not a &#39;CoutPrinter&#39;
+</span></span></span><span style="display:flex;"><span>CoutPrinter().print(<span style="color:#2aa198">&#34;Hello &#34;</span>).SetConsoleColor(Color.red).println(<span style="color:#2aa198">&#34;Printer!&#34;</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// compile error
+</span></span></span></code></pre></div><p>编译报错是因为，<code>print</code> 函数返回的是<code>Printer &amp;</code>类型，是基类，链后续调用的函数<code>SetConsoleColor</code>是子类函数，所以会报错。这里就需要用到多态，可以使用CRTP来避免这种问题</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;iostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">#include</span> <span style="color:#719e07">&lt;ostream&gt;</span><span style="color:#719e07">
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">enum</span> <span style="color:#268bd2">Color</span> {
+</span></span><span style="display:flex;"><span>  Red,
+</span></span><span style="display:flex;"><span>  Blue,
+</span></span><span style="display:flex;"><span>  Green,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> ConcretePrinter<span style="color:#719e07">&gt;</span> <span style="color:#719e07">class</span> <span style="color:#268bd2">Printer</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  Printer(std<span style="color:#719e07">::</span>ostream <span style="color:#719e07">&amp;</span>pstream) <span style="color:#719e07">:</span> m_stream(pstream) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> T<span style="color:#719e07">&gt;</span> Printer <span style="color:#719e07">&amp;</span>print(T <span style="color:#719e07">&amp;&amp;</span>t) {
+</span></span><span style="display:flex;"><span>    m_stream <span style="color:#719e07">&lt;&lt;</span> t;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">*</span><span style="color:#719e07">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> T<span style="color:#719e07">&gt;</span> Printer <span style="color:#719e07">&amp;</span>println(T <span style="color:#719e07">&amp;&amp;</span>t) {
+</span></span><span style="display:flex;"><span>    m_stream <span style="color:#719e07">&lt;&lt;</span> t <span style="color:#719e07">&lt;&lt;</span> std<span style="color:#719e07">::</span>endl;
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">*</span><span style="color:#719e07">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">private</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>ostream <span style="color:#719e07">&amp;</span>m_stream;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// Derived class
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">CoutPrinter</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Printer<span style="color:#719e07">&lt;</span>CoutPrinter<span style="color:#719e07">&gt;</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  CoutPrinter() <span style="color:#719e07">:</span> Printer(std<span style="color:#719e07">::</span>cout) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  CoutPrinter <span style="color:#719e07">&amp;</span>SetConsoleColor(Color c) {
+</span></span><span style="display:flex;"><span>    <span style="color:#586e75">// ...
+</span></span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> <span style="color:#719e07">*</span><span style="color:#719e07">this</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// usage
+</span></span></span><span style="display:flex;"><span>CoutPrinter().print(<span style="color:#2aa198">&#34;Hello &#34;</span>).SetConsoleColor(Color.red).println(<span style="color:#2aa198">&#34;Printer!&#34;</span>);
+</span></span></code></pre></div><h1 id="多态克隆函数">多态克隆函数</h1>
+<p>在使用多态性时，有时需要通过基类指针创建对象副本。 一个常用的成语就是在每个派生类中定义一个虚拟克隆函数。 CRTP 可用于避免在每个派生类中复制该函数或其他类似函数。</p>
+<div class="highlight"><pre tabindex="0" style="color:#93a1a1;background-color:#002b36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#586e75">// Base class has a pure virtual function for cloning
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">AbstractShape</span> {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">virtual</span> <span style="color:#719e07">~</span>AbstractShape() <span style="color:#719e07">=</span> <span style="color:#719e07">default</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#719e07">virtual</span> std<span style="color:#719e07">::</span>unique_ptr<span style="color:#719e07">&lt;</span>AbstractShape<span style="color:#719e07">&gt;</span> clone() <span style="color:#719e07">const</span> <span style="color:#719e07">=</span> <span style="color:#2aa198">0</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// This CRTP class implements clone() for Derived
+</span></span></span><span style="display:flex;"><span><span style="color:#719e07">template</span> <span style="color:#719e07">&lt;</span><span style="color:#719e07">typename</span> Derived<span style="color:#719e07">&gt;</span> <span style="color:#719e07">class</span> <span style="color:#268bd2">Shape</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> AbstractShape {
+</span></span><span style="display:flex;"><span><span style="color:#719e07">public</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  std<span style="color:#719e07">::</span>unique_ptr<span style="color:#719e07">&lt;</span>AbstractShape<span style="color:#719e07">&gt;</span> clone() <span style="color:#719e07">const</span> <span style="color:#719e07">override</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#719e07">return</span> std<span style="color:#719e07">::</span>make_unique<span style="color:#719e07">&lt;</span>Derived<span style="color:#719e07">&gt;</span>(<span style="color:#719e07">static_cast</span><span style="color:#719e07">&lt;</span>Derived <span style="color:#719e07">const</span> <span style="color:#719e07">&amp;&gt;</span>(<span style="color:#719e07">*</span><span style="color:#719e07">this</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">protected</span><span style="color:#719e07">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#586e75">// We make clear Shape class needs to be inherited
+</span></span></span><span style="display:flex;"><span>  Shape() <span style="color:#719e07">=</span> <span style="color:#719e07">default</span>;
+</span></span><span style="display:flex;"><span>  Shape(<span style="color:#719e07">const</span> Shape <span style="color:#719e07">&amp;</span>) <span style="color:#719e07">=</span> <span style="color:#719e07">default</span>;
+</span></span><span style="display:flex;"><span>  Shape(Shape <span style="color:#719e07">&amp;&amp;</span>) <span style="color:#719e07">=</span> <span style="color:#719e07">default</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#586e75">// Every derived class inherits from CRTP class instead of abstract class
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Square</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Shape<span style="color:#719e07">&lt;</span>Square<span style="color:#719e07">&gt;</span> {};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#719e07">class</span> <span style="color:#268bd2">Circle</span> <span style="color:#719e07">:</span> <span style="color:#719e07">public</span> Shape<span style="color:#719e07">&lt;</span>Circle<span style="color:#719e07">&gt;</span> {};
+</span></span></code></pre></div><p>静态多态性的一个问题是，如果不使用像上例中的 AbstractShape 这样的通用基类，派生类就无法同构存储，也就是说，无法将同一基类派生的不同类型放在同一容器中。 例如，定义为 std::vector&lt;Shape*&gt; 的容器是行不通的，因为 Shape 不是一个类，而是一个需要特殊化的模板。 定义为 std::vector&lt;Shape<Circle><em>&gt; 的容器只能存储圆形，而不能存储正方形。 这是因为从 CRTP 基类 Shape 派生的每个类都是唯一的类型。 解决这一问题的常见方法是从具有虚拟析构函数的共享基类继承，如上面的 AbstractShape 示例，这样就可以创建一个 std::vector&lt;AbstractShape</em>&gt;。</p>
+<h1 id="参考文档">参考文档</h1>
+<p>
+<a href="https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern</a></p>
+        </div>
+        <footer>
+  <p class="meta">
+    <span class="byline author vcard">Posted by <span class="fn">Mi1itray.axe</span></span><time>Jan 10, 2025</time>
+    
+      <span class="categories">
+        Tags:<a class="category" href="http://localhost:1313/tags/c&#43;&#43;">c&#43;&#43;</a>  <a class="category" href="http://localhost:1313/tags/polymorphism">polymorphism</a>  <a class="category" href="http://localhost:1313/tags/crtp">CRTP</a>  
+    
+    </span>
+  </p><p class="meta">
+    
+        <a class="basic-alignment left" href="http://localhost:1313/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/" title="Windows进程隐藏初探">Windows进程隐藏初探</a>
+    
+
+    
+      <a class="basic-alignment right" href="http://localhost:1313/blog/2025-01-25-llvm-base-development-environment-configuration/" title="llvm base development environment configuration">llvm base development environment configuration</a>
+    
+  </p>
+  
+  
+</footer>
+
+
+      </article>
+    </div>
+    <aside class="sidebar thirds">
+  <section class="first odd">
+
+    
+      <h1>About</h1>
+    
+
+    <p>
+      
+        <p>mi1itray.axe&rsquo;s blog</p>
+<p>This blog is mainly used to record my learning in the field of CTF. The main direction is Reverse.</p>
+<p>You can use gpg to contact me, My public key in 
+<a href="./gpg_publickey.asc">here</a></p>
+
+      
+    </p>
+  </section><ul class="sidebar-nav">
+  <li class="sidebar-nav-item">
+    <a target="_blank" rel="noopener noreferrer" href="https://github.com/Military-axe" title="https://github.com/Military-axe"><i class="fa fa-github fa-3x"></i></a>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    </li>
+</ul>
+    
+      <section class="odd">
+        
+          <h1>Friend Link</h1>
+        
+        
+          <li>
+            <a href="https://h0pe-ay.github.io/" title="h0pe" >h0pe</a>
+          </li>
+        
+          <li>
+            <a href="https://lindll.github.io/" title="l0ck" >l0ck</a>
+          </li>
+        
+          <li>
+            <a href="https://www.cnblogs.com/Ar3sh1" title="Ar3sh1" >Ar3sh1</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com/WyHlj" title="Char0n" >Char0n</a>
+          </li>
+        
+          <li>
+            <a href="https://southsea.st/" title="southsea" >southsea</a>
+          </li>
+        
+      </section>
+    
+  
+    
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-25-llvm-base-development-environment-configuration/">llvm base development environment configuration</a>
+              </li>
+            
+          
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2025-01-10-c-static-polymorphism-curiously-recurring-template-pattern/">C&#43;&#43; static polymorphism &amp;&amp; Curiously recurring template pattern</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-30-windows%E8%BF%9B%E7%A8%8B%E9%9A%90%E8%97%8F%E5%88%9D%E6%8E%A2/">Windows进程隐藏初探</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-05-06-%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E5%AE%9E%E7%8E%B0%E8%B7%A8%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E8%AF%BB%E5%86%99/">通过修改物理内存实现跨进程内存读写</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-04-29-%E5%8F%A5%E6%9F%84%E9%99%8D%E6%9D%83%E7%BB%95%E8%BF%87callbacks%E6%A3%80%E6%9F%A5/">句柄降权绕过CallBacks检查</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-22-rust%E7%BC%96%E5%86%99%E5%87%A0%E7%A7%8Dhook%E7%9A%84%E6%96%B9%E5%BC%8F/">Rust编写几种hook的方式</a>
+              </li>
+            
+          
+            
+              <li class="post">
+                <a href="/blog/2024-03-19-%E5%88%A9%E7%94%A8peb%E9%81%8D%E5%8E%86%E6%A8%A1%E5%9D%97%E9%93%BE%E8%A1%A8/">利用PEB遍历模块链表</a>
+              </li>
+            
+          
+        </ul>
+      </section>
+    
+  
+</aside>
+
+  </div>
+</div>
+
+    <footer role="contentinfo">
+      <p>Copyright &copy; 2025 Mi1itray.axe - <a href="http://localhost:1313/license/">License</a> -
+        <span class="credit">Powered by <a target="_blank" href="https://gohugo.io" rel="noopener noreferrer">Hugo</a> and <a target="_blank" href="https://github.com/parsiya/hugo-octopress/" rel="noopener noreferrer">Hugo-Octopress</a> theme.
+      </p>
+    </footer>
+  </body>
+</html>
+
